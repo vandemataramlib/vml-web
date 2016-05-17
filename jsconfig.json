@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "system"
+    },
+    "exclude": [
+        "build",
+        "node_modules",
+        "public"
+    ]
+}
