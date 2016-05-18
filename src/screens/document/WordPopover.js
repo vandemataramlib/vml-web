@@ -11,6 +11,7 @@ export default class WordPopover extends Component {
 
         super(props);
         this.handleWordChange = this.handleWordChange.bind(this);
+        this.handleSave = this.handleSave.bind(this);
         this.state = {
             localWord: this.props.word ? this.props.word.word : null
         };
@@ -21,6 +22,20 @@ export default class WordPopover extends Component {
         this.setState({
             localWord: value
         });
+    }
+
+    handleSave(event) {
+
+        const originalWord = this.props.word;
+
+        const wordAnalysis = this.state.localWord.split(' ').map((word, wordIndex) => {
+
+            return {
+                id: originalWord.id + '.' + (wordIndex + 1),
+                token: word
+            };
+        });
+        this.props.onSaveWordAnalysis(event, { wordId: originalWord.id, analysis: wordAnalysis });
     }
 
     render() {
@@ -46,7 +61,7 @@ export default class WordPopover extends Component {
                 <div className="row" style={ styles.createButton }>
                     <div className="col-xs-12">
                         <FlatButton label="Cancel" secondary onTouchTap={ this.props.onTouchTapCancel } />
-                        <FlatButton label="Save" primary onTouchTap={ this.props.onTouchTapSave } />
+                        <FlatButton label="Save" primary onTouchTap={ this.handleSave } />
                     </div>
                 </div>
             </div>

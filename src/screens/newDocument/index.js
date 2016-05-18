@@ -121,23 +121,33 @@ export class TextForm extends Component {
                     const wordId = (verseIndex + 1) + '.' + (lineIndex + 1) + '.' + (wordIndex + 1);
                     return { id: wordId, word };
                 });
-                return { id: (verseIndex + 1) + '.' + (lineIndex + 1), words };
+                return { id: (verseIndex + 1) + '.' + (lineIndex + 1), words, line };
             });
-            return { id: verseIndex + 1, lines };
+            return { id: verseIndex + 1, lines, verse };
         });
 
-        // debugger;
-
         const documentObject = {
-            id: Date.now(),
+            id: Date.now().toString(),
             title: documentTitle,
+            slug,
             category: this.documentCategory.props.value,
             subCategory: this.documentSubCategory.getValue(),
             tags: this.documentTags.getValue().split(',').map((tag) => tag.trim()),
             text: verses
         };
 
-        localStorage.setItem(slug, JSON.stringify(documentObject));
+        let documents = localStorage.getItem('documents');
+
+        if (!documents) {
+            documents = [];
+        } else {
+            documents = JSON.parse(documents);
+        }
+
+        documents.push(documentObject);
+
+        // localStorage.setItem(slug, JSON.stringify(documentObject));
+        localStorage.setItem('documents', JSON.stringify(documents));
         this.props.router.push(`/documents/${slug}`);
     }
 

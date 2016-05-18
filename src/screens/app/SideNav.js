@@ -24,8 +24,8 @@ const menus = [
         group: 'Documents',
         items: [
             {
-                u: '/documents/IshopaniShat',
-                t: Sanscript.t('IshopaniShat', 'itrans', 'devanagari')
+                u: '/documents/IshopaniShad',
+                t: Sanscript.t('IshopaniShad', 'itrans', 'devanagari')
             }
         ]
     }

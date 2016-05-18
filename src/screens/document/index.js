@@ -1,22 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import Toggle from 'material-ui/Toggle';
-import Popover from 'material-ui/Popover';
+import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
-import Sanscript from 'sanscript';
 import { withRouter } from 'react-router';
 import { assign } from 'lodash';
 import { grey300, grey500 } from 'material-ui/styles/colors';
 
 import PaperCustom from '../shared/PaperCustom';
-import WordPopover from './WordPopover';
+import ParagraphDialog from './ParagraphDialog';
 import { translit } from '../shared/utils';
 
 export class Document extends Component {
     constructor(props) {
 
         super(props);
-        // this.handleAnnotateClicked = this.handleAnnotateClicked.bind(this);
         this.handleAnnotateToggled = this.handleAnnotateToggled.bind(this);
         this.handleWordClicked = this.handleWordClicked.bind(this);
         this.handleWordHoveredIn = this.handleWordHoveredIn.bind(this);
@@ -27,16 +25,18 @@ export class Document extends Component {
         this.state = {
             document: {},
             annotateMode: false,
-            wordPopoverOpen: false
+            wordPopoverOpen: false,
+            selected: {}
         };
     }
 
     componentWillMount() {
 
         const documentTitleSlug = this.props.params.title;
-        const document = localStorage.getItem(documentTitleSlug);
+        const documents = localStorage.getItem('documents');
+        const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
         this.setState({
-            document: JSON.parse(document)
+            document
         });
     }
 
@@ -72,12 +72,11 @@ export class Document extends Component {
 
         if (this.state.annotateMode) {
             event.preventDefault();
-            const word = event.target.attributes['data-word'].value;
-            const wordId = event.target.attributes['data-word-id'].value;
+            const docId = event.target.attributes['data-document-id'].value;
+            const verseId = event.target.attributes['data-verse-id'].value;
             this.setState({
                 wordPopoverOpen: true,
-                anchorEl: event.currentTarget,
-                word: { word, wordId }
+                selected: { docId, verseId }
             });
         }
     }
@@ -90,25 +89,6 @@ export class Document extends Component {
         });
     }
 
-    getPopoverContent() {
-
-        if (!this.state.word) {
-            return null;
-        }
-        return (
-            <div style={ styles.popoverStyle }>
-                <h3>{ translit(this.state.word.word) }</h3>
-                <TextField id="itrans-word" defaultValue={ this.state.word.word } />
-                <div className="row">
-                    <div className="col-xs-12" style={ styles.createButton }>
-                        <FlatButton label="Save" primary onTouchTap={ this.handleSaveTap } />
-                        <FlatButton label="Cancel" secondary onTouchTap={ this.handleCancelWordPopover } />
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     handleSaveTap() {
 
         console.log('save');
@@ -119,60 +99,40 @@ export class Document extends Component {
         this.handleRequestClose(event);
     }
 
+    getDialogActions() {
+
+        return [
+            <FlatButton
+                label="Cancel"
+                secondary
+                onTouchTap={ this.handleClose }
+                />,
+            <FlatButton
+                label="Save"
+                primary
+                onTouchTap={ this.handleClose }
+                />
+        ];
+    }
+
     render() {
 
         const verses = this.state.document.text.map((verse) => {
 
-            const numLines = verse.lines.length;
+            // const numLines = verse.lines.length;
 
             return (
-                <p id={ 'p' + verse.id } key={ verse.id }>
-                    { verse.lines.map((line, lineIndex) => {
-
-                        let verseId = '';
-                        if (numLines === lineIndex + 1) {
-                            verseId = ` ||${verse.id}||`;
-                        }
-
-                        const wordsMap = line.words.map((word, wordIndex) => {
-
-                            const wordEl = (
-                                <span
-                                    data-word={ word.word }
-                                    data-word-id={ word.id }
-                                    onMouseOver={ this.handleWordHoveredIn }
-                                    onMouseOut={ this.handleWordHoveredOut }
-                                    onTouchTap={ this.handleWordClicked }
-                                    style={ styles.paragraph(this.state.annotateMode) }
-                                    key={ word.id }
-                                    >
-                                    { translit(word.word) }
-                                </span>
-                            );
-                            return wordIndex === 0 ?
-                                wordEl :
-                                React.Children.toArray([
-                                    <span style={ styles.emptySpace }>&nbsp; </span>,
-                                    wordEl
-                                ]);
-                        });
-
-                        const wordsEl = (
-                            <span id={ line.id } key={ line.id }>
-                                { wordsMap }
-                            </span>
-                        );
-
-                        return (
-                            lineIndex === 0 ?
-                                wordsEl :
-                                React.Children.toArray([
-                                    <br/>,
-                                    wordsEl
-                                ])
-                        );
-                    }) }
-                </p>
+                <p
+                    onMouseEnter={ this.handleWordHoveredIn }
+                    onMouseLeave={ this.handleWordHoveredOut }
+                    onTouchTap={ this.handleWordClicked }
+                    data-document-id={ this.state.document.id }
+                    data-verse-id={ verse.id }
+                    id={ 'p' + verse.id }
+                    style={ styles.paragraph(this.state.annotateMode) }
+                    key={ verse.id }
+                    dangerouslySetInnerHTML={ { __html: verse.verse.split('\n').map((line) => translit(line.trim())).join('<br />') } }
+                    />
             );
         });
 
@@ -199,15 +159,14 @@ export class Document extends Component {
                         </div>
                     </PaperCustom>
                 </div>
-                <Popover
+                <Dialog
+                    title={ `Verse ${this.state.selected.verseId}` }
                     open={ this.state.wordPopoverOpen }
-                    anchorEl={ this.state.anchorEl }
-                    anchorOrigin={ { horizontal: 'left', vertical: 'top' } }
-                    targetOrigin={ { horizontal: 'left', vertical: 'top' } }
                     onRequestClose={ this.handleRequestClose }
-                    canAutoPosition
-                    autoCloseWhenOffScreen={ false }
-                    children={ <WordPopover word={ this.state.word } onTouchTapSave={ this.handleSaveTap } onTouchTapCancel={ this.handleCancelWordPopover } /> }
+                    children={ <ParagraphDialog selected={ this.state.selected } /> }
+                    autoScrollBodyContent
+                    contentStyle={ styles.dialogStyle }
+                    actions={ this.getDialogActions() }
                     />
             </div>
         );
@@ -241,9 +200,9 @@ const styles = {
     emptySpace: {
         margin: '0px -5px'
     },
-    popoverStyle: {
-        padding: '5px 10px',
-        minWidth: 200
+    dialogStyle: {
+        width: '75%',
+        maxWidth: 'none'
     }
 };
 

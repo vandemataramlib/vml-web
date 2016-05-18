@@ -28,6 +28,7 @@
     "radium": "^0.17.1",
     "radium-grid": "^2.0.0",
     "react": "^15.0.2",
+    "react-anything-sortable": "^1.5.0",
     "react-dom": "^15.0.2",
     "react-router": "^2.4.0",
     "sanscript": "0.0.2",

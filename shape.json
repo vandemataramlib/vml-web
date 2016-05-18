@@ -1,0 +1,201 @@
+{
+    "id": "1231231231",
+    "title": "bhAgavadgItA",
+    "verses": [
+        {
+            "id": "1",
+            "verse": "mayyAveshya mano ye mA.m nityayuktA upAsate .\nshraddhayA parayopetAste me yuktatamA matAH ..1..",
+            "lines": [
+                {
+                    "id": "1.1",
+                    "line": "mayyAveshya mano ye mA.m nityayuktA upAsate",
+                    "words": [
+                        {
+                            "id": "1.1.1",
+                            "word": "mayyAveshya",
+                            "analysis": [
+                                {
+                                    "id": "1.1.1.1",
+                                    "token": "mayi",
+                                    "defId": "12345"
+                                },
+                                {
+                                    "token": "Aveshya",
+                                    "id": "1.1.1.2",
+                                    "defId": "12345",
+                                    "etymology": [
+                                        {
+                                            "token": "A",
+                                            "type": "prefix",
+                                            "defId": "23433"
+                                        },
+                                        {
+                                            "token": "vish",
+                                            "type": "root",
+                                            "defId": "34567"
+                                        },
+                                        {
+                                            "token": "ya",
+                                            "type": "suffix",
+                                            "defId": "232343"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "1.1.2",
+                            "word": "mano",
+                            "analysis": [
+                                {
+                                    "token": "manaH",
+                                    "id": "1.1.2.1",
+                                    "defId": "12345"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "1.1.3",
+                            "word": "ye",
+                            "analysis": [
+                                {
+                                    "token": "ye",
+                                    "id": "1.1.3.1",
+                                    "defId": "12345"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "1.1.4",
+                            "word": "mA.m",
+                            "analysis": [
+                                {
+                                    "token": "mA.m",
+                                    "id": "1.1.4.1"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "1.1.5",
+                            "word": "nityayuktA",
+                            "analysis": [
+                                {
+                                    "token": "nityayuktAH",
+                                    "id": "1.1.5.1"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "1.1.6",
+                            "word": "upAsate",
+                            "analysis": [
+                                {
+                                    "id": "1.1.6.1",
+                                    "token": "upAsate"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "txt": "shraddhayA parayopetAste me yuktatamA matAH",
+                    "words": [
+                        {
+                            "txt": "shraddhayA",
+                            "seq": 5
+                        },
+                        {
+                            "txt": "parayopetAste",
+                            "vicid": "axbycc",
+                            "vic": [
+                                {
+                                    "txt": "parayA",
+                                    "seq": 4
+                                },
+                                {
+                                    "txt": "upetAH",
+                                    "seq": 6
+                                },
+                                {
+                                    "txt": "te",
+                                    "seq": 10
+                                }
+                            ]
+                        },
+                        {
+                            "txt": "me",
+                            "seq": 12
+                        },
+                        {
+                            "txt": "yuktatamA",
+                            "vicid": "axbycd",
+                            "vic": [
+                                {
+                                    "txt": "yuktatamAH",
+                                    "seq": 11
+                                }
+                            ]
+                        },
+                        {
+                            "txt": "matAH",
+                            "seq": 13
+                        }
+                    ]
+                }
+            ],
+            "analysis": [
+                {
+                    "token": "mayi",
+                    "id": "6.1.1.1",
+                    "defId": "12345"
+                },
+                {
+                    "token": "Aveshya",
+                    "id": "6.1.1.2",
+                    "defId": "12345"
+                },
+                {
+                    "token": "manaH",
+                    "defId": "12345"
+                },
+                {
+                    "token": "ye",
+                    "defId": "12345"
+                },
+                {
+                    "token": "mA.m"
+                },
+                {
+                    "token": "nitya"
+                },
+                {
+                    "token": "yuktAH"
+                },
+                {
+                    "token": "upAsate"
+                },
+                {
+                    "token": "shraddhayA"
+                },
+                {
+                    "token": "parayA"
+                },
+                {
+                    "token": "upetAH"
+                },
+                {
+                    "token": "te"
+                },
+                {
+                    "token": "me"
+                },
+                {
+                    "token": "yuktatamAH"
+                },
+                {
+                    "token": "matAH"
+                }
+            ]
+        }
+    ]
+}
