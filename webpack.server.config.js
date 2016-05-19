@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
 
@@ -25,6 +26,14 @@ module.exports = {
         __filename: true,
         __dirname: true
     },
+
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                'SERVER': true
+            }
+        })
+    ],
 
     module: {
         loaders: [

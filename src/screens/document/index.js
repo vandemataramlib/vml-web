@@ -3,9 +3,10 @@ import Toggle from 'material-ui/Toggle';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import ActionBookmark from 'material-ui/svg-icons/action/bookmark';
 import { withRouter } from 'react-router';
 import { assign, isEmpty, slice, concat, findIndex } from 'lodash';
-import { grey300, grey500 } from 'material-ui/styles/colors';
+import { orange500, grey300, grey500 } from 'material-ui/styles/colors';
 
 import PaperCustom from '../shared/PaperCustom';
 import ParagraphDialog from './ParagraphDialog';
@@ -30,7 +31,7 @@ export class Document extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
 
         const documentTitleSlug = this.props.params.title;
         const documents = localStorage.getItem('documents');
@@ -40,11 +41,12 @@ export class Document extends Component {
         });
     }
 
-    componentWillUpdate(nextProps) {
+    componentWillReceiveProps(nextProps) {
 
         const documentTitleSlug = nextProps.params.title;
-        const document = localStorage.getItem(documentTitleSlug);
-        this.state.document = JSON.parse(document);
+        const documents = localStorage.getItem('documents');
+        const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
+        this.state.document = document;
     }
 
     handleAnnotateToggled(event, value) {
@@ -113,9 +115,13 @@ export class Document extends Component {
 
     render() {
 
+        if (!this.state.document.text) {
+            return null;
+        }
+
         const verses = this.state.document.text.map((verse) => {
 
-            // const numLines = verse.lines.length;
+            const numLines = verse.lines.length;
 
             return (
                 <p
@@ -125,10 +131,30 @@ export class Document extends Component {
                     data-document-id={ this.state.document.id }
                     data-verse-id={ verse.id }
                     id={ 'p' + verse.id }
-                    style={ styles.paragraph(this.state.annotateMode, verse.analysis) }
+                    style={ styles.paragraph(this.state.annotateMode) }
                     key={ verse.id }
-                    dangerouslySetInnerHTML={ { __html: verse.verse.split('\n').map((line) => translit(line.trim())).join('<br />') } }
-                    />
+                    >
+                    {
+                        verse.verse.split('\n').map((line, lineIndex) => {
+
+                            const lineEl = numLines === lineIndex + 1 && verse.analysis ?
+                                React.Children.toArray([
+                                    translit(line.trim()),
+                                    <ActionBookmark color={ orange500 } style={ styles.analysedIndicator }/>
+                                ]) :
+                                translit(line.trim());
+
+                            if (lineIndex === 0) {
+                                return lineEl;
+                            }
+
+                            return React.Children.toArray([
+                                <br/>,
+                                lineEl
+                            ]);
+                        })
+                    }
+                </p>
             );
         });
 
@@ -175,7 +201,7 @@ const styles = {
     mainBody: {
         marginTop: 10
     },
-    paragraph: function (isAnnotationMode, analysed) {
+    paragraph: function (isAnnotationMode) {
 
         const style = {
             padding: 5
@@ -187,12 +213,6 @@ const styles = {
             });
         }
 
-        if (analysed) {
-            assign(style, {
-                backgroundColor: grey300
-            });
-        }
-
         return style;
     },
     hovered: {
@@ -200,6 +220,9 @@ const styles = {
     },
     emptySpace: {
         margin: '0px -5px'
+    },
+    analysedIndicator: {
+        float: 'right'
     }
 };
 

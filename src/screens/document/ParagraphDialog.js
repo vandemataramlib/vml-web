@@ -17,6 +17,9 @@ export default class ParagraphDialog extends Component {
         this.handleWordClicked = this.handleWordClicked.bind(this);
         this.handleTokenSort = this.handleTokenSort.bind(this);
         this.handleAnalyseClick = this.handleAnalyseClick.bind(this);
+        this.handleRequestClose = this.handleRequestClose.bind(this);
+        this.handleSaveWordAnalysis = this.handleSaveWordAnalysis.bind(this);
+        this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
         this.state = {
             wordPopoverOpen: false,
             showAnalysis: false,
@@ -28,15 +31,33 @@ export default class ParagraphDialog extends Component {
 
     componentWillMount() {
 
-        const documents = JSON.parse(localStorage.getItem('documents'));
-        const document = documents.find((document) => document.id === this.props.selected.docId);
-        const verse = document.text[this.props.selected.verseId - 1];
-        this.handleRequestClose = this.handleRequestClose.bind(this);
-        this.handleSaveWordAnalysis = this.handleSaveWordAnalysis.bind(this);
-        this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
+        const verse = this.getVerse(this.props.selected.docId, this.props.selected.verseId);
         this.setState({
-            verse: assign({}, verse)
+            verse: assign({}, verse),
+            unalysed: verse.analysis ? false : true,
+            analysedTokens: verse.analysis ? this.getAnalysedTokens(verse) : [],
+            rearrangedTokens: verse.analysis ? verse.analysis : [],
+            showAnalysis: verse.analysis ? true : false
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        const verse = this.getVerse(nextProps.selected.docId, nextProps.selected.verseId);
+        this.setState({
+            verse: assign({}, verse),
+            unalysed: verse.analysis ? false : true,
+            analysedTokens: verse.analysis ? this.getAnalysedTokens(verse) : [],
+            rearrangedTokens: verse.analysis ? verse.analysis : [],
+            showAnalysis: verse.analysis ? true : false
+        });
+    }
+
+    getVerse(docId, verseId) {
+
+        const documents = JSON.parse(localStorage.getItem('documents'));
+        const document = documents.find((document) => document.id === docId);
+        return document.text[verseId - 1];
     }
 
     handleWordHoveredIn(event) {
@@ -104,6 +125,26 @@ export default class ParagraphDialog extends Component {
             analysedTokens,
             rearrangedTokens: analysedTokens
         });
+    }
+
+    getAnalysedTokens(verse) {
+
+        const analysedTokens = [];
+
+        const unanalysedLine = verse.lines.find((line) => {
+
+            const unanalysedWord = line.words.find((word) => {
+
+                if (word.analysis) {
+                    analysedTokens.push(word.analysis.map((analysedToken) => { return { id: analysedToken.id, token: analysedToken.token }; }));
+                }
+                return !word.analysis ? true : false;
+            });
+
+            return unanalysedWord ? true : false;
+        });
+
+        return flatten(analysedTokens);
     }
 
     handleCancelWordPopover(event) {
@@ -223,6 +264,7 @@ export default class ParagraphDialog extends Component {
             <FlatButton
                 label="Save"
                 primary
+                disabled={ this.state.unalysed }
                 onTouchTap={ this.props.onSave.bind(this, this.props.selected, verse) }
                 />
         ];

@@ -3,41 +3,39 @@ import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import Subheader from 'material-ui/Subheader';
-import Sanscript from 'sanscript';
 import { Link } from 'react-router';
 
-const menus = [
-    {
-        group: 'Admin',
-        items: [
-            {
-                u: '/new',
-                t: 'New document'
-            },
-            {
-                u: '/about',
-                t: 'About'
-            }
-        ]
-    },
-    {
-        group: 'Documents',
-        items: [
-            {
-                u: '/documents/IshopaniShad',
-                t: Sanscript.t('IshopaniShad', 'itrans', 'devanagari')
-            }
-        ]
-    }
-];
+import { translit } from '../shared/utils';
 
 export default class SideNav extends Component {
-    // constructor(props) {
-
-    //     super(props);
-    // }
-
     render() {
+
+        const menus = [
+            {
+                group: 'Admin',
+                items: [
+                    {
+                        u: '/new',
+                        t: 'New document'
+                    },
+                    {
+                        u: '/about',
+                        t: 'About'
+                    }
+                ]
+            }
+        ];
+
+        if (process.env && !process.env.SERVER) {
+
+            const documents = localStorage.getItem('documents');
+
+            if (documents) {
+                const documentsObj = JSON.parse(documents);
+                const documentMenuItems = documentsObj.map((doc) => { return { u: `/documents/${doc.slug}`, t: translit(doc.title) }; });
+                menus.push({ group: 'Documents', items: documentMenuItems });
+            }
+        }
 
         return (
             <Drawer open={ this.props.open } docked={ false } onRequestChange={ this.props.onClose }>
