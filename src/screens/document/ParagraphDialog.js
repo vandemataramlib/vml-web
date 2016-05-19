@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Dialog from 'material-ui/Dialog';
 import Popover from 'material-ui/Popover';
 import FlatButton from 'material-ui/FlatButton';
 import Sortable from 'react-anything-sortable';
@@ -7,7 +8,7 @@ import { assign, flatten } from 'lodash';
 
 import WordPopover from './WordPopover';
 import SortableToken from './SortableToken';
-import { translit, getColour } from '../shared/utils';
+import { translit, getColour, getLightColour } from '../shared/utils';
 
 export default class ParagraphDialog extends Component {
     constructor(props) {
@@ -20,7 +21,8 @@ export default class ParagraphDialog extends Component {
             wordPopoverOpen: false,
             showAnalysis: false,
             analysedTokens: [],
-            rearrangedTokens: []
+            rearrangedTokens: [],
+            unalysed: true
         };
     }
 
@@ -98,7 +100,7 @@ export default class ParagraphDialog extends Component {
 
         this.setState({
             verse,
-            stillUnalysed: unanalysedLine ? true : false,
+            unalysed: unanalysedLine ? true : false,
             analysedTokens,
             rearrangedTokens: analysedTokens
         });
@@ -119,7 +121,6 @@ export default class ParagraphDialog extends Component {
 
     handleTokenSort(data) {
 
-        // console.log(data);
         this.setState({
             rearrangedTokens: data
         });
@@ -133,9 +134,7 @@ export default class ParagraphDialog extends Component {
         });
     }
 
-    render() {
-        
-        console.log('render');
+    getChildren() {
 
         return (
             <div>
@@ -189,11 +188,11 @@ export default class ParagraphDialog extends Component {
                     }) }
                 </p>
                 <div style={ styles.analyseButton }>
-                    <FlatButton label="Analyse" primary disabled={ this.state.stillUnalysed } onTouchTap={ this.handleAnalyseClick } />
+                    <FlatButton label="Analyse" primary disabled={ this.state.unalysed } onTouchTap={ this.handleAnalyseClick } />
                 </div>
                 <div style={ styles.showAnalysis(this.state.showAnalysis) }>
                     <Sortable onSort={ this.handleTokenSort } dynamic>
-                        { this.state.rearrangedTokens.map((token, i) => <SortableToken sortData={ { id: token.id, token: token.token } } key={ i }><span style={ assign({ color: getColour(i) }, styles.analysedToken) } key={ i }>{ translit(token.token) }</span></SortableToken>) }
+                        { this.state.rearrangedTokens.map((token, i) => <SortableToken sortData={ { id: token.id, token: token.token } } key={ i }><span style={ assign({ backgroundColor: getLightColour(i) }, styles.analysedToken) } key={ i }>{ translit(token.token) }</span></SortableToken>) }
                     </Sortable>
                 </div>
                 <Popover
@@ -207,6 +206,40 @@ export default class ParagraphDialog extends Component {
                     children={ <WordPopover word={ this.state.word } onSaveWordAnalysis={ this.handleSaveWordAnalysis } onTouchTapCancel={ this.handleCancelWordPopover } /> }
                     />
             </div>
+        );
+    }
+
+    getDialogActions() {
+
+        const verse = this.state.verse;
+        verse.analysis = this.state.rearrangedTokens;
+
+        return [
+            <FlatButton
+                label="Cancel"
+                secondary
+                onTouchTap={ this.props.onRequestClose }
+                />,
+            <FlatButton
+                label="Save"
+                primary
+                onTouchTap={ this.props.onSave.bind(this, this.props.selected, verse) }
+                />
+        ];
+    }
+
+    render() {
+
+        return (
+            <Dialog
+                title={ `Verse ${this.props.selected.verseId}` }
+                open={ this.props.open }
+                onRequestClose={ this.props.onRequestClose }
+                children={ this.getChildren() }
+                autoScrollBodyContent
+                contentStyle={ styles.dialogStyle }
+                actions={ this.getDialogActions() }
+                />
         );
     }
 }
@@ -270,12 +303,15 @@ const styles = {
     },
     analysedToken: {
         padding: 5,
-        fontSize: '2em'
+        fontSize: '1.75em',
+        margin: '0 5px'
     },
     showAnalysis: (show) => {
 
         const style = {
-            marginTop: 40
+            marginTop: 24,
+            padding: '0 40px',
+            lineHeight: '3em'
         };
 
         if (show) {
@@ -288,5 +324,11 @@ const styles = {
             });
         }
         return style;
+    },
+    dialogStyle: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        left: 0
     }
 };

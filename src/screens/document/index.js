@@ -4,7 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import { withRouter } from 'react-router';
-import { assign } from 'lodash';
+import { assign, isEmpty, slice, concat, findIndex } from 'lodash';
 import { grey300, grey500 } from 'material-ui/styles/colors';
 
 import PaperCustom from '../shared/PaperCustom';
@@ -20,7 +20,7 @@ export class Document extends Component {
         this.handleWordHoveredIn = this.handleWordHoveredIn.bind(this);
         this.handleWordHoveredOut = this.handleWordHoveredOut.bind(this);
         this.handleRequestClose = this.handleRequestClose.bind(this);
-        this.handleSaveTap = this.handleSaveTap.bind(this);
+        this.handleSaveAnalysis = this.handleSaveAnalysis.bind(this);
         this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
         this.state = {
             document: {},
@@ -89,9 +89,20 @@ export class Document extends Component {
         });
     }
 
-    handleSaveTap() {
+    handleSaveAnalysis(selected, updatedVerse, event) {
 
-        console.log('save');
+        const documents = JSON.parse(localStorage.getItem('documents'));
+        const document = documents.find((doc) => doc.id === selected.docId);
+        const verseIndex = selected.verseId - 1;
+        const updatedDocumentText = concat([], slice(document.text, 0, verseIndex), updatedVerse, slice(document.text, verseIndex + 1));
+        document.text = updatedDocumentText;
+        const documentIndex = findIndex(documents, (doc) => doc.id === selected.docId);
+        const updatedDocuments = concat([], slice(documents, 0, documentIndex), document, slice(documents, documentIndex + 1));
+        localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        this.handleRequestClose(event);
+        this.setState({
+            document
+        });
     }
 
     handleCancelWordPopover(event) {
@@ -99,21 +110,6 @@ export class Document extends Component {
         this.handleRequestClose(event);
     }
 
-    getDialogActions() {
-
-        return [
-            <FlatButton
-                label="Cancel"
-                secondary
-                onTouchTap={ this.handleClose }
-                />,
-            <FlatButton
-                label="Save"
-                primary
-                onTouchTap={ this.handleClose }
-                />
-        ];
-    }
 
     render() {
 
@@ -129,7 +125,7 @@ export class Document extends Component {
                     data-document-id={ this.state.document.id }
                     data-verse-id={ verse.id }
                     id={ 'p' + verse.id }
-                    style={ styles.paragraph(this.state.annotateMode) }
+                    style={ styles.paragraph(this.state.annotateMode, verse.analysis) }
                     key={ verse.id }
                     dangerouslySetInnerHTML={ { __html: verse.verse.split('\n').map((line) => translit(line.trim())).join('<br />') } }
                     />
@@ -159,15 +155,14 @@ export class Document extends Component {
                         </div>
                     </PaperCustom>
                 </div>
-                <Dialog
-                    title={ `Verse ${this.state.selected.verseId}` }
-                    open={ this.state.wordPopoverOpen }
-                    onRequestClose={ this.handleRequestClose }
-                    children={ <ParagraphDialog selected={ this.state.selected } /> }
-                    autoScrollBodyContent
-                    contentStyle={ styles.dialogStyle }
-                    actions={ this.getDialogActions() }
-                    />
+                {
+                    !isEmpty(this.state.selected) ? <ParagraphDialog
+                        selected={ this.state.selected }
+                        open={ this.state.wordPopoverOpen }
+                        onRequestClose={ this.handleRequestClose }
+                        onSave={ this.handleSaveAnalysis }
+                        /> : null
+                }
             </div>
         );
     }
@@ -180,7 +175,7 @@ const styles = {
     mainBody: {
         marginTop: 10
     },
-    paragraph: function (isAnnotationMode) {
+    paragraph: function (isAnnotationMode, analysed) {
 
         const style = {
             padding: 5
@@ -192,6 +187,12 @@ const styles = {
             });
         }
 
+        if (analysed) {
+            assign(style, {
+                backgroundColor: grey300
+            });
+        }
+
         return style;
     },
     hovered: {
@@ -199,12 +200,7 @@ const styles = {
     },
     emptySpace: {
         margin: '0px -5px'
-    },
-    dialogStyle: {
-        width: '75%',
-        maxWidth: 'none'
     }
 };
 
 export default withRouter(Document);
-
