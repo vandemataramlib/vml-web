@@ -14,7 +14,7 @@ ReactTapEventPlugin();
 const App = () => {
 
     const muiTheme = getMuiTheme({
-        fontFamily: 'Helvetica',
+        fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif, Siddhanta',
         palette: {
             primary1Color: orange500,
             primary2Color: orange700,

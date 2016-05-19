@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import Toggle from 'material-ui/Toggle';
-import Dialog from 'material-ui/Dialog';
-import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import Popover from 'material-ui/Popover';
+import Divider from 'material-ui/Divider';
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import ActionBookmark from 'material-ui/svg-icons/action/bookmark';
+import ActionSettings from 'material-ui/svg-icons/action/settings';
 import { withRouter } from 'react-router';
 import { assign, isEmpty, slice, concat, findIndex } from 'lodash';
 import { orange500, grey300, grey500 } from 'material-ui/styles/colors';
@@ -23,11 +25,16 @@ export class Document extends Component {
         this.handleRequestClose = this.handleRequestClose.bind(this);
         this.handleSaveAnalysis = this.handleSaveAnalysis.bind(this);
         this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
+        this.handleSettingsTouchTap = this.handleSettingsTouchTap.bind(this);
+        this.handleSettingsRequestClose = this.handleSettingsRequestClose.bind(this);
+        this.handleEncodingChange = this.handleEncodingChange.bind(this);
         this.state = {
             document: {},
             annotateMode: false,
             wordPopoverOpen: false,
-            selected: {}
+            selected: {},
+            settingsPopoverOpen: false,
+            encoding: 'devanagari'
         };
     }
 
@@ -112,6 +119,29 @@ export class Document extends Component {
         this.handleRequestClose(event);
     }
 
+    handleSettingsTouchTap(event) {
+
+        event.preventDefault();
+
+        this.setState({
+            settingsPopoverOpen: true,
+            anchorEl: event.currentTarget
+        });
+    }
+
+    handleSettingsRequestClose() {
+
+        this.setState({
+            settingsPopoverOpen: false
+        });
+    }
+
+    handleEncodingChange(event, value) {
+
+        this.setState({
+            encoding: value
+        });
+    }
 
     render() {
 
@@ -139,10 +169,10 @@ export class Document extends Component {
 
                             const lineEl = numLines === lineIndex + 1 && verse.analysis ?
                                 React.Children.toArray([
-                                    translit(line.trim()),
+                                    translit(line.trim(), 'itrans', this.state.encoding),
                                     <ActionBookmark color={ orange500 } style={ styles.analysedIndicator }/>
                                 ]) :
-                                translit(line.trim());
+                                translit(line.trim(), 'itrans', this.state.encoding);
 
                             if (lineIndex === 0) {
                                 return lineEl;
@@ -163,14 +193,16 @@ export class Document extends Component {
                 <div className="col-xs-offset-2 col-xs-8">
                     <PaperCustom>
                         <div className="row" style={ styles.header }>
-                            <div className="col-xs-10">
+                            <div className="col-xs-9">
                                 <h1>{ translit(this.state.document.title) }</h1>
                             </div>
-                            <div className="col-xs-2">
-                                <Toggle
-                                    label="Annotate"
-                                    onToggle={ this.handleAnnotateToggled }
-                                    labelPosition="right"
+                            <div style={ styles.settingsContainer } className="col-xs-3">
+                                <FlatButton
+                                    label="Settings"
+                                    labelPosition="after"
+                                    primary
+                                    icon={ <ActionSettings /> }
+                                    onTouchTap={ this.handleSettingsTouchTap }
                                     />
                             </div>
                         </div>
@@ -181,6 +213,33 @@ export class Document extends Component {
                         </div>
                     </PaperCustom>
                 </div>
+                <Popover
+                    open={ this.state.settingsPopoverOpen }
+                    anchorEl={ this.state.anchorEl }
+                    onRequestClose={ this.handleSettingsRequestClose }
+                    style={ styles.settingsPopover }
+                    >
+                    <Toggle
+                        label="Annotate"
+                        onToggle={ this.handleAnnotateToggled }
+                        labelPosition="right"
+                        style={ styles.annotate }
+                        toggled={ this.state.annotateMode }
+                        />
+                    <Divider style={ styles.divider }/>
+                    <RadioButtonGroup onChange={ this.handleEncodingChange } name="encoding" defaultSelected={ this.state.encoding }>
+                        <RadioButton
+                            value="devanagari"
+                            label="देवनागरी"
+                            style={ styles.encodingRadioButton }
+                        />
+                        <RadioButton
+                            value="iast"
+                            label="Roman"
+                            style={ styles.encodingRadioButton }
+                        />
+                    </RadioButtonGroup>
+                </Popover>
                 {
                     !isEmpty(this.state.selected) ? <ParagraphDialog
                         selected={ this.state.selected }
@@ -223,6 +282,24 @@ const styles = {
     },
     analysedIndicator: {
         float: 'right'
+    },
+    settingsContainer: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+    },
+    settingsPopover: {
+        padding: 10,
+        fontSize: '85%'
+    },
+    encodingRadioButton: {
+        marginBottom: 5
+    },
+    annotate: {
+        marginBottom: 10
+    },
+    divider: {
+        margin: '10px 0'
     }
 };
 

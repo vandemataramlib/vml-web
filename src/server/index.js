@@ -42,6 +42,7 @@ const renderPage = (appHtml) => {
         <title>Vande Mataram Library</title>
         <link rel="stylesheet" href="/static/flexboxgrid.min.css">
         <link rel="stylesheet" href="/static/sortable.css">
+        <link rel="stylesheet" href="/static/fonts.css">
         </head>
         <body style="background-color: #FFF3E0">
         <div id=app>${appHtml}</div>
@@ -59,7 +60,7 @@ server.route({
 
         const muiTheme = getMuiTheme({
             userAgent: request.raw.req.headers['user-agent'],
-            fontFamily: 'Helvetica',
+            fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif, Siddhanta',
             palette: {
                 primary1Color: orange500,
                 primary2Color: orange700,
