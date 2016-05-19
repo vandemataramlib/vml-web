@@ -14,6 +14,8 @@ import PaperCustom from '../shared/PaperCustom';
 import ParagraphDialog from './ParagraphDialog';
 import { translit } from '../shared/utils';
 
+const defaultEncoding = 'devanagari';
+
 export class Document extends Component {
     constructor(props) {
 
@@ -34,7 +36,7 @@ export class Document extends Component {
             wordPopoverOpen: false,
             selected: {},
             settingsPopoverOpen: false,
-            encoding: 'devanagari'
+            encoding: defaultEncoding
         };
     }
 
@@ -43,8 +45,10 @@ export class Document extends Component {
         const documentTitleSlug = this.props.params.title;
         const documents = localStorage.getItem('documents');
         const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
+        const encoding = localStorage.getItem('encoding') || defaultEncoding;
         this.setState({
-            document
+            document,
+            encoding
         });
     }
 
@@ -137,6 +141,8 @@ export class Document extends Component {
     }
 
     handleEncodingChange(event, value) {
+
+        localStorage.setItem('encoding', value);
 
         this.setState({
             encoding: value
