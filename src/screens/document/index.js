@@ -264,12 +264,13 @@ const styles = {
         borderBottom: `1px solid ${grey500}`
     },
     mainBody: {
-        marginTop: 10
+        marginTop: 10,
+        fontFamily: 'Georgia, serif, Siddhanta'
     },
     paragraph: function (isAnnotationMode) {
 
         const style = {
-            padding: 5
+            padding: '0 5px'
         };
 
         if (isAnnotationMode) {
