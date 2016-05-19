@@ -10,7 +10,7 @@ export default class Home extends Component {
                     <PaperCustom>
                         <div className="row">
                             <div className="col-xs-12">
-                                <h1>Welcome</h1>
+                                <h1>Welcome to Vande Mataram Library</h1>
                             </div>
                         </div>
                     </PaperCustom>

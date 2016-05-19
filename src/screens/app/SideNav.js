@@ -10,21 +10,23 @@ import { translit } from '../shared/utils';
 export default class SideNav extends Component {
     render() {
 
-        const menus = [
-            {
-                group: 'Admin',
-                items: [
-                    {
-                        u: '/new',
-                        t: 'New document'
-                    },
-                    {
-                        u: '/about',
-                        t: 'About'
-                    }
-                ]
-            }
-        ];
+        // const menus = [
+        //     {
+        //         group: 'Admin',
+        //         items: [
+        //             {
+        //                 u: '/new',
+        //                 t: 'New document'
+        //             },
+        //             {
+        //                 u: '/about',
+        //                 t: 'About'
+        //             }
+        //         ]
+        //     }
+        // ];
+
+        const menus = [];
 
         if (process.env && !process.env.SERVER) {
 

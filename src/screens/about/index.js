@@ -10,7 +10,7 @@ export default class About extends Component {
                     <PaperCustom>
                         <div className="row">
                             <div className="col-xs-12">
-                                <h1>About</h1>
+                                <h1>About the Vande Mataram Library</h1>
                             </div>
                         </div>
                     </PaperCustom>
