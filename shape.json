@@ -13,7 +13,7 @@
                         {
                             "id": "1.1.1",
                             "word": "mayyAveshya",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "id": "1.1.1.1",
                                     "token": "mayi",
@@ -23,19 +23,19 @@
                                     "token": "Aveshya",
                                     "id": "1.1.1.2",
                                     "defId": "12345",
-                                    "etymology": [
+                                    "ety": [
                                         {
-                                            "token": "A",
+                                            "pho": "A",
                                             "type": "prefix",
                                             "defId": "23433"
                                         },
                                         {
-                                            "token": "vish",
+                                            "pho": "vish",
                                             "type": "root",
                                             "defId": "34567"
                                         },
                                         {
-                                            "token": "ya",
+                                            "pho": "ya",
                                             "type": "suffix",
                                             "defId": "232343"
                                         }
@@ -46,7 +46,7 @@
                         {
                             "id": "1.1.2",
                             "word": "mano",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "token": "manaH",
                                     "id": "1.1.2.1",
@@ -57,7 +57,7 @@
                         {
                             "id": "1.1.3",
                             "word": "ye",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "token": "ye",
                                     "id": "1.1.3.1",
@@ -68,7 +68,7 @@
                         {
                             "id": "1.1.4",
                             "word": "mA.m",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "token": "mA.m",
                                     "id": "1.1.4.1"
@@ -78,7 +78,7 @@
                         {
                             "id": "1.1.5",
                             "word": "nityayuktA",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "token": "nityayuktAH",
                                     "id": "1.1.5.1"
@@ -88,7 +88,7 @@
                         {
                             "id": "1.1.6",
                             "word": "upAsate",
-                            "analysis": [
+                            "tokens": [
                                 {
                                     "id": "1.1.6.1",
                                     "token": "upAsate"
