@@ -238,12 +238,12 @@ export class Document extends Component {
                             value="devanagari"
                             label="देवनागरी"
                             style={ styles.encodingRadioButton }
-                        />
+                            />
                         <RadioButton
                             value="iast"
                             label="Roman"
                             style={ styles.encodingRadioButton }
-                        />
+                            />
                     </RadioButtonGroup>
                 </Popover>
                 {
