@@ -116,21 +116,19 @@ export class Document extends Component {
         return (
             <div className="row">
                 <div className="col-xs-offset-2 col-xs-8">
-                    <PaperCustom>
-                        <Header
-                            documentTitle={ this.state.document.title }
-                            onSettingsTouchTap={ this.handleSettingsTouchTap }
-                            onAnnotateToggle={ this.handleAnnotateToggle }
-                            annotateMode={ this.state.annotateMode }
-                            onEncodingChange={ this.handleEncodingChange }
-                            encoding={ this.state.encoding }
-                            />
-                        <Body
-                            text={ this.state.document.text }
-                            encoding={ this.state.encoding }
-                            documentId={ this.state.document.id }
-                            />
-                    </PaperCustom>
+                    <Header
+                        documentTitle={ this.state.document.title }
+                        onSettingsTouchTap={ this.handleSettingsTouchTap }
+                        onAnnotateToggle={ this.handleAnnotateToggle }
+                        annotateMode={ this.state.annotateMode }
+                        onEncodingChange={ this.handleEncodingChange }
+                        encoding={ this.state.encoding }
+                        />
+                    <Body
+                        text={ this.state.document.text }
+                        encoding={ this.state.encoding }
+                        documentId={ this.state.document.id }
+                        />
                 </div>
                 {
                     !isEmpty(this.state.selected) ? <ParagraphDialog

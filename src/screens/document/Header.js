@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
+import IconButton from 'material-ui/IconButton';
 import ActionSettings from 'material-ui/svg-icons/action/settings';
-import { grey500 } from 'material-ui/styles/colors';
+import { grey500, orange200, orange50 } from 'material-ui/styles/colors';
 
 import HeaderSettings from './HeaderSettings';
 import { translit } from '../shared/utils';
@@ -51,19 +52,19 @@ export default class Header extends Component {
         const { documentTitle, annotateMode, encoding, onAnnotateToggle, onEncodingChange } = this.props;
 
         return (
-            <div>
+            <Paper style={ styles.self }>
                 <div className="row" style={ styles.header }>
                     <div className="col-xs-9">
                         <h1>{ translit(documentTitle) }</h1>
                     </div>
                     <div style={ styles.settingsContainer } className="col-xs-3">
-                        <FlatButton
-                            label="Settings"
-                            labelPosition="after"
-                            primary
-                            icon={ <ActionSettings /> }
+                        <IconButton
                             onTouchTap={ this.handleSettingsTouchTap }
-                            />
+                            iconStyle={ styles.smallIcon }
+                            style={ styles.small }
+                            >
+                            <ActionSettings />
+                        </IconButton>
                     </div>
                 </div>
                 <HeaderSettings
@@ -75,7 +76,7 @@ export default class Header extends Component {
                     encoding={ encoding }
                     anchorEl={ this.state.anchorEl }
                     />
-            </div>
+            </Paper>
         );
     }
 }
@@ -89,12 +90,26 @@ Header.propTypes = {
 };
 
 const styles = {
+    self: {
+        // backgroundColor: orange200, orange50
+        background: `linear-gradient(${orange200}, #fff)`
+    },
     header: {
-        borderBottom: `1px solid ${grey500}`
+        // borderBottom: `1px solid ${grey500}`
+        padding: '0 20px 20px 20px'
     },
     settingsContainer: {
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center'
+    },
+    smallIcon: {
+        width: 20,
+        height: 20
+    },
+    small: {
+        // width: 38,
+        // height: 38,
+        // padding: 16
     }
 };

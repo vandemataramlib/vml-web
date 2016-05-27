@@ -75,10 +75,10 @@ export default class Verse extends Component {
 
         const { verse } = this.props;
         return (
-            <Paper zDepth={ this.state.expanded ? 1 : 0 } style={ this.state.expanded ? styles.self : null }>
+            <Paper transitionEnabled={ true } rounded={ this.state.expanded ? true : false } zDepth={ this.state.expanded ? 2 : 1 } style={ styles.self(this.props, this.state) }>
                 <div onMouseEnter={ this.handleMouseEnter.bind(this) } onMouseLeave={ this.handleMouseLeave.bind(this) } className="row">
                     <div className="col-xs-11">
-                        <p style={ { margin: '8px 0' } }>
+                        <p style={ styles.verse(this.state) }>
                             { verse.verse.split('\n').map(this.renderPara.bind(this, verse)) }
                         </p>
                     </div>
@@ -90,8 +90,10 @@ export default class Verse extends Component {
                         }
                     </div>
                 </div>
-                <div className="row">
-                    { this.state.expanded ? <FlatButton label="Action" /> : null }
+                <div className="row" style={ { display: this.state.expanded ? 'block' : 'none' } }>
+                    {
+                        verse.analysis ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(verse.analysis.map((a) => a.token).join(' ')) }</div> : null
+                    }
                 </div>
             </Paper>
         );
@@ -108,8 +110,29 @@ const styles = {
     analysedIndicator: {
         float: 'right'
     },
-    self: {
-        marginBottom: 10
+    self: (props, state) => {
+
+        let style = {
+            padding: '0 20px'
+        };
+        
+        if (!state.expanded) {
+            style = { ...style, boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 4px 4px' }
+            padding: props.isLast ? '0 20px 20px 20px' : '0 20px'
+
+            if (props.isLast) {
+                style = { ...style, padding: '0 20px 20px 20px' }
+            }
+            // else if (props.isFirst) {
+            //     style = { ...style, padding: '20px 20px 0px 20px' }
+            // }
+        }
+        
+        if (state.expanded) {
+            style = { ...style, margin: '20px -20px 20px -20px' }
+        }
+        
+        return style;
     },
     hovered: {
         backgroundColor: grey300
@@ -121,5 +144,13 @@ const styles = {
     verseHandle: {
         alignSelf: 'center',
         cursor: 'pointer'
+    },
+    verse: (state) => {
+
+        return {
+            fontFamily: 'Georgia, serif, Siddhanta',
+            margin: '8px 0',
+            fontSize: state.expanded ? '1.2em' : '1em'
+        }
     }
 };

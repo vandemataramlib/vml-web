@@ -6,7 +6,7 @@ export default class Body extends Component {
     constructor(props) {
 
         super(props);
-        this.renderVerse = this.renderVerse.bind(this);
+        // this.renderVerse = this.renderVerse.bind(this);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -20,7 +20,7 @@ export default class Body extends Component {
         return true;
     }
 
-    renderVerse(verse) {
+    renderVerse(numVerses, verse, verseIndex) {
 
         const { documentId, encoding } = this.props;
 
@@ -29,6 +29,8 @@ export default class Body extends Component {
                 documentId={ documentId }
                 verse={ verse }
                 encoding={ encoding }
+                isLast={ verseIndex === numVerses - 1 }
+                isFirst={ verseIndex === 0 }
                 key={ verse.id }
                 />
         );
@@ -36,9 +38,13 @@ export default class Body extends Component {
 
     render() {
 
+        const { text } = this.props;
+
+        const numVerses = text.length;
+
         return (
             <div style={ styles.mainBody }>
-                { this.props.text.map(this.renderVerse) }
+                { text.map(this.renderVerse.bind(this, numVerses)) }
             </div>
         );
     }
@@ -52,7 +58,6 @@ Body.propTypes = {
 
 const styles = {
     mainBody: {
-        marginTop: 10,
-        fontFamily: 'Georgia, serif, Siddhanta'
+        // marginTop: 10
     }
 };
