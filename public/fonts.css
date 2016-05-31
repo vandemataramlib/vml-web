@@ -1,4 +1,85 @@
+/*Siddhanta*/
 @font-face {
   font-family:'Siddhanta';
-  src: url('./siddhanta.ttf') format('truetype');
+  src: url('./fonts/Siddhanta.woff') format('woff');
+}
+
+/*Charlotte Sans Italic*/
+@font-face {
+  font-family:"Charlotte Sans";
+  font-weight: normal;
+  font-style: italic;
+  src: url("./fonts/ab6c3217-f343-43e8-8812.woff") format("woff");
+}
+
+/*Monotype Sabon Semi Bold Italic*/
+@font-face {
+  font-family:"Monotype Sabon";
+  font-weight: bold;
+  font-style: italic;
+  src: url("./fonts/962aeaed-3ce5-4183-8ae5.woff") format("woff");
+}
+
+/*Charlotte Sans Medium*/
+@font-face {
+  font-family:"Charlotte Sans";
+  font-weight: 500;
+  font-style: normal;
+  src: url("./fonts/932ca59f-5feb-450a-9fc1.woff") format("woff");
+}
+
+/*Monotype Sabon Semi Bold*/
+@font-face {
+  font-family:"Monotype Sabon";
+  font-weight: bold;
+  font-style: normal;
+  src: url("./fonts/00f12d34-bf7d-4e87-a2a5.woff") format("woff");
+}
+
+/*Charlotte Sans Book*/
+@font-face {
+  font-family:"Charlotte Sans";
+  font-weight: normal;
+  font-style: normal;
+  src: url("./fonts/1efd1edb-1790-4869-a7a7.woff") format("woff");
+}
+
+/*Monotype Sabon Italic*/
+@font-face {
+  font-family:"Monotype Sabon";
+  font-weight: normal;
+  font-style: italic;
+  src: url("./fonts/a3d1f03d-2040-4592-aa69.woff") format("woff");
+}
+
+/*Monotype Sabon Regular*/
+@font-face {
+  font-family:"Monotype Sabon";
+  font-weight: normal;
+  font-style: normal;
+  src: url("./fonts/07ea7c3e-59f9-4a86-8057.woff") format("woff");
+}
+
+/*Auromere*/
+@font-face {
+  font-family:"Auromere";
+  font-weight: normal;
+  font-style: normal;
+  src: url("./fonts/Auromere-n4.woff") format("woff")
+}
+
+/*Auromere Italic*/
+@font-face {
+  font-family:"Auromere";
+  font-weight: normal;
+  font-style: italic;
+  src: url("./fonts/Auromere-i4.woff") format("woff")
+}
+
+/*Auromere Bold Italic*/
+@font-face {
+  font-family:"Auromere";
+  font-weight: bold;
+  font-style: italic;
+  src: url("./fonts/Auromere-i5.woff") format("woff")
 }

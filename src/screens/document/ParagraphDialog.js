@@ -31,7 +31,8 @@ export default class ParagraphDialog extends Component {
 
     componentWillMount() {
 
-        const verse = this.getVerse(this.props.selected.docId, this.props.selected.verseId);
+        // const verse = this.getVerse(this.props.selected.docId, this.props.selected.verseId);
+        const verse = this.getVerse();
         this.setState({
             verse: assign({}, verse),
             unalysed: verse.analysis ? false : true,
@@ -43,7 +44,8 @@ export default class ParagraphDialog extends Component {
 
     componentWillReceiveProps(nextProps) {
 
-        const verse = this.getVerse(nextProps.selected.docId, nextProps.selected.verseId);
+        // const verse = this.getVerse(nextProps.selected.docId, nextProps.selected.verseId);
+        const verse = this.getVerse();
         this.setState({
             verse: assign({}, verse),
             unalysed: verse.analysis ? false : true,
@@ -55,9 +57,10 @@ export default class ParagraphDialog extends Component {
 
     getVerse(docId, verseId) {
 
-        const documents = JSON.parse(localStorage.getItem('documents'));
-        const document = documents.find((document) => document.id === docId);
-        return document.text[verseId - 1];
+        // const documents = JSON.parse(localStorage.getItem('documents'));
+        // const document = documents.find((document) => document.id === docId);
+        // return document.text[verseId - 1];
+        return this.props.verse;
     }
 
     handleWordHoveredIn(event) {
@@ -88,8 +91,10 @@ export default class ParagraphDialog extends Component {
 
         this.handleRequestClose(event);
         const updatedLines = this.state.verse.lines.map((line) => {
+
             if (line.id === this.state.line.id) {
                 line.words.map((word) => {
+
                     if (word.id === this.state.word.id) {
                         word.analysis = value.analysis;
                     }
@@ -274,7 +279,7 @@ export default class ParagraphDialog extends Component {
 
         return (
             <Dialog
-                title={ `Verse ${this.props.selected.verseId}` }
+                title={ `Verse ${this.props.verse.id}` }
                 open={ this.props.open }
                 onRequestClose={ this.props.onRequestClose }
                 children={ this.getChildren() }

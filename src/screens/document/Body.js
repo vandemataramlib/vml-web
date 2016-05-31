@@ -11,9 +11,9 @@ export default class Body extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
 
-        const { text, encoding, documentId } = this.props;
+        const { text, encoding, documentId, annotateMode } = this.props;
 
-        if (text === nextProps.text && encoding === nextProps.encoding && documentId === nextProps.documentId) {
+        if (text === nextProps.text && encoding === nextProps.encoding && documentId === nextProps.documentId && annotateMode === nextProps.annotateMode) {
             return false;
         }
 
@@ -22,7 +22,7 @@ export default class Body extends Component {
 
     renderVerse(numVerses, verse, verseIndex) {
 
-        const { documentId, encoding } = this.props;
+        const { documentId, encoding, annotateMode } = this.props;
 
         return (
             <Verse
@@ -32,6 +32,7 @@ export default class Body extends Component {
                 isLast={ verseIndex === numVerses - 1 }
                 isFirst={ verseIndex === 0 }
                 key={ verse.id }
+                annotateMode={ annotateMode }
                 />
         );
     }
@@ -53,11 +54,15 @@ export default class Body extends Component {
 Body.propTypes = {
     text: PropTypes.array,
     encoding: PropTypes.string,
-    documentId: PropTypes.string
+    documentId: PropTypes.string,
+    annotateMode: PropTypes.bool
 };
 
 const styles = {
     mainBody: {
+        boxSizing: 'border-box',
+        WebkitBoxSizing: 'border-box'
         // marginTop: 10
+        // position: 'relative'
     }
 };

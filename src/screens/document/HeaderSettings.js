@@ -11,10 +11,7 @@ const encodingSchemes = [
     },
     {
         value: 'iast',
-        label: 'Roman',
-        labelStyle: {
-            fontFamily: 'Georgia, serif'
-        }
+        label: 'Roman'
     }
 ];
 
@@ -62,7 +59,7 @@ export default class HeaderSettings extends Component {
                                     value={ scheme.value }
                                     label={ scheme.label }
                                     style={ styles.encodingRadioButton }
-                                    labelStyle={ scheme.labelStyle }
+                                    labelStyle={ styles.labelStyle }
                                     key={ i }
                                     />
                             );
@@ -97,5 +94,8 @@ const styles = {
     },
     encodingRadioButton: {
         marginBottom: 5
+    },
+    labelStyle: {
+        fontFamily: 'Monotype Sabon, Auromere, serif, Siddhanta'
     }
 };

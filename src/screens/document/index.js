@@ -1,9 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { withRouter } from 'react-router';
-import { assign, isEmpty, slice, concat, findIndex } from 'lodash';
+import { slice, concat, findIndex } from 'lodash';
 
-import PaperCustom from '../shared/PaperCustom';
-import ParagraphDialog from './ParagraphDialog';
 import Header from './Header';
 import Body from './Body';
 
@@ -128,39 +126,32 @@ export class Document extends Component {
                         text={ this.state.document.text }
                         encoding={ this.state.encoding }
                         documentId={ this.state.document.id }
+                        annotateMode={ this.state.annotateMode }
                         />
                 </div>
-                {
-                    !isEmpty(this.state.selected) ? <ParagraphDialog
-                        selected={ this.state.selected }
-                        open={ this.state.wordPopoverOpen }
-                        onRequestClose={ this.handleRequestClose }
-                        onSave={ this.handleSaveAnalysis }
-                        /> : null
-                }
             </div>
         );
     }
 }
 
-const styles = {
-    paragraph: function (isAnnotationMode) {
+// const styles = {
+//     paragraph: function (isAnnotationMode) {
 
-        const style = {
-            padding: '0 5px'
-        };
+//         const style = {
+//             padding: '0 5px'
+//         };
 
-        if (isAnnotationMode) {
-            assign(style, {
-                cursor: 'pointer'
-            });
-        }
+//         if (isAnnotationMode) {
+//             assign(style, {
+//                 cursor: 'pointer'
+//             });
+//         }
 
-        return style;
-    },
-    emptySpace: {
-        margin: '0px -5px'
-    }
-};
+//         return style;
+//     },
+//     emptySpace: {
+//         margin: '0px -5px'
+//     }
+// };
 
 export default withRouter(Document);

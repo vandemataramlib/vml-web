@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
 import ActionSettings from 'material-ui/svg-icons/action/settings';
-import { grey500, orange200, orange50 } from 'material-ui/styles/colors';
+import { orange200 } from 'material-ui/styles/colors';
 
 import HeaderSettings from './HeaderSettings';
 import { translit } from '../shared/utils';
@@ -91,8 +91,10 @@ Header.propTypes = {
 
 const styles = {
     self: {
-        // backgroundColor: orange200, orange50
-        background: `linear-gradient(${orange200}, #fff)`
+        background: `linear-gradient(${orange200}, #fff)`,
+        borderBottomRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px'
     },
     header: {
         // borderBottom: `1px solid ${grey500}`
