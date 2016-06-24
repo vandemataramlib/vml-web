@@ -1,21 +1,31 @@
-import React, { Component, PropTypes } from 'react';
-import Popover from 'material-ui/Popover';
-import Divider from 'material-ui/Divider';
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-import Toggle from 'material-ui/Toggle';
+import * as React from "react";
+import Popover from "material-ui/Popover";
+import Divider from "material-ui/Divider";
+import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
+import Toggle from "material-ui/Toggle";
 
 const encodingSchemes = [
     {
-        value: 'devanagari',
-        label: 'देवनागरी'
+        value: "devanagari",
+        label: "देवनागरी"
     },
     {
-        value: 'iast',
-        label: 'Roman'
+        value: "iast",
+        label: "Roman"
     }
 ];
 
-export default class HeaderSettings extends Component {
+interface HeaderSettingsProps {
+    popoverOpen: boolean;
+    onSettingsRequestClose: any;
+    onAnnotateToggle: Function;
+    annotateMode: boolean;
+    onEncodingChange: any;
+    encoding: string;
+    anchorEl: React.Component<any, any>;
+};
+
+export default class HeaderSettings extends React.Component<HeaderSettingsProps, any> {
     shouldComponentUpdate(nextProps, nextState) {
 
         const { annotateMode, popoverOpen } = this.props;
@@ -71,31 +81,21 @@ export default class HeaderSettings extends Component {
     }
 }
 
-HeaderSettings.propTypes = {
-    popoverOpen: PropTypes.bool,
-    onSettingsRequestClose: PropTypes.func,
-    onAnnotateToggle: PropTypes.func,
-    annotateMode: PropTypes.bool,
-    onEncodingChange: PropTypes.func,
-    encoding: PropTypes.string,
-    anchorEl: PropTypes.object
-};
-
 const styles = {
     settingsPopover: {
         padding: 10,
-        fontSize: '85%'
+        fontSize: "85%"
     },
     annotate: {
         marginBottom: 10
     },
     divider: {
-        margin: '10px 0'
+        margin: "10px 0"
     },
     encodingRadioButton: {
         marginBottom: 5
     },
     labelStyle: {
-        fontFamily: 'Monotype Sabon, Auromere, serif, Siddhanta'
+        fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta"
     }
 };

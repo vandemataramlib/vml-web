@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import * as React from "react";
 
 const styles = {
     self: {
@@ -7,7 +7,7 @@ const styles = {
     }
 };
 
-export default class Layout extends Component {
+export default class Layout extends React.Component<{}, {}> {
     render() {
 
         return (

@@ -1,7 +1,7 @@
-import React, { Component, PropTypes } from 'react';
-import PaperCustom from '../shared/PaperCustom';
+import * as React from "react";
+import PaperCustom from "../shared/PaperCustom";
 
-export default class Home extends Component {
+export default class About extends React.Component<any, any> {
     render() {
 
         return (
@@ -10,7 +10,7 @@ export default class Home extends Component {
                     <PaperCustom>
                         <div className="row">
                             <div className="col-xs-12">
-                                <h1>Welcome to Vande Mataram Library</h1>
+                                <h1>About the Vande Mataram Library</h1>
                             </div>
                         </div>
                     </PaperCustom>

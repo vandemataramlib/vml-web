@@ -1,15 +1,26 @@
-import React, { Component, PropTypes } from 'react';
-import Paper from 'material-ui/Paper';
-import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down';
-import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
-import { slice, concat, findIndex } from 'lodash';
-import { orange100, orange500 } from 'material-ui/styles/colors';
+import * as React from "react";
+import Paper from "material-ui/Paper";
+import KeyboardArrowDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
+import KeyboardArrowUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
+import { assign } from "lodash";
+import { slice, concat, findIndex } from "lodash";
+import { orange100, orange500 } from "material-ui/styles/colors";
 
-import ParagraphDialog from './ParagraphDialog';
-import { DEFAULT_TEXT_ENCODING } from '../shared/constants';
-import { translit } from '../shared/utils';
+import ParagraphDialog from "./ParagraphDialog";
+import { DEFAULT_TEXT_ENCODING } from "../shared/constants";
+import { translit } from "../shared/utils";
 
-export default class Verse extends Component {
+interface VerseProps {
+    verse: any;
+    encoding: string;
+    numLines?: number;
+    annotateMode: boolean;
+    documentId: string;
+    isFirst?: boolean;
+    isLast: boolean;
+};
+
+export default class Verse extends React.Component<VerseProps, any> {
     constructor(props) {
 
         super(props);
@@ -59,7 +70,7 @@ export default class Verse extends Component {
         });
     }
 
-    handleRequestClose() {
+    handleRequestClose = (event) => {
 
         this.setState({
             popoverOpen: false
@@ -68,14 +79,14 @@ export default class Verse extends Component {
 
     handleAnalysisSave(selected, updatedVerse, event) {
 
-        const documents = JSON.parse(localStorage.getItem('documents'));
+        const documents = JSON.parse(localStorage.getItem("documents"));
         const document = documents.find((doc) => doc.id === this.props.documentId);
         const verseIndex = this.props.verse.id - 1;
         const updatedDocumentText = concat([], slice(document.text, 0, verseIndex), updatedVerse, slice(document.text, verseIndex + 1));
         document.text = updatedDocumentText;
-        const documentIndex = findIndex(documents, (doc) => doc.id === this.props.documentId);
+        const documentIndex = findIndex(documents, (doc: any) => doc.id === this.props.documentId);
         const updatedDocuments = concat([], slice(documents, 0, documentIndex), document, slice(documents, documentIndex + 1));
-        localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        localStorage.setItem("documents", JSON.stringify(updatedDocuments));
         this.handleRequestClose(event);
         this.setState({
             updatedVerse
@@ -83,7 +94,7 @@ export default class Verse extends Component {
 
     }
 
-    renderPara(verse, line, lineIndex) {
+    renderPara(verse, line, lineIndex): string | (React.ReactElement<any> | string | number)[] {
 
         // const numLines = verse.lines.length;
 
@@ -112,16 +123,16 @@ export default class Verse extends Component {
 
         const { verse } = this.props;
         return (
-            <div id={ 'p' + (verse.id + 1) } style={ verse.analysis && !this.state.expanded && this.props.annotateMode ? { borderLeft: `2px solid ${orange500}` } : null }>
+            <div id={ "p" + (verse.id + 1) } style={ verse.analysis && !this.state.expanded && this.props.annotateMode ? { borderLeft: `2px solid ${orange500}` } : null }>
                 <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.state.expanded ? 2 : 1 } style={ styles.self(this.props, this.state) }>
                     <div onMouseEnter={ this.handleMouseEnter.bind(this) } onMouseLeave={ this.handleMouseLeave.bind(this) } className="row">
                         <div onTouchTap={ this.handleAnnotateVerse.bind(this) } style={ styles.verseContent(this.props) } className="col-xs-11">
                             <p style={ styles.verse(this.state) }>
-                                { verse.verse.split('\n').map(this.renderPara.bind(this, verse)) }
+                                { verse.verse.split("\n").map(this.renderPara.bind(this, verse)) }
                             </p>
-                            <div className="row" style={ { display: this.state.expanded ? 'block' : 'none' } }>
+                            <div className="row" style={ { display: this.state.expanded ? "block" : "none" } }>
                                 {
-                                    verse.analysis ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(verse.analysis.map((a) => a.token).join(' ')) }</div> : null
+                                    verse.analysis ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(verse.analysis.map((a) => a.token).join(" ")) }</div> : null
                                 }
                             </div>
                         </div>
@@ -145,47 +156,39 @@ export default class Verse extends Component {
     }
 }
 
-Verse.propTypes = {
-    verse: PropTypes.object,
-    encoding: PropTypes.string,
-    numLines: PropTypes.number,
-    annotateMode: PropTypes.bool,
-    documentId: PropTypes.string,
-    isLast: PropTypes.bool
-};
-
 const styles = {
     analysedIndicator: {
-        float: 'right'
+        float: "right"
     },
     self: (props, state) => {
 
-        let style = {
-            padding: '0 20px',
-            borderTopRightRadius: props.isLast ? 0 : 'inherit',
-            borderTopLeftRadius: props.isLast ? 0 : 'inherit'
+        let style: any = {
+            padding: "0 20px",
+            borderTopRightRadius: props.isLast ? 0 : "inherit",
+            borderTopLeftRadius: props.isLast ? 0 : "inherit"
         };
 
         if (!state.expanded) {
             // style = { ...style, padding: props.verse.analysis && props.annotateMode ? '0 20px 0 18px' : '0 20px' };
             if (!props.annotateMode) {
-                style = { ...style, boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px' };
+                // style = { ...style, boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px' };
+                style = assign(style, { boxShadow: "rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px" });
             }
             else {
                 if (state.hovered) {
-                    style = { ...style, backgroundColor: orange100 };
+                    style = assign(style, { backgroundColor: orange100 });
                 }
             }
 
             if (props.isLast) {
-                style = { ...style, padding: '0 20px 20px 20px' };
+                style = assign(style, { padding: "0 20px 20px 20px" });
             }
             // else if (props.isFirst) {
             //     style = { ...style, padding: '20px 20px 0px 20px' }
             // }
         }
         else if (state.expanded) {
-            style = { ...style, margin: '20px -20px 20px -20px' };
+            style = assign(style, { margin: "20px -20px 20px -20px" });
         }
 
         return style;
@@ -194,26 +197,26 @@ const styles = {
         backgroundColor: orange100
     },
     verseHandleContainer: {
-        display: 'flex',
-        justifyContent: 'center',
-        cursor: 'pointer'
+        display: "flex",
+        justifyContent: "center",
+        cursor: "pointer"
     },
     verseHandle: {
-        alignSelf: 'center'
+        alignSelf: "center"
     },
     verse: (state) => {
 
         return {
-            fontFamily: 'Monotype Sabon, Auromere, serif, Siddhanta',
-            margin: '8px 0',
-            fontSize: state.expanded ? '1.5em' : '1em'
+            fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta",
+            margin: "8px 0",
+            fontSize: state.expanded ? "1.5em" : "1em"
         };
     },
     verseContent: (props) => {
 
         if (props.annotateMode) {
             return {
-                cursor: 'context-menu'
+                cursor: "context-menu"
             };
         }
     }

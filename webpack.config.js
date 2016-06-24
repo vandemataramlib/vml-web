@@ -1,12 +1,16 @@
 const webpack = require('webpack');
 
 module.exports = {
-    entry: './src/client/index.js',
+    entry: './src/client/index.tsx',
 
     output: {
         filename: 'bundle.js',
         publicPath: 'static',
         path: 'public'
+    },
+
+    resolve: {
+        extensions: ["", ".tsx", ".ts", ".js", ".jsx"]
     },
 
     plugins: process.env.NODE_ENV === 'production' ? [
@@ -23,9 +27,9 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.jsx?$/,
+                test: /\.[jt]?sx?$/,
                 exclude: /node_modules/,
-                loader: 'babel'
+                loaders: ['awesome-typescript']
             }
         ]
     }

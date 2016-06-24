@@ -1,16 +1,18 @@
-import React, { Component, PropTypes } from 'react';
-import Dialog from 'material-ui/Dialog';
-import Popover from 'material-ui/Popover';
-import FlatButton from 'material-ui/FlatButton';
-import Sortable from 'react-anything-sortable';
-import { grey300, grey500, orange500 } from 'material-ui/styles/colors';
-import { assign, flatten } from 'lodash';
+import * as React from "react";
+import Dialog from "material-ui/Dialog";
+import Popover from "material-ui/Popover";
+import FlatButton from "material-ui/FlatButton";
+import * as Sortable from "react-anything-sortable";
+import { grey300, grey500, orange500 } from "material-ui/styles/colors";
+import { assign, flatten } from "lodash";
 
-import WordPopover from './WordPopover';
-import SortableToken from './SortableToken';
-import { translit, getColour, getLightColour } from '../shared/utils';
+import WordPopover from "./WordPopover";
+import SortableToken from "./SortableToken";
+import { translit, getColour, getLightColour } from "../shared/utils";
 
-export default class ParagraphDialog extends Component {
+
+
+export default class ParagraphDialog extends React.Component<any, any> {
     constructor(props) {
 
         super(props);
@@ -27,6 +29,7 @@ export default class ParagraphDialog extends Component {
             rearrangedTokens: [],
             unalysed: true
         };
+        // <Sortable></Sortable>
     }
 
     componentWillMount() {
@@ -55,7 +58,7 @@ export default class ParagraphDialog extends Component {
         });
     }
 
-    getVerse(docId, verseId) {
+    getVerse() {
 
         // const documents = JSON.parse(localStorage.getItem('documents'));
         // const document = documents.find((document) => document.id === docId);
@@ -76,8 +79,8 @@ export default class ParagraphDialog extends Component {
     handleWordClicked(event, value) {
 
         event.preventDefault();
-        const word = event.target.attributes['data-word'].value;
-        const wordId = event.target.attributes['data-word-id'].value;
+        const word = event.target.attributes["data-word"].value;
+        const wordId = event.target.attributes["data-word-id"].value;
         const lineId = event.target.parentElement.parentElement.id;
         this.setState({
             wordPopoverOpen: true,
@@ -105,7 +108,7 @@ export default class ParagraphDialog extends Component {
             return line;
         });
 
-        const verse = assign({}, this.state.verse, { lines: updatedLines });
+        const verse: any = assign({}, this.state.verse, { lines: updatedLines });
 
         let analysedTokens = [];
 
@@ -157,7 +160,7 @@ export default class ParagraphDialog extends Component {
         this.handleRequestClose(event);
     }
 
-    handleRequestClose() {
+    handleRequestClose = (event) => {
 
         this.setState({
             wordPopoverOpen: false,
@@ -206,7 +209,7 @@ export default class ParagraphDialog extends Component {
                                         {
                                             word.analysis ? word.analysis.map((w, i) => {
                                                 return React.Children.toArray([
-                                                    <span style={ { color: grey500 } }> { i === 0 ? '' : '+' } </span>,
+                                                    <span style={ { color: grey500 } }> { i === 0 ? "" : "+" } </span>,
                                                     <span style={ { color: getColour(i) } }>{ translit(w.token) }</span>
                                                 ]);
                                             }) : null
@@ -244,8 +247,8 @@ export default class ParagraphDialog extends Component {
                 <Popover
                     open={ this.state.wordPopoverOpen }
                     anchorEl={ this.state.anchorEl }
-                    anchorOrigin={ { horizontal: 'left', vertical: 'bottom' } }
-                    targetOrigin={ { horizontal: 'left', vertical: 'top' } }
+                    anchorOrigin={ { horizontal: "left", vertical: "bottom" } }
+                    targetOrigin={ { horizontal: "left", vertical: "top" } }
                     onRequestClose={ this.handleRequestClose }
                     canAutoPosition
                     autoCloseWhenOffScreen={ false }
@@ -299,16 +302,16 @@ const styles = {
         marginTop: 10
     },
     paragraph: {
-        fontSize: '1.5em',
-        textAlign: 'center'
+        fontSize: "1.5em",
+        textAlign: "center"
     },
     line: {
-        display: 'flex',
-        justifyContent: 'center'
+        display: "flex",
+        justifyContent: "center"
     },
     wordContainer: {
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         padding: 15
     },
     // word: function (analysis) {
@@ -327,53 +330,53 @@ const styles = {
     //     return style;
     // },
     word: {
-        cursor: 'pointer'
+        cursor: "pointer"
     },
     hovered: {
         backgroundColor: grey300
     },
     emptySpace: {
-        margin: '0px -5px'
+        margin: "0px -5px"
     },
     popoverStyle: {
-        padding: '5px 10px',
+        padding: "5px 10px",
         minWidth: 200
     },
     analysedWord: {
         backgroundColor: orange500
     },
     analysedTokens: {
-        fontSize: '75%'
+        fontSize: "75%"
     },
     analyseButton: {
-        textAlign: 'center'
+        textAlign: "center"
     },
     analysedToken: {
         padding: 5,
-        fontSize: '1.75em',
-        margin: '0 5px'
+        fontSize: "1.75em",
+        margin: "0 5px"
     },
     showAnalysis: (show) => {
 
         const style = {
             marginTop: 24,
-            padding: '0 40px',
-            lineHeight: '3em'
+            padding: "0 40px",
+            lineHeight: "3em"
         };
 
         if (show) {
             assign(style, {
-                display: 'block'
+                display: "block"
             });
         } else {
             assign(style, {
-                display: 'none'
+                display: "none"
             });
         }
         return style;
     },
     dialogStyle: {
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         right: 0,
         left: 0

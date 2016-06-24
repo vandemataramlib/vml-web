@@ -1,8 +1,15 @@
-import React, { Component, PropTypes } from 'react';
+import * as React from "react";
 
-import Verse from './Verse';
+import Verse from "./Verse";
 
-export default class Body extends Component {
+interface BodyProps {
+    text: Array<string>;
+    encoding: string;
+    documentId: string;
+    annotateMode: boolean;
+};
+
+export default class Body extends React.Component<BodyProps, any> {
     constructor(props) {
 
         super(props);
@@ -51,17 +58,10 @@ export default class Body extends Component {
     }
 }
 
-Body.propTypes = {
-    text: PropTypes.array,
-    encoding: PropTypes.string,
-    documentId: PropTypes.string,
-    annotateMode: PropTypes.bool
-};
-
 const styles = {
     mainBody: {
-        boxSizing: 'border-box',
-        WebkitBoxSizing: 'border-box'
+        boxSizing: "border-box",
+        WebkitBoxSizing: "border-box"
         // marginTop: 10
         // position: 'relative'
     }

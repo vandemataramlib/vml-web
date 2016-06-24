@@ -1,14 +1,14 @@
-import Hapi from 'hapi';
-import Inert from 'inert';
-import React from 'react';
-import { match, RouterContext } from 'react-router';
-import { renderToString } from 'react-dom/server';
-import { orange100, orange500, orange700 } from 'material-ui/styles/colors';
+import * as Hapi from "hapi";
+import * as Inert from "inert";
+import * as React from "react";
+import { match, RouterContext } from "react-router";
+import { renderToString } from "react-dom/server";
+import { orange100, orange500, orange700 } from "material-ui/styles/colors";
 
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from "material-ui/styles/getMuiTheme";
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 
-import routes from '../config/routes';
+import routes from "../config/routes";
 
 const server = new Hapi.Server();
 server.connection({
@@ -23,11 +23,11 @@ server.register(Inert, (err) => {
 });
 
 server.route({
-    path: '/static/{filename}',
-    method: 'GET',
+    path: "/static/{filename}",
+    method: "GET",
     handler: {
         directory: {
-            path: 'public'
+            path: "public"
         }
     }
 });
@@ -54,13 +54,13 @@ const renderPage = (appHtml) => {
 
 
 server.route({
-    path: '/{path*}',
-    method: 'GET',
+    path: "/{path*}",
+    method: "GET",
     handler: function (request, reply) {
 
         const muiTheme = getMuiTheme({
-            userAgent: request.raw.req.headers['user-agent'],
-            fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif, Siddhanta',
+            userAgent: request.raw.req.getHeader("user-agent"), // .headers
+            fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif, Siddhanta",
             palette: {
                 primary1Color: orange500,
                 primary2Color: orange700,
@@ -78,10 +78,10 @@ server.route({
                 return reply.redirect(redirect.pathname + redirect.search);
             }
             else if (!props) {
-                return reply('not found');
+                return reply("not found");
             }
 
-            const appHtml = renderToString(<MuiThemeProvider muiTheme={ muiTheme }><RouterContext {...props} /></MuiThemeProvider>);
+            const appHtml = renderToString(<MuiThemeProvider muiTheme= { muiTheme } > <RouterContext {...props } /></MuiThemeProvider > );
             reply(renderPage(appHtml));
         });
     }
@@ -94,5 +94,5 @@ server.start((err) => {
         return;
     }
 
-    console.log('server started at', server.info.uri);
+    console.log("server started at", server.info.uri);
 });

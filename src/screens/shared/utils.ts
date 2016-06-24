@@ -1,4 +1,4 @@
-import Sanscript from 'sanscript';
+import * as Sanscript from "sanscript";
 import {
     red500,
     pink500,
@@ -36,12 +36,12 @@ import {
     deepOrange50,
     brown50,
     blueGrey50
-} from 'material-ui/styles/colors';
+} from "material-ui/styles/colors";
 
-export const translit = (word, from, to) => {
+export const translit = (word: string, from?: string, to?: string): string => {
 
     if (!from) {
-        return Sanscript.t(word, 'itrans', 'devanagari');
+        return Sanscript.t(word, "itrans", "devanagari");
     }
 
     return Sanscript.t(word, from, to);

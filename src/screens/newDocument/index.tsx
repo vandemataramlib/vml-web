@@ -1,87 +1,99 @@
-import React, { Component, PropTypes } from 'react';
-import { withRouter } from 'react-router';
-import MenuItem from 'material-ui/MenuItem';
-import SelectField from 'material-ui/SelectField';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
-import { uniqueId } from 'lodash';
+import * as React from "react";
+import { withRouter } from "react-router";
+import MenuItem from "material-ui/MenuItem";
+import SelectField from "material-ui/SelectField";
+import TextField from "material-ui/TextField";
+import FlatButton from "material-ui/FlatButton";
+import { uniqueId } from "lodash";
 
-import PaperCustom from '../shared/PaperCustom';
+import PaperCustom from "../shared/PaperCustom";
 
 const categories = [
     {
-        c: 'Shruti',
+        c: "Shruti",
         id: 1,
         sub: [
             {
-                c: 'Veda',
+                c: "Veda",
                 id: 11
             },
             {
-                c: 'Upanishad',
+                c: "Upanishad",
                 id: 12
             },
             {
-                c: 'Gita',
+                c: "Gita",
                 id: 11
             }
         ]
     },
     {
-        c: 'Smriti',
+        c: "Smriti",
         id: 2,
         sub: [
             {
-                c: 'Purana',
+                c: "Purana",
                 id: 21
             }
         ]
     },
     {
-        c: 'Itihasa',
+        c: "Itihasa",
         id: 3,
         sub: [
             {
-                c: 'Ramayana',
+                c: "Ramayana",
                 id: 31
             },
             {
-                c: 'Mahabharata',
+                c: "Mahabharata",
                 id: 32
             }
         ]
     },
     {
-        c: 'Shastra',
+        c: "Shastra",
         id: 4
     },
     {
-        c: 'Literature',
+        c: "Literature",
         id: 5
     },
     {
-        c: 'Tantra',
+        c: "Tantra",
         id: 6
     },
     {
-        c: 'Vedanta',
+        c: "Vedanta",
         id: 7
     },
     {
-        c: 'Yoga',
+        c: "Yoga",
         id: 8
     },
     {
-        c: 'Science and Technology',
+        c: "Science and Technology",
         id: 9
     },
     {
-        c: 'Other',
+        c: "Other",
         id: 10
     }
 ];
 
-export class TextForm extends Component {
+interface TextFormProps {
+    router: Array<any>;
+}
+
+export class TextForm extends React.Component<TextFormProps, any> {
+    componentRefs: {
+        documentTitle?: TextField;
+        documentCategory?: TextField;
+        documentSubCategory?: TextField;
+        documentTags?: TextField;
+        documentText?: TextField;
+    } = {};
+
     constructor(props) {
 
         super(props);
@@ -89,13 +101,12 @@ export class TextForm extends Component {
         this.handleCreateClicked = this.handleCreateClicked.bind(this);
         this.handleCancelClicked = this.handleCancelClicked.bind(this);
         this.state = {
-            selectedCategory: ''
+            selectedCategory: ""
         };
     }
 
     handleCategoryChange(event, index, value) {
 
-        console.log(index, value);
         this.setState({
             selectedCategory: value
         });
@@ -103,25 +114,23 @@ export class TextForm extends Component {
 
     handleCreateClicked(event) {
 
-        const documentTitle = this.documentTitle.getValue();
-        const slug = documentTitle.split(' ').join('-');
+        const documentTitle = this.componentRefs.documentTitle.getValue();
+        const slug = documentTitle.split(" ").join("-");
 
-        const documentTextRaw = this.documentText.getValue();
+        const documentTextRaw = this.componentRefs.documentTitle.getValue();
 
-        let verses = documentTextRaw.split('\n\n');
         const refPattern = /\|{1,2}[\d\s]*\|{0,2}/;
-        verses = verses.map((verse, verseIndex) => {
+        const verses = documentTextRaw.split("\n\n").map((verse, verseIndex) => {
 
-            let lines = verse.split('\n');
-            lines = lines.map((line, lineIndex) => {
+            const lines = verse.split("\n").map((line, lineIndex) => {
 
-                line = line.replace(refPattern, '').trim();
-                const words = line.split(' ').map((word, wordIndex) => {
+                line = line.replace(refPattern, "").trim();
+                const words = line.split(" ").map((word, wordIndex) => {
 
-                    const wordId = (verseIndex + 1) + '.' + (lineIndex + 1) + '.' + (wordIndex + 1);
+                    const wordId = (verseIndex + 1) + "." + (lineIndex + 1) + "." + (wordIndex + 1);
                     return { id: wordId, word };
                 });
-                return { id: (verseIndex + 1) + '.' + (lineIndex + 1), words, line };
+                return { id: (verseIndex + 1) + "." + (lineIndex + 1), words, line };
             });
             return { id: verseIndex + 1, lines, verse };
         });
@@ -130,30 +139,33 @@ export class TextForm extends Component {
             id: Date.now().toString(),
             title: documentTitle,
             slug,
-            category: this.documentCategory.props.value,
-            subCategory: this.documentSubCategory.getValue(),
-            tags: this.documentTags.getValue().split(',').map((tag) => tag.trim()),
+            category: this.componentRefs.documentCategory.getValue(),
+            subCategory: this.componentRefs.documentSubCategory.getValue(),
+            tags: this.componentRefs.documentTags.getValue().split(",").map((tag) => tag.trim()),
             text: verses
         };
 
-        let documents = localStorage.getItem('documents');
+        const storedDocuments = localStorage.getItem("documents");
 
-        if (!documents) {
-            documents = [];
-        } else {
-            documents = JSON.parse(documents);
+        let docObj;
+
+        if (!storedDocuments) {
+            docObj = [];
+        }
+        else {
+            docObj = JSON.parse(storedDocuments);
         }
 
-        documents.push(documentObject);
+        docObj.push(documentObject);
 
         // localStorage.setItem(slug, JSON.stringify(documentObject));
-        localStorage.setItem('documents', JSON.stringify(documents));
+        localStorage.setItem("documents", JSON.stringify(docObj));
         this.props.router.push(`/documents/${slug}`);
     }
 
     handleCancelClicked() {
 
-        this.props.router.push('/');
+        this.props.router.push("/");
     }
 
     render() {
@@ -173,7 +185,7 @@ export class TextForm extends Component {
                                     hintText="Document title in ITRANS"
                                     floatingLabelText="Title"
                                     fullWidth
-                                    ref={ (c) => this.documentTitle = c }
+                                    ref={ (documentTitle) => this.componentRefs.documentTitle = documentTitle }
                                     />
                             </div>
                         </div>
@@ -184,7 +196,7 @@ export class TextForm extends Component {
                                     fullWidth
                                     onChange={ this.handleCategoryChange }
                                     value={ this.state.selectedCategory }
-                                    ref={ (c) => this.documentCategory = c }
+                                    ref={ (documentCategory) => this.componentRefs.documentCategory = documentCategory }
                                     >
                                     { categories.map((category) => <MenuItem value={ category.id } key={ category.id } primaryText={ category.c } />) }
                                 </SelectField>
@@ -193,7 +205,7 @@ export class TextForm extends Component {
                                 <TextField
                                     floatingLabelText="Sub-category"
                                     fullWidth
-                                    ref={ (c) => this.documentSubCategory = c }
+                                    ref={ (documentSubCategory) => this.componentRefs.documentSubCategory = documentSubCategory }
                                     />
                             </div>
                         </div>
@@ -203,7 +215,7 @@ export class TextForm extends Component {
                                     hintText="Comma-separated"
                                     floatingLabelText="Tags"
                                     fullWidth
-                                    ref={ (c) => this.documentTags = c }
+                                    ref={ (documentTags) => this.componentRefs.documentTags = documentTags }
                                     />
                             </div>
                         </div>
@@ -215,7 +227,7 @@ export class TextForm extends Component {
                                     multiLine
                                     rows={ 20 }
                                     fullWidth
-                                    ref={ (c) => this.documentText = c }
+                                    ref={ (documentText) => this.componentRefs.documentText = documentText }
                                     />
                             </div>
                         </div>
@@ -237,6 +249,6 @@ export default withRouter(TextForm);
 const styles = {
     createButton: {
         marginTop: 30,
-        textAlign: 'right'
+        textAlign: "right"
     }
 };

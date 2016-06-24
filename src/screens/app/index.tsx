@@ -1,27 +1,27 @@
-import React, { Component, PropTypes } from 'react';
-import AppBar from 'material-ui/AppBar';
-import FlatButton from 'material-ui/FlatButton';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import * as React from "react";
+import AppBar from "material-ui/AppBar";
+import FlatButton from "material-ui/FlatButton";
+import FloatingActionButton from "material-ui/FloatingActionButton";
+import ContentAdd from "material-ui/svg-icons/content/add";
 // import Radium, { StyleRoot } from 'radium';
-import { Link, withRouter } from 'react-router';
+import { Link, withRouter } from "react-router";
 // import { Grid, Cell } from 'radium-grid';
 
-import Layout from './Layout';
-import SideNav from './SideNav';
+import Layout from "./Layout";
+import SideNav from "./SideNav";
 
 const styles = {
     title: {
-        cursor: 'pointer'
+        cursor: "pointer"
     },
     fab: {
-        position: 'fixed',
+        position: "fixed",
         right: 25,
         bottom: 25
     }
 };
 
-export class App extends Component {
+export class App extends React.Component<any, any> {
     constructor(props) {
 
         super(props);
@@ -50,12 +50,12 @@ export class App extends Component {
 
     handleTitleTouchTap() {
 
-        this.props.router.push('/');
+        this.props.router.push("/");
     }
 
     handleTouchEnded() {
 
-        this.props.router.push('/new');
+        this.props.router.push("/new");
     }
 
     render() {

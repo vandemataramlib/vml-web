@@ -1,13 +1,13 @@
-import React, { Component, PropTypes } from 'react';
-import { withRouter } from 'react-router';
-import { slice, concat, findIndex } from 'lodash';
+import * as React from "react";
+import { withRouter } from "react-router";
+import { slice, concat, findIndex } from "lodash";
 
-import Header from './Header';
-import Body from './Body';
+import Header from "./Header";
+import Body from "./Body";
 
-const defaultEncoding = 'devanagari';
+const defaultEncoding = "devanagari";
 
-export class Document extends Component {
+export class Document extends React.Component<any, any> {
     constructor(props) {
 
         super(props);
@@ -30,9 +30,9 @@ export class Document extends Component {
     componentDidMount() {
 
         const documentTitleSlug = this.props.params.title;
-        const documents = localStorage.getItem('documents');
+        const documents = localStorage.getItem("documents");
         const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
-        const encoding = localStorage.getItem('encoding') || defaultEncoding;
+        const encoding = localStorage.getItem("encoding") || defaultEncoding;
         this.setState({
             document,
             encoding
@@ -42,7 +42,7 @@ export class Document extends Component {
     componentWillReceiveProps(nextProps) {
 
         const documentTitleSlug = nextProps.params.title;
-        const documents = localStorage.getItem('documents');
+        const documents = localStorage.getItem("documents");
         const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
         this.state.document = document;
     }
@@ -58,8 +58,8 @@ export class Document extends Component {
 
         if (this.state.annotateMode) {
             event.preventDefault();
-            const docId = event.target.attributes['data-document-id'].value;
-            const verseId = event.target.attributes['data-verse-id'].value;
+            const docId = event.target.attributes["data-document-id"].value;
+            const verseId = event.target.attributes["data-verse-id"].value;
             this.setState({
                 wordPopoverOpen: true,
                 selected: { docId, verseId }
@@ -67,7 +67,7 @@ export class Document extends Component {
         }
     }
 
-    handleRequestClose() {
+    handleRequestClose = (event) => {
 
         this.setState({
             wordPopoverOpen: false,
@@ -77,14 +77,14 @@ export class Document extends Component {
 
     handleSaveAnalysis(selected, updatedVerse, event) {
 
-        const documents = JSON.parse(localStorage.getItem('documents'));
+        const documents = JSON.parse(localStorage.getItem("documents"));
         const document = documents.find((doc) => doc.id === selected.docId);
         const verseIndex = selected.verseId - 1;
         const updatedDocumentText = concat([], slice(document.text, 0, verseIndex), updatedVerse, slice(document.text, verseIndex + 1));
         document.text = updatedDocumentText;
-        const documentIndex = findIndex(documents, (doc) => doc.id === selected.docId);
+        const documentIndex = findIndex(documents, (doc: any) => doc.id === selected.docId);
         const updatedDocuments = concat([], slice(documents, 0, documentIndex), document, slice(documents, documentIndex + 1));
-        localStorage.setItem('documents', JSON.stringify(updatedDocuments));
+        localStorage.setItem("documents", JSON.stringify(updatedDocuments));
         this.handleRequestClose(event);
         this.setState({
             document
@@ -98,7 +98,7 @@ export class Document extends Component {
 
     handleEncodingChange(event, value) {
 
-        localStorage.setItem('encoding', value);
+        localStorage.setItem("encoding", value);
 
         this.setState({
             encoding: value
@@ -116,7 +116,7 @@ export class Document extends Component {
                 <div className="col-xs-offset-2 col-xs-8">
                     <Header
                         documentTitle={ this.state.document.title }
-                        onSettingsTouchTap={ this.handleSettingsTouchTap }
+                        // onSettingsTouchTap={ this.handleSettingsTouchTap }
                         onAnnotateToggle={ this.handleAnnotateToggle }
                         annotateMode={ this.state.annotateMode }
                         onEncodingChange={ this.handleEncodingChange }

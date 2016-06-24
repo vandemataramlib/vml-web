@@ -1,13 +1,14 @@
-import React, { Component, PropTypes } from 'react';
-import Divider from 'material-ui/Divider';
-import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
-import Subheader from 'material-ui/Subheader';
-import { Link } from 'react-router';
+import * as React from "react";
+import Divider from "material-ui/Divider";
+import Drawer from "material-ui/Drawer";
+import MenuItem from "material-ui/MenuItem";
+import Subheader from "material-ui/Subheader";
+import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
+import { Link } from "react-router";
 
-import { translit } from '../shared/utils';
+import { translit } from "../shared/utils";
 
-export default class SideNav extends Component {
+export default class SideNav extends React.Component<any, any> {
     render() {
 
         // const menus = [
@@ -28,14 +29,14 @@ export default class SideNav extends Component {
 
         const menus = [];
 
-        if (process.env && !process.env.SERVER) {
+        if (ExecutionEnvironment.canUseDOM) {
 
-            const documents = localStorage.getItem('documents');
+            const documents = localStorage.getItem("documents");
 
             if (documents) {
                 const documentsObj = JSON.parse(documents);
                 const documentMenuItems = documentsObj.map((doc) => { return { u: `/documents/${doc.slug}`, t: translit(doc.title) }; });
-                menus.push({ group: 'Documents', items: documentMenuItems });
+                menus.push({ group: "Documents", items: documentMenuItems });
             }
         }
 

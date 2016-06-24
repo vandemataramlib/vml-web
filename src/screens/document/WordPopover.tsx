@@ -1,37 +1,35 @@
-import React, { Component, PropTypes } from 'react';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
-import { grey500 } from 'material-ui/styles/colors';
-import { assign } from 'lodash';
+import * as React from "react";
+import TextField from "material-ui/TextField";
+import FlatButton from "material-ui/FlatButton";
+import { grey500 } from "material-ui/styles/colors";
+import { assign } from "lodash";
 
-import { translit, getColour } from '../shared/utils';
+import { translit, getColour } from "../shared/utils";
 
-export default class WordPopover extends Component {
+export default class WordPopover extends React.Component<any, any> {
     constructor(props) {
 
         super(props);
-        this.handleWordChange = this.handleWordChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
         this.state = {
             localWord: this.props.word ? this.props.word.word : null
         };
     }
 
-    handleWordChange(event, value) {
+    handleWordChange = (event) => {
 
         this.setState({
-            localWord: value
+            localWord: event.target.value
         });
     }
 
-    handleSave(event) {
+    handleSave = (event) => {
 
         const originalWord = this.props.word;
 
-        const wordAnalysis = this.state.localWord.split(' ').map((word, wordIndex) => {
+        const wordAnalysis = this.state.localWord.split(" ").map((word, wordIndex) => {
 
             return {
-                id: originalWord.id + '.' + (wordIndex + 1),
+                id: originalWord.id + "." + (wordIndex + 1),
                 token: word
             };
         });
@@ -49,9 +47,9 @@ export default class WordPopover extends Component {
                 <div style={ styles.heading }>{ translit(this.props.word.word) }</div>
                 <div>
                     {
-                        this.state.localWord.split(' ').map((w, i) => {
+                        this.state.localWord.split(" ").map((w, i) => {
                             return React.Children.toArray([
-                                <span style={ { color: grey500 } }> { i === 0 ? '=' : '+'} </span>,
+                                <span style={ { color: grey500 } }> { i === 0 ? "=" : "+"} </span>,
                                 <span style={ assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
                             ]);
                         })
@@ -71,19 +69,19 @@ export default class WordPopover extends Component {
 
 const styles = {
     popoverStyle: {
-        padding: '10px 20px',
+        padding: "10px 20px",
         minWidth: 400
     },
     createButton: {
-        textAlign: 'right'
+        textAlign: "right"
     },
     heading: {
-        fontWeight: 'bold',
-        fontSize: '1.17em',
+        fontWeight: "bold",
+        fontSize: "1.17em",
         marginBottom: 10
     },
     sandhi: {
-        fontWeight: 'bold',
-        fontSize: '1.25em'
+        fontWeight: "bold",
+        fontSize: "1.25em"
     }
 };
