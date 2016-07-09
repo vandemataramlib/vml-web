@@ -5,9 +5,13 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { orange100, orange500, orange700 } from "material-ui/styles/colors";
 import { render } from "react-dom";
 import { Router, browserHistory } from "react-router";
+import { Provider } from "mobx-react";
+import "core-js/shim";
 
 import routes from "../config/routes";
-import { bootstrapData } from "../db/bootstrapData";
+import { AppState } from "../stores/appState";
+import { DocumentStore } from "../stores/documents";
+import { Context } from "../interfaces/context";
 
 ReactTapEventPlugin();
 
@@ -22,10 +26,6 @@ const App = () => {
         }
     });
 
-    if (!localStorage.getItem("documents")) {
-        localStorage.setItem("documents", JSON.stringify(bootstrapData.data));
-    }
-
     return (
         <MuiThemeProvider muiTheme={ muiTheme }>
             <Router routes={ routes } history={ browserHistory } />
@@ -33,7 +33,20 @@ const App = () => {
     );
 };
 
+interface WindowCustom extends Window {
+    __INITIAL_STATE__: Context;
+}
+
+declare const window: WindowCustom;
+
+const context: Context = {
+    appState: new AppState(window.__INITIAL_STATE__.appState),
+    documentStore: new DocumentStore(window.__INITIAL_STATE__.documentStore)
+};
+
 render(
-    <App />,
+    <Provider { ...context }>
+        <App />
+    </Provider>,
     document.getElementById("app")
 );

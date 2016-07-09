@@ -1,3 +1,5 @@
+"use script";
+
 const webpack = require('webpack');
 
 module.exports = {

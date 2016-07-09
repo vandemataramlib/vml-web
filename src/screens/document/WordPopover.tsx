@@ -2,38 +2,46 @@ import * as React from "react";
 import TextField from "material-ui/TextField";
 import FlatButton from "material-ui/FlatButton";
 import { grey500 } from "material-ui/styles/colors";
-import { assign } from "lodash";
+import { observable } from "mobx";
+import { observer } from "mobx-react";
 
-import { translit, getColour } from "../shared/utils";
+import { translit, getColour } from "../../utils";
+import { Word as WordType, DocumentStore, Token } from "../../stores/documents";
 
-export default class WordPopover extends React.Component<any, any> {
+interface WordPopoverProps {
+    word: WordType;
+    onSaveWordAnalysis: any;
+    onTouchTapCancel: any;
+}
+
+@observer
+export class WordPopover extends React.Component<WordPopoverProps, {}> {
+    @observable localWord: string;
+
     constructor(props) {
 
         super(props);
-        this.state = {
-            localWord: this.props.word ? this.props.word.word : null
-        };
+        this.localWord = this.props.word.analysis ? this.props.word.analysis.map(token => token.token).join(" ") : this.props.word.word;
     }
 
     handleWordChange = (event) => {
 
-        this.setState({
-            localWord: event.target.value
-        });
+        this.localWord = event.target.value.trim();
     }
 
     handleSave = (event) => {
 
-        const originalWord = this.props.word;
+        const { word } = this.props;
 
-        const wordAnalysis = this.state.localWord.split(" ").map((word, wordIndex) => {
+        const analysis = this.localWord.split(/\s+/).map((token, tokenIndex): Token => {
 
             return {
-                id: originalWord.id + "." + (wordIndex + 1),
-                token: word
+                id: word.id + "." + (tokenIndex + 1),
+                token: token
             };
         });
-        this.props.onSaveWordAnalysis(event, { wordId: originalWord.id, analysis: wordAnalysis });
+
+        this.props.onSaveWordAnalysis(event, { id: word.id, word, analysis });
     }
 
     render() {
@@ -47,15 +55,15 @@ export default class WordPopover extends React.Component<any, any> {
                 <div style={ styles.heading }>{ translit(this.props.word.word) }</div>
                 <div>
                     {
-                        this.state.localWord.split(" ").map((w, i) => {
+                        this.localWord.split(/\s+/).map((w, i) => {
                             return React.Children.toArray([
                                 <span style={ { color: grey500 } }> { i === 0 ? "=" : "+"} </span>,
-                                <span style={ assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
+                                <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
                             ]);
                         })
                     }
                 </div>
-                <TextField id="itrans-word" defaultValue={ this.props.word.word } onChange={ this.handleWordChange } fullWidth />
+                <TextField id="text-field" defaultValue={ this.localWord } onChange={ this.handleWordChange } fullWidth />
                 <div className="row" style={ styles.createButton }>
                     <div className="col-xs-12">
                         <FlatButton label="Cancel" secondary onTouchTap={ this.props.onTouchTapCancel } />

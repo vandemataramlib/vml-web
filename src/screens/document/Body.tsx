@@ -1,58 +1,107 @@
 import * as React from "react";
+import { observer } from "mobx-react";
+import { observable } from "mobx";
 
-import Verse from "./Verse";
+import { Paragraph } from "./Paragraph";
+import { ParagraphDialog } from "./ParagraphDialog";
+import { Encoding } from "../../stores/appState";
+import { DocumentStore, Text, Word, Line } from "../../stores/documents";
 
 interface BodyProps {
-    text: Array<string>;
-    encoding: string;
-    documentId: string;
     annotateMode: boolean;
-};
+    documentStore?: DocumentStore;
+}
 
-export default class Body extends React.Component<BodyProps, any> {
-    constructor(props) {
+@observer(["documentStore"])
+export class Body extends React.Component<BodyProps, {}> {
+    @observable dialogOpen: boolean;
+    @observable dialogText: Text;
 
-        super(props);
-        // this.renderVerse = this.renderVerse.bind(this);
-    }
+    renderParagraph = (paragraph: Text, paragraphIndex: number, numParagraphs: number) => {
 
-    shouldComponentUpdate(nextProps, nextState) {
-
-        const { text, encoding, documentId, annotateMode } = this.props;
-
-        if (text === nextProps.text && encoding === nextProps.encoding && documentId === nextProps.documentId && annotateMode === nextProps.annotateMode) {
-            return false;
-        }
-
-        return true;
-    }
-
-    renderVerse(numVerses, verse, verseIndex) {
-
-        const { documentId, encoding, annotateMode } = this.props;
+        const { documentStore, annotateMode } = this.props;
 
         return (
-            <Verse
-                documentId={ documentId }
-                verse={ verse }
-                encoding={ encoding }
-                isLast={ verseIndex === numVerses - 1 }
-                isFirst={ verseIndex === 0 }
-                key={ verse.id }
+            <Paragraph
+                text={ paragraph }
+                isLast={ paragraphIndex === numParagraphs - 1 }
+                key={ paragraph.id }
                 annotateMode={ annotateMode }
+                onDialogOpen={ this.handleDialogOpen }
                 />
         );
     }
 
+    handleDialogOpen = (text: Text) => {
+
+        this.dialogText = text;
+        this.dialogOpen = true;
+    }
+
+    handleRequestClose = () => {
+
+        this.dialogOpen = false;
+    }
+
+    handleSaveWordAnalysis = (event, lineId, updatedWord: Word) => {
+
+        let newText: Text = Object.assign({}, this.dialogText);
+
+        newText.lines = newText.lines.map(line => {
+
+            const newLine: Line = Object.assign({}, line);
+
+            if (newLine.id === lineId) {
+                let newWords: Word[] = Object.assign({}, newLine.words);
+                newWords = newLine.words.map(word => {
+
+                    let newWord: Word = Object.assign({}, word);
+
+                    if (word.id === updatedWord.id) {
+                        newWord.analysis = updatedWord.analysis;
+                    }
+
+                    return newWord;
+                });
+
+                newLine.words = newWords;
+            }
+            return newLine;
+        });
+        this.dialogText = newText;
+    }
+
+    handleSaveParagraphDialog = (updatedText: Text) => {
+
+        this.dialogOpen = false;
+        this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.slug, updatedText);
+    }
+
     render() {
 
-        const { text } = this.props;
+        const { documentStore } = this.props;
 
-        const numVerses = text.length;
+        if (!documentStore.shownDocument) {
+            return null;
+        }
+
+        const text = documentStore.shownDocument.text;
+        const numParagraphs = text.length;
 
         return (
             <div style={ styles.mainBody }>
-                { text.map(this.renderVerse.bind(this, numVerses)) }
+                { text.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs)) }
+                {
+                    this.props.annotateMode ?
+                        <ParagraphDialog
+                            open={ this.dialogOpen }
+                            text={ this.dialogText }
+                            onRequestClose={ this.handleRequestClose }
+                            onSaveWordAnalysis={ (event, lineId, updatedWord) => this.handleSaveWordAnalysis(event, lineId, updatedWord) }
+                            onSaveParagraph={ this.handleSaveParagraphDialog }
+                            />
+                        : null
+                }
             </div>
         );
     }

@@ -1,11 +1,15 @@
 {
   "dependencies": {
-    "lodash": "registry:npm/lodash#4.0.0+20160416211519",
+    "history": "registry:npm/history#2.0.0+20160607172317",
     "react-router": "registry:npm/react-router#2.4.0+20160616150328"
   },
   "globalDependencies": {
+    "boom": "registry:dt/boom#0.0.0+20160317120654",
+    "core-js": "registry:dt/core-js#0.0.0+20160602141332",
+    "handlebars": "registry:dt/handlebars#3.0.3+20160317120654",
     "hapi": "registry:dt/hapi#13.0.0+20160521152637",
-    "material-ui": "registry:dt/material-ui#0.15.0+20160608102658",
+    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046",
+    "material-ui": "registry:dt/material-ui#0.15.1+20160701192820",
     "react": "registry:dt/react#0.14.0+20160602151522",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
     "react-tap-event-plugin": "registry:dt/react-tap-event-plugin#0.0.0+20160602142434"

@@ -3,42 +3,29 @@ import Divider from "material-ui/Divider";
 import Drawer from "material-ui/Drawer";
 import MenuItem from "material-ui/MenuItem";
 import Subheader from "material-ui/Subheader";
-import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 import { Link } from "react-router";
+import { observer } from "mobx-react";
 
-import { translit } from "../shared/utils";
+import { translit } from "../../utils";
+import { Context } from "../../interfaces/context";
+import { DocumentStore } from "../../stores/documents";
 
-export default class SideNav extends React.Component<any, any> {
+interface SideNavProps {
+    documentStore?: DocumentStore;
+    open: boolean;
+    onClose: any;
+}
+
+@observer(["documentStore"])
+export default class SideNav extends React.Component<SideNavProps, {}> {
     render() {
 
-        // const menus = [
-        //     {
-        //         group: 'Admin',
-        //         items: [
-        //             {
-        //                 u: '/new',
-        //                 t: 'New document'
-        //             },
-        //             {
-        //                 u: '/about',
-        //                 t: 'About'
-        //             }
-        //         ]
-        //     }
-        // ];
-
-        const menus = [];
-
-        if (ExecutionEnvironment.canUseDOM) {
-
-            const documents = localStorage.getItem("documents");
-
-            if (documents) {
-                const documentsObj = JSON.parse(documents);
-                const documentMenuItems = documentsObj.map((doc) => { return { u: `/documents/${doc.slug}`, t: translit(doc.title) }; });
-                menus.push({ group: "Documents", items: documentMenuItems });
+        const menus = [
+            {
+                group: "Documents",
+                items: this.props.documentStore.documentsTOC
             }
-        }
+        ];
 
         return (
             <Drawer open={ this.props.open } docked={ false } onRequestChange={ this.props.onClose }>

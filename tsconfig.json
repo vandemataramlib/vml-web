@@ -3,16 +3,16 @@
         "module": "commonjs",
         "target": "es5",
         "noImplicitAny": false,
-        "sourceMap": false,
         "jsx": "react",
-        "allowJs": true,
-        "outDir": "dist",
-        "experimentalDecorators": true
-        // "declaration": true
+        "outDir": "public",
+        "experimentalDecorators": true,
+        "removeComments": true
     },
     "exclude": [
         "node_modules",
         "webpack.config.js",
-        "webpack.server.config.js"
+        "webpack.server.config.js",
+        "webpack.client.config.js",
+        "webpack.newserver.config.js"
     ]
 }

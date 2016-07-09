@@ -4,264 +4,48 @@ import Popover from "material-ui/Popover";
 import FlatButton from "material-ui/FlatButton";
 import * as Sortable from "react-anything-sortable";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
-import { assign, flatten } from "lodash";
+import { observer } from "mobx-react";
+import { observable } from "mobx";
+import { translit, getColour, getLightColour } from "../../utils";
 
-import WordPopover from "./WordPopover";
-import SortableToken from "./SortableToken";
-import { translit, getColour, getLightColour } from "../shared/utils";
+import { Text, DocumentStore, Word, Token } from "../../stores/documents";
+import { SortableToken } from "./SortableToken";
+import { WordPopover } from "./WordPopover";
+import { Line } from "./Line";
 
+interface TheDialogProps {
+    open: boolean;
+    text: Text;
+    onRequestClose: React.EventHandler<any>;
+    documentStore?: DocumentStore;
+    onSaveWordAnalysis: any;
+    onSaveParagraph: any;
+}
 
+@observer(["documentStore"])
+export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
+    @observable wordPopoverOpen: boolean;
+    @observable anchorEl: any;
+    @observable word: Word;
+    lineId: string;
+    rearrangedTokens: Token[] = [];
+    @observable allWordsAnalysed: boolean;
+    @observable analysedClicked: boolean;
 
-export default class ParagraphDialog extends React.Component<any, any> {
-    constructor(props) {
+    prepareParagraphSave = () => {
 
-        super(props);
-        this.handleWordClicked = this.handleWordClicked.bind(this);
-        this.handleTokenSort = this.handleTokenSort.bind(this);
-        this.handleAnalyseClick = this.handleAnalyseClick.bind(this);
-        this.handleRequestClose = this.handleRequestClose.bind(this);
-        this.handleSaveWordAnalysis = this.handleSaveWordAnalysis.bind(this);
-        this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
-        this.state = {
-            wordPopoverOpen: false,
-            showAnalysis: false,
-            analysedTokens: [],
-            rearrangedTokens: [],
-            unalysed: true
-        };
-        // <Sortable></Sortable>
+        const updatedText: Text = Object.assign({}, this.props.text);
+        updatedText.analysis = this.rearrangedTokens;
+        this.props.onSaveParagraph(updatedText);
     }
 
-    componentWillMount() {
+    componentWillReceiveProps() {
 
-        // const verse = this.getVerse(this.props.selected.docId, this.props.selected.verseId);
-        const verse = this.getVerse();
-        this.setState({
-            verse: assign({}, verse),
-            unalysed: verse.analysis ? false : true,
-            analysedTokens: verse.analysis ? this.getAnalysedTokens(verse) : [],
-            rearrangedTokens: verse.analysis ? verse.analysis : [],
-            showAnalysis: verse.analysis ? true : false
-        });
+        this.analysedClicked = false;
+        this.rearrangedTokens = [];
     }
 
-    componentWillReceiveProps(nextProps) {
-
-        // const verse = this.getVerse(nextProps.selected.docId, nextProps.selected.verseId);
-        const verse = this.getVerse();
-        this.setState({
-            verse: assign({}, verse),
-            unalysed: verse.analysis ? false : true,
-            analysedTokens: verse.analysis ? this.getAnalysedTokens(verse) : [],
-            rearrangedTokens: verse.analysis ? verse.analysis : [],
-            showAnalysis: verse.analysis ? true : false
-        });
-    }
-
-    getVerse() {
-
-        // const documents = JSON.parse(localStorage.getItem('documents'));
-        // const document = documents.find((document) => document.id === docId);
-        // return document.text[verseId - 1];
-        return this.props.verse;
-    }
-
-    handleWordHoveredIn(event) {
-
-        event.target.style.backgroundColor = styles.hovered.backgroundColor;
-    }
-
-    handleWordHoveredOut(event) {
-
-        event.target.style.backgroundColor = null;
-    }
-
-    handleWordClicked(event, value) {
-
-        event.preventDefault();
-        const word = event.target.attributes["data-word"].value;
-        const wordId = event.target.attributes["data-word-id"].value;
-        const lineId = event.target.parentElement.parentElement.id;
-        this.setState({
-            wordPopoverOpen: true,
-            anchorEl: event.currentTarget,
-            word: { id: wordId, word },
-            line: { id: lineId }
-        });
-    }
-
-    handleSaveWordAnalysis(event, value) {
-
-        this.handleRequestClose(event);
-        const updatedLines = this.state.verse.lines.map((line) => {
-
-            if (line.id === this.state.line.id) {
-                line.words.map((word) => {
-
-                    if (word.id === this.state.word.id) {
-                        word.analysis = value.analysis;
-                    }
-
-                    return word;
-                });
-            }
-            return line;
-        });
-
-        const verse: any = assign({}, this.state.verse, { lines: updatedLines });
-
-        let analysedTokens = [];
-
-        const unanalysedLine = verse.lines.find((line) => {
-
-            const unanalysedWord = line.words.find((word) => {
-
-                if (word.analysis) {
-                    analysedTokens.push(word.analysis.map((analysedToken) => { return { id: analysedToken.id, token: analysedToken.token }; }));
-                }
-                return !word.analysis ? true : false;
-            });
-
-            return unanalysedWord ? true : false;
-        });
-
-        analysedTokens = flatten(analysedTokens);
-
-        this.setState({
-            verse,
-            unalysed: unanalysedLine ? true : false,
-            analysedTokens,
-            rearrangedTokens: analysedTokens
-        });
-    }
-
-    getAnalysedTokens(verse) {
-
-        const analysedTokens = [];
-
-        const unanalysedLine = verse.lines.find((line) => {
-
-            const unanalysedWord = line.words.find((word) => {
-
-                if (word.analysis) {
-                    analysedTokens.push(word.analysis.map((analysedToken) => { return { id: analysedToken.id, token: analysedToken.token }; }));
-                }
-                return !word.analysis ? true : false;
-            });
-
-            return unanalysedWord ? true : false;
-        });
-
-        return flatten(analysedTokens);
-    }
-
-    handleCancelWordPopover(event) {
-
-        this.handleRequestClose(event);
-    }
-
-    handleRequestClose = (event) => {
-
-        this.setState({
-            wordPopoverOpen: false,
-            word: null
-        });
-    }
-
-    handleTokenSort(data) {
-
-        this.setState({
-            rearrangedTokens: data
-        });
-    }
-
-    handleAnalyseClick() {
-
-        this.setState({
-            showAnalysis: true,
-            rearrangedTokens: this.state.analysedTokens
-        });
-    }
-
-    getChildren() {
-
-        return (
-            <div>
-                <p style={ styles.paragraph }>
-                    { this.state.verse.lines.map((line, lineIndex) => {
-
-                        const wordsMap = line.words.map((word, wordIndex) => {
-
-                            const wordEl = (
-                                <span style={ styles.wordContainer } key={ word.id }>
-                                    <span
-                                        data-word={ word.word }
-                                        data-word-id={ word.id }
-                                        onMouseOver={ this.handleWordHoveredIn }
-                                        onMouseOut={ this.handleWordHoveredOut }
-                                        onTouchTap={ this.handleWordClicked }
-                                        style={ styles.word }
-                                        key={ word.id }
-                                        >
-                                        { translit(word.word) }
-                                    </span>
-                                    <span style={ styles.analysedTokens }>
-                                        {
-                                            word.analysis ? word.analysis.map((w, i) => {
-                                                return React.Children.toArray([
-                                                    <span style={ { color: grey500 } }> { i === 0 ? "" : "+" } </span>,
-                                                    <span style={ { color: getColour(i) } }>{ translit(w.token) }</span>
-                                                ]);
-                                            }) : null
-                                        }
-                                    </span>
-                                </span>
-                            );
-                            return wordIndex === 0 ?
-                                wordEl :
-                                React.Children.toArray([
-                                    <span style={ styles.emptySpace }>&nbsp; </span>,
-                                    wordEl
-                                ]);
-                        });
-
-                        const wordsEl = (
-                            <span id={ line.id } key={ line.id } style={ styles.line }>
-                                { wordsMap }
-                            </span>
-                        );
-
-                        return (
-                            wordsEl
-                        );
-                    }) }
-                </p>
-                <div style={ styles.analyseButton }>
-                    <FlatButton label="Analyse" primary disabled={ this.state.unalysed } onTouchTap={ this.handleAnalyseClick } />
-                </div>
-                <div style={ styles.showAnalysis(this.state.showAnalysis) }>
-                    <Sortable onSort={ this.handleTokenSort } dynamic>
-                        { this.state.rearrangedTokens.map((token, i) => <SortableToken sortData={ { id: token.id, token: token.token } } key={ i }><span style={ assign({ backgroundColor: getLightColour(i) }, styles.analysedToken) } key={ i }>{ translit(token.token) }</span></SortableToken>) }
-                    </Sortable>
-                </div>
-                <Popover
-                    open={ this.state.wordPopoverOpen }
-                    anchorEl={ this.state.anchorEl }
-                    anchorOrigin={ { horizontal: "left", vertical: "bottom" } }
-                    targetOrigin={ { horizontal: "left", vertical: "top" } }
-                    onRequestClose={ this.handleRequestClose }
-                    canAutoPosition
-                    autoCloseWhenOffScreen={ false }
-                    children={ <WordPopover word={ this.state.word } onSaveWordAnalysis={ this.handleSaveWordAnalysis } onTouchTapCancel={ this.handleCancelWordPopover } /> }
-                    />
-            </div>
-        );
-    }
-
-    getDialogActions() {
-
-        const verse = this.state.verse;
-        verse.analysis = this.state.rearrangedTokens;
+    getDialogActions(): JSX.Element[] {
 
         return [
             <FlatButton
@@ -272,81 +56,185 @@ export default class ParagraphDialog extends React.Component<any, any> {
             <FlatButton
                 label="Save"
                 primary
-                disabled={ this.state.unalysed }
-                onTouchTap={ this.props.onSave.bind(this, this.props.selected, verse) }
+                // disabled
+                onTouchTap={ this.prepareParagraphSave }
                 />
         ];
     }
 
-    render() {
+    handleAnalyseClick = () => {
+
+        const analysedTokens: Token[] = [];
+
+        this.props.text.lines.forEach(line => {
+
+            line.words.forEach(word => {
+
+                word.analysis.forEach(token => {
+
+                    analysedTokens.push(token);
+                });
+            });
+        });
+        this.analysedClicked = true;
+        this.rearrangedTokens = analysedTokens;
+    }
+
+    isAnalysedDisabled() {
+
+        const lineWithoutAnalysis = this.props.text.lines.some(line => {
+
+            const wordWithoutAnalysis = line.words.some(word => !word.analysis ? true : false);
+            return wordWithoutAnalysis ? true : false;
+        });
+
+        return lineWithoutAnalysis;
+    }
+
+    getAnalysedWords() {
+
+        if (!this.analysedClicked && !this.props.text.analysis) {
+            return [];
+        }
+
+        const analysedTokens: Token[] = [];
+
+        if (this.props.text.analysis && !this.analysedClicked) {
+            this.props.text.analysis.forEach(token => {
+
+                analysedTokens.push(token);
+            });
+        }
+        else {
+            this.props.text.lines.forEach(line => {
+
+                line.words.forEach(word => {
+
+                    word.analysis.forEach(token => {
+
+                        analysedTokens.push(token);
+                    });
+                });
+            });
+        }
+
+        return analysedTokens;
+    }
+
+    handleTokenSort = (tokens: Token[]) => {
+
+        this.rearrangedTokens = tokens;
+    }
+
+    getDialogChildren() {
 
         return (
-            <Dialog
-                title={ `Verse ${this.props.verse.id}` }
-                open={ this.props.open }
-                onRequestClose={ this.props.onRequestClose }
-                children={ this.getChildren() }
-                autoScrollBodyContent
-                contentStyle={ styles.dialogStyle }
-                actions={ this.getDialogActions() }
-                />
+            <div>
+                <p style={ styles.paragraph }>
+                    {
+                        this.props.text.lines.map((line, lineIndex) => {
+                            return lineIndex > 0 ?
+                                React.Children.toArray([
+                                    <br />,
+                                    <Line line={ line } onWordClicked={ (event, lineId, word) => this.handleWordClicked(event, lineId, word) } key={ line.id }/>
+                                ])
+                                : <Line line={ line } onWordClicked={ (event, lineId, word) => this.handleWordClicked(event, lineId, word) } key={ line.id }/>;
+                        })
+                    }
+                </p>
+                <div style={ styles.analyseButton }>
+                    <FlatButton label="Analyse" primary disabled={ this.isAnalysedDisabled() } onTouchTap={ this.handleAnalyseClick } />
+                </div>
+                <div style={ styles.showAnalysis(this.analysedClicked || this.props.text.analysis) }>
+                    <Sortable onSort={ this.handleTokenSort } dynamic>
+                        {
+                            this.getAnalysedWords().map((token, tokenIndex) => {
+
+                                return (
+                                    <SortableToken sortData={ token } key={ tokenIndex }>
+                                        <span style={ Object.assign({ backgroundColor: getLightColour(tokenIndex) }, styles.analysedToken) } key={ tokenIndex }>{ translit(token.token) }</span>
+                                    </SortableToken>
+                                );
+                            })
+                        }
+                    </Sortable>
+                </div>
+            </div>
+        );
+    }
+
+    handleRequestClose = (event) => {
+
+        if (this.wordPopoverOpen) {
+            return;
+        }
+
+        this.props.onRequestClose(event);
+    }
+
+    handleRequestPopoverClose = () => {
+
+        this.wordPopoverOpen = false;
+    }
+
+    handleWordClicked = (event: React.TouchEvent, lineId: string, word: Word) => {
+
+        event.preventDefault();
+        this.word = word;
+        this.anchorEl = event.currentTarget;
+        this.wordPopoverOpen = true;
+        this.lineId = lineId;
+    }
+
+    handleProcessWordAnalysis = (event, updatedWord: Word) => {
+
+        this.wordPopoverOpen = false;
+        this.props.onSaveWordAnalysis(event, this.lineId, updatedWord);
+    }
+
+    render() {
+
+        if (!this.props.text) {
+            return null;
+        }
+
+        return (
+            <div>
+                <Dialog
+                    title={ `Verse ${this.props.text.id}` }
+                    open={ this.props.open }
+                    onRequestClose={ this.handleRequestClose }
+                    contentStyle={ styles.dialogStyle }
+                    actions={ this.getDialogActions() }
+                    autoScrollBodyContent
+                    children={ this.getDialogChildren() }
+                    bodyStyle={ styles.dialogBodyStyle }
+                    />
+                <Popover
+                    open={ this.wordPopoverOpen }
+                    anchorEl={ this.anchorEl }
+                    anchorOrigin={ { horizontal: "left", vertical: "bottom" } }
+                    targetOrigin={ { horizontal: "left", vertical: "top" } }
+                    onRequestClose={ this.handleRequestPopoverClose }
+                    canAutoPosition
+                    autoCloseWhenOffScreen={ false }
+                    children={
+                        <WordPopover
+                            word={ this.word }
+                            onSaveWordAnalysis={ (event, updatedWord) => this.handleProcessWordAnalysis(event, updatedWord) }
+                            onTouchTapCancel={ this.handleRequestPopoverClose }
+                            />
+                    }
+                    />
+            </div>
         );
     }
 }
 
 const styles = {
-    header: {
-        borderBottom: `1px solid ${grey500}`
-    },
-    mainBody: {
-        marginTop: 10
-    },
     paragraph: {
         fontSize: "1.5em",
         textAlign: "center"
-    },
-    line: {
-        display: "flex",
-        justifyContent: "center"
-    },
-    wordContainer: {
-        display: "flex",
-        flexDirection: "column",
-        padding: 15
-    },
-    // word: function (analysis) {
-
-    //     const style = {
-    //         cursor: 'pointer'
-    //     };
-
-    //     if (analysis && analysis.length) {
-    //         assign(style, {
-    //             backgroundColor: orange500
-    //         });
-    //     }
-    //     // }
-
-    //     return style;
-    // },
-    word: {
-        cursor: "pointer"
-    },
-    hovered: {
-        backgroundColor: grey300
-    },
-    emptySpace: {
-        margin: "0px -5px"
-    },
-    popoverStyle: {
-        padding: "5px 10px",
-        minWidth: 200
-    },
-    analysedWord: {
-        backgroundColor: orange500
-    },
-    analysedTokens: {
-        fontSize: "75%"
     },
     analyseButton: {
         textAlign: "center"
@@ -354,7 +242,7 @@ const styles = {
     analysedToken: {
         padding: 5,
         fontSize: "1.75em",
-        margin: "0 5px"
+        margin: 5
     },
     showAnalysis: (show) => {
 
@@ -365,11 +253,12 @@ const styles = {
         };
 
         if (show) {
-            assign(style, {
-                display: "block"
+            Object.assign(style, {
+                display: "flex",
+                flexWrap: "wrap"
             });
         } else {
-            assign(style, {
+            Object.assign(style, {
                 display: "none"
             });
         }
@@ -380,5 +269,8 @@ const styles = {
         top: 0,
         right: 0,
         left: 0
+    },
+    dialogBodyStyle: {
+        color: "inherit"
     }
 };

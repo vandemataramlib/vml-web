@@ -4,7 +4,6 @@ import MenuItem from "material-ui/MenuItem";
 import SelectField from "material-ui/SelectField";
 import TextField from "material-ui/TextField";
 import FlatButton from "material-ui/FlatButton";
-import { uniqueId } from "lodash";
 
 import PaperCustom from "../shared/PaperCustom";
 

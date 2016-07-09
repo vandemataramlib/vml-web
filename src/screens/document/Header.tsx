@@ -3,69 +3,54 @@ import Paper from "material-ui/Paper";
 import IconButton from "material-ui/IconButton";
 import ActionSettings from "material-ui/svg-icons/action/settings";
 import { orange200 } from "material-ui/styles/colors";
+import { observable } from "mobx";
+import { observer } from "mobx-react";
 
-import HeaderSettings from "./HeaderSettings";
-import { translit } from "../shared/utils";
+import { HeaderSettings } from "./HeaderSettings";
+import { translit } from "../../utils";
+import { AppState } from "../../stores/appState";
+import { DocumentStore } from "../../stores/documents";
 
 interface HeaderProps {
-    documentTitle: string;
     onAnnotateToggle: Function;
     annotateMode: boolean;
-    onEncodingChange: Function;
-    encoding: string;
+    appState?: AppState;
+    documentStore?: DocumentStore;
 };
 
-export default class Header extends React.Component<HeaderProps, any> {
-    constructor(props) {
+@observer(["appState", "documentStore"])
+export class Header extends React.Component<HeaderProps, {}> {
+    @observable settingsPopoverOpen: boolean;
+    @observable anchorEl: any;
 
-        super(props);
-        this.handleSettingsTouchTap = this.handleSettingsTouchTap.bind(this);
-        this.handleSettingsRequestClose = this.handleSettingsRequestClose.bind(this);
-        this.state = {
-            settingsPopoverOpen: false
-        };
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-
-        const { documentTitle, annotateMode  } = this.props;
-        const { settingsPopoverOpen } = this.state;
-        if (documentTitle === nextProps.documentTitle && annotateMode === nextProps.annotateMode && settingsPopoverOpen === nextState.settingsPopoverOpen) {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    handleSettingsTouchTap(event) {
+    handleSettingsTouchTap = (event) => {
 
         event.preventDefault();
 
-        this.setState({
-            settingsPopoverOpen: true,
-            anchorEl: event.currentTarget
-        });
+        this.settingsPopoverOpen = true;
+        this.anchorEl = event.currentTarget;
     }
 
-    handleSettingsRequestClose() {
+    handleSettingsRequestClose = () => {
 
-        this.setState({
-            settingsPopoverOpen: false
-        });
+        this.settingsPopoverOpen = false;
     }
 
     render() {
 
-        const { documentTitle, annotateMode, encoding, onAnnotateToggle, onEncodingChange } = this.props;
+        const { annotateMode, onAnnotateToggle, appState, documentStore } = this.props;
+
+        if (!documentStore.shownDocument) {
+            return null;
+        }
 
         return (
             <Paper style={ styles.self }>
                 <div className="row" style={ styles.header }>
                     <div className="col-xs-9">
-                        <h1>{ translit(documentTitle) }</h1>
+                        <h1>{ translit(documentStore.shownDocument.title) }</h1>
                     </div>
-                    <div style={ styles.settingsContainer } className="col-xs-3">
+                    <div style={ styles.settingsContainer(appState) } className="col-xs-3">
                         <IconButton
                             onTouchTap={ this.handleSettingsTouchTap }
                             iconStyle={ styles.smallIcon }
@@ -76,13 +61,11 @@ export default class Header extends React.Component<HeaderProps, any> {
                     </div>
                 </div>
                 <HeaderSettings
-                    popoverOpen={ this.state.settingsPopoverOpen }
+                    popoverOpen={ this.settingsPopoverOpen }
                     onSettingsRequestClose={ this.handleSettingsRequestClose }
                     onAnnotateToggle={ onAnnotateToggle }
                     annotateMode={ annotateMode }
-                    onEncodingChange={ onEncodingChange }
-                    encoding={ encoding }
-                    anchorEl={ this.state.anchorEl }
+                    anchorEl={ this.anchorEl }
                     />
             </Paper>
         );
@@ -100,10 +83,12 @@ const styles = {
         // borderBottom: `1px solid ${grey500}`
         padding: "0 20px 20px 20px"
     },
-    settingsContainer: {
-        display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "center"
+    settingsContainer: (appState) => {
+        return {
+            display: appState.isClientEnv ? "flex" : "none",
+            justifyContent: "flex-end",
+            alignItems: "center"
+        };
     },
     smallIcon: {
         width: 20,

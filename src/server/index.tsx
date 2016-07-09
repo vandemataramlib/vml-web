@@ -1,90 +1,77 @@
 import * as Hapi from "hapi";
 import * as Inert from "inert";
 import * as React from "react";
+import * as Vision from "vision";
+import * as Handlebars from "handlebars";
+import { readFileSync } from "fs";
 import { match, RouterContext } from "react-router";
 import { renderToString } from "react-dom/server";
 import { orange100, orange500, orange700 } from "material-ui/styles/colors";
-
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+import { Provider } from "mobx-react";
 
+import * as HapiReactSSRWithMaterialUI from "./hapi-react-ssr-mui";
+import { AppState } from "../stores/appState";
+import { DocumentStore } from "../stores/documents";
+import * as StaticFileServer from "./fileServer";
 import routes from "../config/routes";
+import { Context } from "../interfaces/context";
 
 const server = new Hapi.Server();
+
 server.connection({
     port: 8080
 });
 
-server.register(Inert, (err) => {
+const getInitialContext = function (): Context {
+    return {
+        appState: new AppState(),
+        documentStore: new DocumentStore()
+    };
+};
+
+const muiThemeOptions = {
+    fontFamily: "Charlotte Sans, sans-serif, Siddhanta",
+    palette: {
+        primary1Color: orange500,
+        primary2Color: orange700,
+        primary3Color: orange100
+    }
+};
+
+const bundleName = JSON.parse(readFileSync("build/webpack.hash.json", "utf-8")).main;
+
+const plugins = [
+    Vision,
+    Inert,
+    StaticFileServer,
+    {
+        register: HapiReactSSRWithMaterialUI,
+        options: {
+            routes,
+            getInitialContext,
+            bootstrapAction: "fetchData",
+            rootElement: Provider,
+            template: "./index",
+            muiThemeOptions,
+            renderToStaticMarkup: true,
+            params: {
+                bundleName
+            }
+        }
+    }
+];
+
+server.register(plugins, (err) => {
 
     if (err) {
         console.error(err);
     }
 });
 
-server.route({
-    path: "/static/{filename}",
-    method: "GET",
-    handler: {
-        directory: {
-            path: "public"
-        }
-    }
-});
-
-const renderPage = (appHtml) => {
-
-    return `
-        <!doctype html public="storage">
-        <html>
-        <head>
-        <meta charset=utf-8/>
-        <title>Vande Mataram Library</title>
-        <link rel="stylesheet" href="/static/flexboxgrid.min.css">
-        <link rel="stylesheet" href="/static/sortable.css">
-        <link rel="stylesheet" href="/static/fonts.css">
-        </head>
-        <body style="background-color: #FFF3E0">
-        <div id=app>${appHtml}</div>
-        <script src="/static/bundle.js"></script>
-        </body>
-        </html>
-   `;
-};
-
-
-server.route({
-    path: "/{path*}",
-    method: "GET",
-    handler: function (request, reply) {
-
-        const muiTheme = getMuiTheme({
-            userAgent: request.raw.req.getHeader("user-agent"), // .headers
-            fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif, Siddhanta",
-            palette: {
-                primary1Color: orange500,
-                primary2Color: orange700,
-                primary3Color: orange100
-            }
-        });
-
-        match({ routes: routes, location: request.url }, (err, redirect, props) => {
-
-            if (err) {
-                console.error(err);
-                return reply(err);
-            }
-            else if (redirect) {
-                return reply.redirect(redirect.pathname + redirect.search);
-            }
-            else if (!props) {
-                return reply("not found");
-            }
-
-            const appHtml = renderToString(<MuiThemeProvider muiTheme= { muiTheme } > <RouterContext {...props } /></MuiThemeProvider > );
-            reply(renderPage(appHtml));
-        });
-    }
+server.views({
+    engines: { hbs: Handlebars }
 });
 
 server.start((err) => {

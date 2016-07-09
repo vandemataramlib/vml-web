@@ -3,10 +3,15 @@ import AppBar from "material-ui/AppBar";
 import FlatButton from "material-ui/FlatButton";
 import FloatingActionButton from "material-ui/FloatingActionButton";
 import ContentAdd from "material-ui/svg-icons/content/add";
-// import Radium, { StyleRoot } from 'radium';
+import * as ReactRouter from "react-router";
 import { Link, withRouter } from "react-router";
-// import { Grid, Cell } from 'radium-grid';
+import { observable } from "mobx";
+import { observer } from "mobx-react";
+import DevTools from "mobx-react-devtools";
 
+import { RouterRenderedComponent } from "../../interfaces/component";
+import { Context } from "../../interfaces/context";
+import { DocumentStore } from "../../stores/documents";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
 
@@ -21,39 +26,38 @@ const styles = {
     }
 };
 
-export class App extends React.Component<any, any> {
-    constructor(props) {
+const doFetchData = (context: Context, props: any) => {
+    return context.documentStore.getDocuments();
+};
 
-        super(props);
-        this.handleLeftIconClicked = this.handleLeftIconClicked.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleTitleTouchTap = this.handleTitleTouchTap.bind(this);
-        this.handleTouchEnded = this.handleTouchEnded.bind(this);
-        this.state = {
-            drawerOpen: false
-        };
+interface AppProps {
+    router: ReactRouter.IRouter;
+}
+
+@withRouter
+@observer
+export class App extends React.Component<AppProps, {}> {
+    @observable drawerOpen: boolean = false;
+    static fetchData(context: Context, props: any) {
+        return doFetchData(context, props);
     }
 
-    handleLeftIconClicked(event) {
+    handleLeftIconClicked= (event) => {
 
-        this.setState({
-            drawerOpen: !this.state.drawerOpen
-        });
+        this.drawerOpen = !this.drawerOpen;
     }
 
-    handleClose() {
+    handleClose = () => {
 
-        this.setState({
-            drawerOpen: false
-        });
+        this.drawerOpen = false;
     }
 
-    handleTitleTouchTap() {
+    handleTitleTouchTap = () => {
 
         this.props.router.push("/");
     }
 
-    handleTouchEnded() {
+    handleTouchEnded = () => {
 
         this.props.router.push("/new");
     }
@@ -69,16 +73,17 @@ export class App extends React.Component<any, any> {
                     iconElementRight={ <FlatButton label="About" containerElement={ <Link to="/about" /> } /> }
                     />
                 <SideNav
-                    open={ this.state.drawerOpen }
+                    open={ this.drawerOpen }
                     onClose={ this.handleClose }
                     />
                 <FloatingActionButton onMouseDown={ this.handleTouchEnded } style={ styles.fab }>
                     <ContentAdd />
                 </FloatingActionButton>
                 <Layout>{ this.props.children }</Layout>
+                <DevTools />
             </div>
         );
     }
 }
 
-export default withRouter(App);
+export default App as RouterRenderedComponent;

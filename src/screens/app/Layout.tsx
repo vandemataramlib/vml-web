@@ -1,4 +1,5 @@
 import * as React from "react";
+import { observer } from "mobx-react";
 
 const styles = {
     self: {
@@ -7,6 +8,7 @@ const styles = {
     }
 };
 
+@observer
 export default class Layout extends React.Component<{}, {}> {
     render() {
 

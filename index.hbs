@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vande Mataram Library</title>
+        <link rel="stylesheet" href="/static/flexboxgrid.min.css">
+        <link rel="stylesheet" href="/static/fonts.css">
+        <link rel="stylesheet" href="/static/sortable.css">
+        {{! fake a favicon - http://stackoverflow.com/a/13416784 }}
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    </head>
+    <body style="background-color: #FFF3E0">
+        <div id="app">{{{ componentRenderedToString }}}</div>
+    </body>
+    <link rel="stylesheet" href="/static/sortable.css">
+    <script type="application/javascript">
+        window.__INITIAL_STATE__ = {{{ context }}};
+    </script>
+    <script src="/static/{{ bundleName }}" type="application/javascript"></script>
+</html>

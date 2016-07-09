@@ -1,132 +1,62 @@
 import * as React from "react";
 import { withRouter } from "react-router";
-import { slice, concat, findIndex } from "lodash";
+import { observable } from "mobx";
+import { observer } from "mobx-react";
 
-import Header from "./Header";
-import Body from "./Body";
+import { RouterRenderedComponent } from "../../interfaces/component";
+import { Context } from "../../interfaces/context";
+import { DocumentStore, Document as DocumentModel } from "../../stores/documents";
+import { AppState } from "../../stores/appState";
 
-const defaultEncoding = "devanagari";
+import { Header } from "./Header";
+import { Body } from "./Body";
 
-export class Document extends React.Component<any, any> {
-    constructor(props) {
+interface DocumentProps {
+    documentStore?: DocumentStore;
+    params: any;
+}
 
-        super(props);
-        this.handleAnnotateToggle = this.handleAnnotateToggle.bind(this);
-        this.handleWordClicked = this.handleWordClicked.bind(this);
-        this.handleRequestClose = this.handleRequestClose.bind(this);
-        this.handleSaveAnalysis = this.handleSaveAnalysis.bind(this);
-        this.handleCancelWordPopover = this.handleCancelWordPopover.bind(this);
-        this.handleEncodingChange = this.handleEncodingChange.bind(this);
-        this.state = {
-            document: {},
-            annotateMode: false,
-            wordPopoverOpen: false,
-            selected: {},
-            settingsPopoverOpen: false,
-            encoding: defaultEncoding
-        };
+const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => {
+
+    return context.documentStore.showDocument(props.params.slug);
+};
+
+@withRouter
+@observer(["documentStore"])
+class Document extends React.Component<DocumentProps, {}> {
+    @observable annotateMode: boolean = false;
+
+    static fetchData(context: Context, props: any) {
+
+        return doFetchData(context, props);
     }
 
     componentDidMount() {
 
-        const documentTitleSlug = this.props.params.title;
-        const documents = localStorage.getItem("documents");
-        const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
-        const encoding = localStorage.getItem("encoding") || defaultEncoding;
-        this.setState({
-            document,
-            encoding
-        });
+        doFetchData(this.props, this.props);
     }
 
     componentWillReceiveProps(nextProps) {
 
-        const documentTitleSlug = nextProps.params.title;
-        const documents = localStorage.getItem("documents");
-        const document = JSON.parse(documents).find((doc) => doc.slug === documentTitleSlug);
-        this.state.document = document;
+        doFetchData(nextProps, nextProps);
     }
 
-    handleAnnotateToggle(event, value) {
+    handleAnnotateToggle = (event, value) => {
 
-        this.setState({
-            annotateMode: value
-        });
-    }
-
-    handleWordClicked(event, value) {
-
-        if (this.state.annotateMode) {
-            event.preventDefault();
-            const docId = event.target.attributes["data-document-id"].value;
-            const verseId = event.target.attributes["data-verse-id"].value;
-            this.setState({
-                wordPopoverOpen: true,
-                selected: { docId, verseId }
-            });
-        }
-    }
-
-    handleRequestClose = (event) => {
-
-        this.setState({
-            wordPopoverOpen: false,
-            word: null
-        });
-    }
-
-    handleSaveAnalysis(selected, updatedVerse, event) {
-
-        const documents = JSON.parse(localStorage.getItem("documents"));
-        const document = documents.find((doc) => doc.id === selected.docId);
-        const verseIndex = selected.verseId - 1;
-        const updatedDocumentText = concat([], slice(document.text, 0, verseIndex), updatedVerse, slice(document.text, verseIndex + 1));
-        document.text = updatedDocumentText;
-        const documentIndex = findIndex(documents, (doc: any) => doc.id === selected.docId);
-        const updatedDocuments = concat([], slice(documents, 0, documentIndex), document, slice(documents, documentIndex + 1));
-        localStorage.setItem("documents", JSON.stringify(updatedDocuments));
-        this.handleRequestClose(event);
-        this.setState({
-            document
-        });
-    }
-
-    handleCancelWordPopover(event) {
-
-        this.handleRequestClose(event);
-    }
-
-    handleEncodingChange(event, value) {
-
-        localStorage.setItem("encoding", value);
-
-        this.setState({
-            encoding: value
-        });
+        this.annotateMode = value;
     }
 
     render() {
-
-        if (!this.state.document.text) {
-            return null;
-        }
 
         return (
             <div className="row">
                 <div className="col-xs-offset-2 col-xs-8">
                     <Header
-                        documentTitle={ this.state.document.title }
-                        // onSettingsTouchTap={ this.handleSettingsTouchTap }
                         onAnnotateToggle={ this.handleAnnotateToggle }
-                        annotateMode={ this.state.annotateMode }
-                        onEncodingChange={ this.handleEncodingChange }
-                        encoding={ this.state.encoding }
+                        annotateMode={ this.annotateMode }
                         />
                     <Body
-                        text={ this.state.document.text }
-                        encoding={ this.state.encoding }
-                        documentId={ this.state.document.id }
-                        annotateMode={ this.state.annotateMode }
+                        annotateMode={ this.annotateMode }
                         />
                 </div>
             </div>
@@ -134,24 +64,4 @@ export class Document extends React.Component<any, any> {
     }
 }
 
-// const styles = {
-//     paragraph: function (isAnnotationMode) {
-
-//         const style = {
-//             padding: '0 5px'
-//         };
-
-//         if (isAnnotationMode) {
-//             assign(style, {
-//                 cursor: 'pointer'
-//             });
-//         }
-
-//         return style;
-//     },
-//     emptySpace: {
-//         margin: '0px -5px'
-//     }
-// };
-
-export default withRouter(Document);
+export default Document as RouterRenderedComponent;

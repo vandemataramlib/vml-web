@@ -3,43 +3,29 @@ import Popover from "material-ui/Popover";
 import Divider from "material-ui/Divider";
 import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
 import Toggle from "material-ui/Toggle";
+import { observer } from "mobx-react";
 
-const encodingSchemes = [
-    {
-        value: "devanagari",
-        label: "देवनागरी"
-    },
-    {
-        value: "iast",
-        label: "Roman"
-    }
-];
+import { AppState, Encoding } from "../../stores/appState";
 
 interface HeaderSettingsProps {
     popoverOpen: boolean;
     onSettingsRequestClose: any;
     onAnnotateToggle: Function;
     annotateMode: boolean;
-    onEncodingChange: any;
-    encoding: string;
     anchorEl: React.Component<any, any>;
+    appState?: AppState;
 };
 
-export default class HeaderSettings extends React.Component<HeaderSettingsProps, any> {
-    shouldComponentUpdate(nextProps, nextState) {
+@observer(["appState"])
+export class HeaderSettings extends React.Component<HeaderSettingsProps, {}> {
+    handleEncodingChange = (event) => {
 
-        const { annotateMode, popoverOpen } = this.props;
-
-        if (annotateMode === nextProps.annotateMode && popoverOpen === nextProps.popoverOpen) {
-            return false;
-        }
-
-        return true;
+        this.props.appState.changeEncoding(parseInt(event.currentTarget.value));
     }
 
     render() {
 
-        const { anchorEl, annotateMode, encoding, onAnnotateToggle, onEncodingChange, onSettingsRequestClose } = this.props;
+        const { anchorEl, annotateMode, onAnnotateToggle, onSettingsRequestClose, appState } = this.props;
 
         return (
             <Popover
@@ -57,16 +43,16 @@ export default class HeaderSettings extends React.Component<HeaderSettingsProps,
                     />
                 <Divider style={ styles.divider }/>
                 <RadioButtonGroup
-                    onChange={ onEncodingChange }
+                    onChange={ this.handleEncodingChange }
                     name="encoding"
-                    defaultSelected={ encoding }
+                    defaultSelected={ appState.encoding.toString() }
                     >
                     {
-                        encodingSchemes.map((scheme, i) => {
+                        appState.encodingSchemes.map((scheme, i) => {
 
                             return (
                                 <RadioButton
-                                    value={ scheme.value }
+                                    value={ scheme.value.toString() }
                                     label={ scheme.label }
                                     style={ styles.encodingRadioButton }
                                     labelStyle={ styles.labelStyle }
