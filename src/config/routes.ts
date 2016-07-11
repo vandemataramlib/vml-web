@@ -23,7 +23,7 @@ export default [{
             component: TextForm
         },
         {
-            path: "/documents/:slug",
+            path: "/:slug",
             component: Document
         }
     ]

@@ -29,6 +29,11 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
         this.localWord = event.target.value.trim();
     }
 
+    handleTokenMeaningEntered = (event) => {
+
+        console.log(event.currentTarget.value);
+    }
+
     handleSave = (event) => {
 
         const { word } = this.props;
@@ -53,17 +58,30 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
         return (
             <div style={ styles.popoverStyle }>
                 <div style={ styles.heading }>{ translit(this.props.word.word) }</div>
+                <TextField
+                    floatingLabelText={ `Sandhi vichchheda for ${translit(this.props.word.word)}` }
+                    defaultValue={ this.localWord }
+                    onChange={ this.handleWordChange }
+                    fullWidth
+                    />
                 <div>
                     {
                         this.localWord.split(/\s+/).map((w, i) => {
-                            return React.Children.toArray([
-                                <span style={ { color: grey500 } }> { i === 0 ? "=" : "+"} </span>,
-                                <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
-                            ]);
+                            // return React.Children.toArray([
+                            //     <span style={ { color: grey500 } }> { i === 0 ? "=" : "+"} </span>,
+                            //     <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
+                            // ]);
+                            return (
+                                <div style={ styles.tokenContainer } key={ i }>
+                                    <span style={ { color: grey500, marginRight: 5 } }> { i === 0 ? "=" : "+"} </span>
+                                    <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(w) }</span>
+                                    <span style={ { color: grey500, marginRight: 5 } }> = </span>
+                                    <TextField onChange={ this.handleTokenMeaningEntered } hintText={ `Meaning of ${translit(w)}` } fullWidth />
+                                </div>
+                            );
                         })
                     }
                 </div>
-                <TextField id="text-field" defaultValue={ this.localWord } onChange={ this.handleWordChange } fullWidth />
                 <div className="row" style={ styles.createButton }>
                     <div className="col-xs-12">
                         <FlatButton label="Cancel" secondary onTouchTap={ this.props.onTouchTapCancel } />
@@ -86,10 +104,16 @@ const styles = {
     heading: {
         fontWeight: "bold",
         fontSize: "1.17em",
-        marginBottom: 10
+        marginBottom: -10
     },
     sandhi: {
         fontWeight: "bold",
-        fontSize: "1.25em"
+        fontSize: "1.25em",
+        marginRight: 5
+    },
+    tokenContainer: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center"
     }
 };

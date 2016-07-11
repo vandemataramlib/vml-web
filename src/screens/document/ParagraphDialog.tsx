@@ -213,8 +213,8 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
                 <Popover
                     open={ this.wordPopoverOpen }
                     anchorEl={ this.anchorEl }
-                    anchorOrigin={ { horizontal: "left", vertical: "bottom" } }
-                    targetOrigin={ { horizontal: "left", vertical: "top" } }
+                    anchorOrigin={ { horizontal: "left", vertical: "top" } }
+                    targetOrigin={ { horizontal: "right", vertical: "center" } }
                     onRequestClose={ this.handleRequestPopoverClose }
                     canAutoPosition
                     autoCloseWhenOffScreen={ false }

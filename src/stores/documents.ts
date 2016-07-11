@@ -40,7 +40,7 @@ export class Document {
     }
 
     static getSingleDocumentURL(slug: string) {
-        return `/documents/${slug}`;
+        return `/${slug}`;
     }
 
     static getAllDocumentsAPIURL() {
