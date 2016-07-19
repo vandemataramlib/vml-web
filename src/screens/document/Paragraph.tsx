@@ -3,7 +3,7 @@ import Paper from "material-ui/Paper";
 import KeyboardArrowDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import KeyboardArrowUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 import { orange100, orange500 } from "material-ui/styles/colors";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { observable, transaction } from "mobx";
 
 import { DEFAULT_TEXT_ENCODING } from "../shared/constants";
@@ -19,7 +19,8 @@ interface ParagraphProps {
     onDialogOpen: React.EventHandler<any>;
 };
 
-@observer(["appState", "documentStore"])
+@inject("appState", "documentStore")
+@observer
 export class Paragraph extends React.Component<ParagraphProps, {}> {
     @observable hovered: boolean = false;
     @observable expanded: boolean = false;

@@ -11,6 +11,7 @@ import "core-js/shim";
 import routes from "../config/routes";
 import { AppState } from "../stores/appState";
 import { DocumentStore } from "../stores/documents";
+import { DocumentListStore } from "../stores/documentList";
 import { Context } from "../interfaces/context";
 
 ReactTapEventPlugin();
@@ -41,7 +42,8 @@ declare const window: WindowCustom;
 
 const context: Context = {
     appState: new AppState(window.__INITIAL_STATE__.appState),
-    documentStore: new DocumentStore(window.__INITIAL_STATE__.documentStore)
+    documentStore: new DocumentStore(window.__INITIAL_STATE__.documentStore),
+    documentListStore: new DocumentListStore(window.__INITIAL_STATE__.documentListStore)
 };
 
 render(

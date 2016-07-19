@@ -14,6 +14,7 @@ import { Provider } from "mobx-react";
 import * as HapiReactSSRWithMaterialUI from "./hapi-react-ssr-mui";
 import { AppState } from "../stores/appState";
 import { DocumentStore } from "../stores/documents";
+import { DocumentListStore } from "../stores/documentList";
 import * as StaticFileServer from "./fileServer";
 import routes from "../config/routes";
 import { Context } from "../interfaces/context";
@@ -27,7 +28,8 @@ server.connection({
 const getInitialContext = function (): Context {
     return {
         appState: new AppState(),
-        documentStore: new DocumentStore()
+        documentStore: new DocumentStore(),
+        documentListStore: new DocumentListStore()
     };
 };
 

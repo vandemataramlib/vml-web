@@ -25,6 +25,14 @@ export default [{
         {
             path: "/:slug",
             component: Document
+        },
+        {
+            path: "/:slug/:subdocId",
+            component: Document
+        },
+        {
+            path: "/:slug/:subdocId/:recordId",
+            component: Document
         }
     ]
 }];

@@ -1,3 +1,5 @@
+import * as fetch from "isomorphic-fetch";
+import { Deserializer } from "jsonapi-serializer";
 import * as Sanscript from "sanscript";
 import {
     red500,
@@ -61,4 +63,16 @@ export const getLightColour = (index) => {
         lightBlue50, cyan50, teal50, green50, lightGreen50, lime50,
         yellow50, amber50, orange50, deepOrange50, brown50, blueGrey50];
     return colours[index % colours.length];
+};
+
+export const fetchData = (url: string): Promise<any> => {
+
+    return fetch(url)
+        .then(response => response.json())
+        .then((data) => new Deserializer({keyForAttribute: "camelCase"}).deserialize(data))
+        .catch((err: Error) => {
+
+            console.error(err.message);
+            return err;
+        });
 };

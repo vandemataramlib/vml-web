@@ -1,7 +1,7 @@
 import * as React from "react";
 import { withRouter } from "react-router";
 import { observable } from "mobx";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 
 import { RouterRenderedComponent } from "../../interfaces/component";
 import { Context } from "../../interfaces/context";
@@ -18,11 +18,12 @@ interface DocumentProps {
 
 const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => {
 
-    return context.documentStore.showDocument(props.params.slug);
+    return context.documentStore.showDocument(props.params.slug, props.params.subdocId, props.params.recordId);
 };
 
+@inject("documentStore")
 @withRouter
-@observer(["documentStore"])
+@observer
 class Document extends React.Component<DocumentProps, {}> {
     @observable annotateMode: boolean = false;
 

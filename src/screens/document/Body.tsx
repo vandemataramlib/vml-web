@@ -1,5 +1,5 @@
 import * as React from "react";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 
 import { Paragraph } from "./Paragraph";
@@ -12,7 +12,8 @@ interface BodyProps {
     documentStore?: DocumentStore;
 }
 
-@observer(["documentStore"])
+@inject("documentStore")
+@observer
 export class Body extends React.Component<BodyProps, {}> {
     @observable dialogOpen: boolean;
     @observable dialogText: Text;

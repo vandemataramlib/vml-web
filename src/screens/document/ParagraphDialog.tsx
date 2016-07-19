@@ -4,7 +4,7 @@ import Popover from "material-ui/Popover";
 import FlatButton from "material-ui/FlatButton";
 import * as Sortable from "react-anything-sortable";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import { translit, getColour, getLightColour } from "../../utils";
 
@@ -22,7 +22,8 @@ interface TheDialogProps {
     onSaveParagraph: any;
 }
 
-@observer(["documentStore"])
+@inject("documentStore")
+@observer
 export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;

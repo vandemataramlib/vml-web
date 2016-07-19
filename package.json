@@ -29,17 +29,17 @@
     "core-js": "^2.4.0",
     "fbjs": "^0.8.3",
     "handlebars": "^4.0.5",
-    "hapi": "^13.4.1",
-    "hapi-react-ssr": "^0.1.1",
+    "hapi": "^13.5.0",
     "history": "^3.0.0",
-    "inert": "4.0.0",
+    "inert": "^4.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "material-ui": "^0.15.1",
-    "mobx": "^2.3.5",
-    "mobx-react": "^3.4.0",
+    "jsonapi-serializer": "^3.2.1",
+    "material-ui": "^0.15.2",
+    "mobx": "^2.3.7",
+    "mobx-react": "^3.5.1",
     "per-env": "^1.0.2",
     "react": "^15.2.1",
-    "react-anything-sortable": "1.5.0",
+    "react-anything-sortable": "^1.5.1",
     "react-dom": "^15.2.1",
     "react-router": "^2.5.2",
     "react-tap-event-plugin": "^1.0.0",
@@ -47,10 +47,10 @@
     "vision": "^4.1.0"
   },
   "devDependencies": {
-    "awesome-typescript-loader": "^1.1.1",
-    "mobx-react-devtools": "^4.2.0",
-    "tslint": "^3.11.0",
+    "awesome-typescript-loader": "^2.0.2",
+    "mobx-react-devtools": "^4.2.2",
+    "tslint": "^3.13.0",
     "typescript": "^1.8.10",
-    "webpack": "1.13.0"
+    "webpack": "^1.13.1"
   }
 }

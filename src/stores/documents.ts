@@ -1,9 +1,8 @@
 import { observable, computed, action } from "mobx";
-import * as fetch from "isomorphic-fetch";
 
 import { Store } from "../interfaces/store";
 import { API_SERVER_BASE_URL, WEB_SERVER_BASE_URL } from "../config/api";
-import { translit } from "../utils";
+import { translit, fetchData } from "../utils";
 
 export interface Token {
     id: string;
@@ -35,21 +34,32 @@ export interface Text {
 
 export class Document {
     slug: string;
-    static getSingleDocumentAPIURL(slug: string) {
-        return `${API_SERVER_BASE_URL}/documents/${slug}`;
-    }
+    static getSingleDocumentAPIURL = (slug: string, subdocId: string, recordId: string) => {
 
-    static getSingleDocumentURL(slug: string) {
-        return `/${slug}`;
-    }
+        let url = `${API_SERVER_BASE_URL}/docs/${slug}`;
 
-    static getAllDocumentsAPIURL() {
-        return `${API_SERVER_BASE_URL}/documents`;
-    }
+        if (subdocId) {
+            url += `/subdocs/${subdocId}`;
+        }
 
-    static getAllDocumentsURL() {
-        return `/documents`;
-    }
+        if (recordId) {
+            url += `/records/${recordId}`;
+        }
+
+        return url;
+    };
+
+    // static getSingleDocumentURL(slug: string) {
+    //     return `/${slug}`;
+    // }
+
+    // static getAllDocumentsAPIURL() {
+    //     return `${API_SERVER_BASE_URL}/docList`;
+    // }
+
+    // static getAllDocumentsURL() {
+    //     return `/documents`;
+    // }
 
     constructor(public id: string, public title: string, public text: Array<Text>, slug?: string, category?: number, subCategory?: number, tags?: Array<string>) {
         if (!slug) {
@@ -66,51 +76,54 @@ type DocumentsCollection = {
 
 export class DocumentStore implements Store {
     @observable documentsCollection: DocumentsCollection;
-    @observable documents: Array<Document>;
+    // @observable documents: Array<Document>;
     @observable shownDocument: Document;
     @observable isLoading;
 
-    @computed get documentsTOC() {
-        return this.documents.map(document => {
-            return {
-                u: `${Document.getSingleDocumentURL(document.slug)}`,
-                t: translit(document.title)
-            };
-        });
-    }
+    // @computed get documentsTOC() {
+    //     return this.documents.map(document => {
+    //         return {
+    //             u: `${Document.getSingleDocumentURL(document.slug)}`,
+    //             t: translit(document.title)
+    //         };
+    //     });
+    // }
 
     constructor(initialState?: DocumentStore) {
         this.documentsCollection = initialState ? initialState.documentsCollection : {};
-        this.documents = initialState ? initialState.documents : [];
+        // this.documents = initialState ? initialState.documents : [];
         this.shownDocument = initialState ? initialState.shownDocument : null;
     }
 
     @action
     addDocumentToStore = (document: Document) => {
+        console.log(document);
         this.documentsCollection[document.slug] = document;
     }
 
-    @action
-    addDocumentsToStore = (documents) => {
-        this.documents = documents;
-    }
+    // @action
+    // addDocumentsToStore = (documents) => {
+    //     this.documents = documents;
+    // }
 
     @action
-    showDocument(slug: string): Promise<any> {
+    showDocument(slug: string, subdocId?: string, recordId?: string): Promise<any> {
 
         if (this.documentsCollection[slug]) {
             this.shownDocument = this.documentsCollection[slug];
             return;
         } else {
-            return Utils.fetchData(Document.getSingleDocumentAPIURL(slug), this.addDocumentToStore)
+            return fetchData(Document.getSingleDocumentAPIURL(slug, subdocId, recordId))
+                .then(this.addDocumentToStore)
                 .then(() => { this.shownDocument = this.documentsCollection[slug]; });
         }
     }
 
-    @action
-    getDocuments() {
-        return Utils.fetchData(Document.getAllDocumentsAPIURL(), this.addDocumentsToStore);
-    }
+    // @action
+    // getDocuments() {
+    //     return fetchData(Document.getAllDocumentsAPIURL())
+    //         .then(this.addDocumentsToStore);
+    // }
 
     @action
     updateDocumentText(slug: string, updatedText: Text) {
@@ -132,18 +145,5 @@ export class DocumentStore implements Store {
 
             return paragraph;
         });
-    }
-}
-
-export class Utils {
-    static fetchData(url: string, cb: any): Promise<any> {
-
-        return fetch(url)
-            .then(response => response.json())
-            .then(cb)
-            .catch((err: Error) => {
-                console.error(err.message);
-                return err;
-            });
     }
 }

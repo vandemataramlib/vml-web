@@ -27,7 +27,7 @@ const styles = {
 };
 
 const doFetchData = (context: Context, props: any) => {
-    return context.documentStore.getDocuments();
+    return context.documentListStore.getDocumentList();
 };
 
 interface AppProps {

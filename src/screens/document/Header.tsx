@@ -4,7 +4,7 @@ import IconButton from "material-ui/IconButton";
 import ActionSettings from "material-ui/svg-icons/action/settings";
 import { orange200 } from "material-ui/styles/colors";
 import { observable } from "mobx";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 
 import { HeaderSettings } from "./HeaderSettings";
 import { translit } from "../../utils";
@@ -18,7 +18,8 @@ interface HeaderProps {
     documentStore?: DocumentStore;
 };
 
-@observer(["appState", "documentStore"])
+@inject("appState", "documentStore")
+@observer
 export class Header extends React.Component<HeaderProps, {}> {
     @observable settingsPopoverOpen: boolean;
     @observable anchorEl: any;

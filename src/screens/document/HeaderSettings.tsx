@@ -3,7 +3,7 @@ import Popover from "material-ui/Popover";
 import Divider from "material-ui/Divider";
 import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
 import Toggle from "material-ui/Toggle";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 
 import { AppState, Encoding } from "../../stores/appState";
 
@@ -16,7 +16,8 @@ interface HeaderSettingsProps {
     appState?: AppState;
 };
 
-@observer(["appState"])
+@inject("appState")
+@observer
 export class HeaderSettings extends React.Component<HeaderSettingsProps, {}> {
     handleEncodingChange = (event) => {
 
