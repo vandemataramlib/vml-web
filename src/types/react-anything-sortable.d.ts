@@ -13,7 +13,7 @@ declare module "react-anything-sortable" {
 
     export class Sortable extends React.Component<ReactAnythingSortableProps, any> {}
 
-    export default Sortable;
+    // export default Sortable;
 
     export const sortable: any;
 }

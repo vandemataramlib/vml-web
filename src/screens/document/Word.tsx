@@ -2,12 +2,13 @@ import * as React from "react";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
+import { Models } from "vml-common";
 
-import { Word as WordType, DocumentStore } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 import { translit, getColour, getLightColour } from "../../utils";
 
 interface WordProps {
-    word: WordType;
+    word: Models.Word;
     onWordClicked: any;
 }
 

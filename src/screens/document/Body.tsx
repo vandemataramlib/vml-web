@@ -1,11 +1,13 @@
 import * as React from "react";
 import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
+import { Models } from "vml-common";
 
 import { Paragraph } from "./Paragraph";
+import { Segment } from "./Segment";
 import { ParagraphDialog } from "./ParagraphDialog";
 import { Encoding } from "../../stores/appState";
-import { DocumentStore, Text, Word, Line } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 
 interface BodyProps {
     annotateMode: boolean;
@@ -16,15 +18,15 @@ interface BodyProps {
 @observer
 export class Body extends React.Component<BodyProps, {}> {
     @observable dialogOpen: boolean;
-    @observable dialogText: Text;
+    @observable dialogText: Models.Stanza;
 
-    renderParagraph = (paragraph: Text, paragraphIndex: number, numParagraphs: number) => {
+    renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
 
         const { documentStore, annotateMode } = this.props;
 
         return (
             <Paragraph
-                text={ paragraph }
+                stanza={ paragraph }
                 isLast={ paragraphIndex === numParagraphs - 1 }
                 key={ paragraph.id }
                 annotateMode={ annotateMode }
@@ -33,7 +35,7 @@ export class Body extends React.Component<BodyProps, {}> {
         );
     }
 
-    handleDialogOpen = (text: Text) => {
+    handleDialogOpen = (text: Models.Stanza) => {
 
         this.dialogText = text;
         this.dialogOpen = true;
@@ -44,19 +46,19 @@ export class Body extends React.Component<BodyProps, {}> {
         this.dialogOpen = false;
     }
 
-    handleSaveWordAnalysis = (event, lineId, updatedWord: Word) => {
+    handleSaveWordAnalysis = (event, lineId, updatedWord: Models.Word) => {
 
-        let newText: Text = Object.assign({}, this.dialogText);
+        let newText: Models.Stanza = Object.assign({}, this.dialogText);
 
         newText.lines = newText.lines.map(line => {
 
-            const newLine: Line = Object.assign({}, line);
+            const newLine: Models.Line = Object.assign({}, line);
 
             if (newLine.id === lineId) {
-                let newWords: Word[] = Object.assign({}, newLine.words);
+                let newWords: Models.Word[] = Object.assign({}, newLine.words);
                 newWords = newLine.words.map(word => {
 
-                    let newWord: Word = Object.assign({}, word);
+                    let newWord: Models.Word = Object.assign({}, word);
 
                     if (word.id === updatedWord.id) {
                         newWord.analysis = updatedWord.analysis;
@@ -72,28 +74,32 @@ export class Body extends React.Component<BodyProps, {}> {
         this.dialogText = newText;
     }
 
-    handleSaveParagraphDialog = (updatedText: Text) => {
+    handleSaveParagraphDialog = (updatedText: Models.Stanza) => {
 
         this.dialogOpen = false;
-        this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.slug, updatedText);
+        this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.url, updatedText);
     }
 
     render() {
 
-        const { documentStore } = this.props;
+        const { documentStore, annotateMode } = this.props;
 
         if (!documentStore.shownDocument) {
             return null;
         }
 
-        const text = documentStore.shownDocument.text;
-        const numParagraphs = text.length;
+        // const text = documentStore.shownDocument.text;
+        const segments = (documentStore.shownDocument.contents as Models.IChapter).segments;
+        // segments.map(s => s.)
+        // const text = (documentStore.shownDocument.contents as Models.IChapter).stanzas;
+        // const numParagraphs = text.length;
 
         return (
             <div style={ styles.mainBody }>
-                { text.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs)) }
+                { segments.map((segment, i) => <Segment segment={ segment } annotateMode={ annotateMode } key={ i } />) }
+                { /*text.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs))*/ }
                 {
-                    this.props.annotateMode ?
+                    /*this.props.annotateMode ?
                         <ParagraphDialog
                             open={ this.dialogOpen }
                             text={ this.dialogText }
@@ -101,7 +107,7 @@ export class Body extends React.Component<BodyProps, {}> {
                             onSaveWordAnalysis={ (event, lineId, updatedWord) => this.handleSaveWordAnalysis(event, lineId, updatedWord) }
                             onSaveParagraph={ this.handleSaveParagraphDialog }
                             />
-                        : null
+                        : null*/
                 }
             </div>
         );

@@ -1,8 +1,11 @@
-"use script";
-
 var webpack = require("webpack");
 var fs = require("fs");
 var path = require("path");
+var dotenv = require("dotenv");
+
+var WebpackHashPlugin = require("./WebpackHashPlugin");
+
+var envConfig = dotenv.config();
 
 module.exports = {
     entry: './src/client/index.tsx',
@@ -21,31 +24,11 @@ module.exports = {
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.optimize.UglifyJsPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify('production')
-            }
-        })
+        new webpack.EnvironmentPlugin(Object.keys(envConfig)),
     ] : [
-        function () {
-            this.plugin("done", function (stats) {
-                var outputFile = "build/webpack.hash.json";
-                try {
-                    fs.accessSync(outputFile, fs.W_OK);
-                    var bundleName = JSON.parse(fs.readFileSync(outputFile)).main;
-                    if (bundleName !== stats.toJson().assetsByChunkName.main) {
-                        fs.unlinkSync("public/" + bundleName);
-                    }
-                } catch (err) {
-                    console.log(outputFile, "not found");
-                }
-                fs.writeFileSync(
-                    path.join(__dirname, outputFile),
-                    JSON.stringify(stats.toJson().assetsByChunkName)
-                );
-            })
-        }
-    ],
+            new webpack.EnvironmentPlugin(Object.keys(envConfig)),
+            new WebpackHashPlugin()
+        ],
 
     module: {
         loaders: [

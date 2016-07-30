@@ -3,3 +3,4 @@ node_modules
 typings
 public/bundle*.js
 dist
+.env

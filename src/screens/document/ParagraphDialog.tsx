@@ -2,20 +2,21 @@ import * as React from "react";
 import Dialog from "material-ui/Dialog";
 import Popover from "material-ui/Popover";
 import FlatButton from "material-ui/FlatButton";
-import * as Sortable from "react-anything-sortable";
+import { Sortable } from "react-anything-sortable";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import { translit, getColour, getLightColour } from "../../utils";
+import { Models } from "vml-common";
 
-import { Text, DocumentStore, Word, Token } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 import { SortableToken } from "./SortableToken";
 import { WordPopover } from "./WordPopover";
 import { Line } from "./Line";
 
 interface TheDialogProps {
     open: boolean;
-    text: Text;
+    text: Models.Stanza;
     onRequestClose: React.EventHandler<any>;
     documentStore?: DocumentStore;
     onSaveWordAnalysis: any;
@@ -27,15 +28,15 @@ interface TheDialogProps {
 export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;
-    @observable word: Word;
+    @observable word: Models.Word;
     lineId: string;
-    rearrangedTokens: Token[] = [];
+    rearrangedTokens: Models.Token[] = [];
     @observable allWordsAnalysed: boolean;
     @observable analysedClicked: boolean;
 
     prepareParagraphSave = () => {
 
-        const updatedText: Text = Object.assign({}, this.props.text);
+        const updatedText: Models.Stanza = Object.assign({}, this.props.text);
         updatedText.analysis = this.rearrangedTokens;
         this.props.onSaveParagraph(updatedText);
     }
@@ -65,7 +66,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
 
     handleAnalyseClick = () => {
 
-        const analysedTokens: Token[] = [];
+        const analysedTokens: Models.Token[] = [];
 
         this.props.text.lines.forEach(line => {
 
@@ -98,7 +99,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
             return [];
         }
 
-        const analysedTokens: Token[] = [];
+        const analysedTokens: Models.Token[] = [];
 
         if (this.props.text.analysis && !this.analysedClicked) {
             this.props.text.analysis.forEach(token => {
@@ -122,7 +123,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
         return analysedTokens;
     }
 
-    handleTokenSort = (tokens: Token[]) => {
+    handleTokenSort = (tokens: Models.Token[]) => {
 
         this.rearrangedTokens = tokens;
     }
@@ -178,7 +179,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
         this.wordPopoverOpen = false;
     }
 
-    handleWordClicked = (event: React.TouchEvent, lineId: string, word: Word) => {
+    handleWordClicked = (event: React.TouchEvent, lineId: string, word: Models.Word) => {
 
         event.preventDefault();
         this.word = word;
@@ -187,7 +188,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
         this.lineId = lineId;
     }
 
-    handleProcessWordAnalysis = (event, updatedWord: Word) => {
+    handleProcessWordAnalysis = (event, updatedWord: Models.Word) => {
 
         this.wordPopoverOpen = false;
         this.props.onSaveWordAnalysis(event, this.lineId, updatedWord);

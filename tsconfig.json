@@ -6,7 +6,8 @@
         "jsx": "react",
         "outDir": "public",
         "experimentalDecorators": true,
-        "removeComments": true
+        "removeComments": true,
+        "sourceMap": true
     },
     "exclude": [
         "node_modules",

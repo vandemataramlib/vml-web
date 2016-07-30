@@ -1,11 +1,12 @@
 import * as React from "react";
+import { Models } from "vml-common";
 
-import { Line as LineType, DocumentStore } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 import { Word } from "./Word";
 import { observer } from "mobx-react";
 
 interface LineProps {
-    line: LineType;
+    line: Models.Line;
     onWordClicked: any;
 }
 

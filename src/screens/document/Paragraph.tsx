@@ -1,22 +1,25 @@
 import * as React from "react";
 import Paper from "material-ui/Paper";
+import LinearProgress from "material-ui/LinearProgress";
 import KeyboardArrowDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
 import KeyboardArrowUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
 import { orange100, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
 import { observable, transaction } from "mobx";
+import { Models } from "vml-common";
 
 import { DEFAULT_TEXT_ENCODING } from "../shared/constants";
 import { translit } from "../../utils";
 import { AppState, Encoding } from "../../stores/appState";
-import { DocumentStore, Text } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 
 interface ParagraphProps {
-    text: Text;
+    stanza: Models.Stanza;
     annotateMode: boolean;
     isLast: boolean;
     appState?: AppState;
     onDialogOpen: React.EventHandler<any>;
+    documentStore?: DocumentStore;
 };
 
 @inject("appState", "documentStore")
@@ -37,7 +40,11 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
         this.hovered = false;
     }
 
-    handleVerseClick = () => {
+    handleVerseClick = (event, stanzaId) => {
+
+        // if (!this.expanded) {
+        //     this.props.documentStore.getStanza(this.props.documentStore.shownDocument.url, stanzaId);
+        // }
 
         this.expanded = !this.expanded;
     }
@@ -53,9 +60,9 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
         this.props.onDialogOpen(text);
     }
 
-    renderPara = (line, lineIndex): string | (React.ReactElement<any> | string | number)[] => {
+    renderPara = (line: Models.Line, lineIndex): string | (React.ReactElement<any> | string | number)[] => {
 
-        const lineEl = translit(line.trim(), DEFAULT_TEXT_ENCODING, Encoding[this.props.appState.encodingScheme.value]);
+        const lineEl = translit(line.line, DEFAULT_TEXT_ENCODING, Encoding[this.props.appState.encodingScheme.value]);
 
         if (lineIndex === 0) {
             return lineEl;
@@ -69,22 +76,22 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
 
     render() {
 
-        const { text } = this.props;
+        const { stanza } = this.props;
         return (
-            <div id={ "p" + (text.id + 1) } style={ text.analysis && !this.expanded && this.props.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
+            <div id={ "p" + stanza.id } style={ stanza.analysis && !this.expanded && this.props.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
                 <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.expanded ? 2 : 1 } style={ styles.self(this.props, this.expanded, this.hovered) }>
                     <div onMouseEnter={ this.handleMouseEnter } onMouseLeave={ this.handleMouseLeave } className="row">
-                        <div onTouchTap={ (event) => this.handleAnnotateParagraph(text, event) } style={ styles.verseContent(this.props) } className="col-xs-11">
+                        <div onTouchTap={ (event) => this.handleAnnotateParagraph(stanza, event) } style={ styles.verseContent(this.props) } className="col-xs-11">
                             <p style={ styles.verse(this.expanded) }>
-                                { text.verse.split("\n").map(this.renderPara) }
+                                { stanza.lines.map(this.renderPara) }
                             </p>
                             <div className="row" style={ { display: this.expanded ? "block" : "none" } }>
                                 {
-                                    text.analysis ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(text.analysis.map((a) => a.token).join(" ")) }</div> : null
+                                    stanza.analysis && Object.keys(stanza.analysis).length ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(stanza.analysis.map((a) => a.token).join(" ")) }</div> : null
                                 }
                             </div>
                         </div>
-                        <div className="col-xs-1" style={ styles.verseHandleContainer } onTouchTap={ this.handleVerseClick }>
+                        <div className="col-xs-1" style={ styles.verseHandleContainer } onTouchTap={ (event) => this.handleVerseClick(event, stanza.id) }>
                             {
                                 this.expanded ?
                                     <div style={ styles.verseHandle }><KeyboardArrowUp /></div>
@@ -96,6 +103,7 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
                             }
                         </div>
                     </div>
+                    { this.expanded ? <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } /> : null }
                 </Paper>
             </div>
         );
@@ -159,5 +167,10 @@ const styles = {
                 cursor: "context-menu"
             };
         }
+    },
+    stanzaProgress: {
+        marginRight: -20,
+        marginLeft: -20,
+        width: "auto"
     }
 };

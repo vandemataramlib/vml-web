@@ -4,12 +4,13 @@ import FlatButton from "material-ui/FlatButton";
 import { grey500 } from "material-ui/styles/colors";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
+import { Models } from "vml-common";
 
 import { translit, getColour } from "../../utils";
-import { Word as WordType, DocumentStore, Token } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 
 interface WordPopoverProps {
-    word: WordType;
+    word: Models.Word;
     onSaveWordAnalysis: any;
     onTouchTapCancel: any;
 }
@@ -38,7 +39,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         const { word } = this.props;
 
-        const analysis = this.localWord.split(/\s+/).map((token, tokenIndex): Token => {
+        const analysis = this.localWord.split(/\s+/).map((token, tokenIndex): Models.Token => {
 
             return {
                 id: word.id + "." + (tokenIndex + 1),

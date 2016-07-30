@@ -6,7 +6,7 @@
   "scripts": {
     "start": "per-env",
     "start:test": "webpack-dev-server --inline --content-base public",
-    "start:development": "npm run buildNew && node build/server.bundle.js",
+    "start:development": "npm run buildNew && node -r dotenv/config build/server.bundle.js",
     "start:production": "npm run build && node build/server.bundle.js",
     "build": "npm run build:client && npm run build:server",
     "build:client": "webpack",
@@ -27,10 +27,12 @@
   "dependencies": {
     "boom": "^3.2.2",
     "core-js": "^2.4.0",
+    "dotenv": "^2.0.0",
     "fbjs": "^0.8.3",
     "handlebars": "^4.0.5",
     "hapi": "^13.5.0",
     "history": "^3.0.0",
+    "hoek": "^4.0.2",
     "inert": "^4.0.1",
     "isomorphic-fetch": "^2.2.1",
     "jsonapi-serializer": "^3.2.1",
@@ -44,7 +46,8 @@
     "react-router": "^2.5.2",
     "react-tap-event-plugin": "^1.0.0",
     "sanscript": "^0.0.2",
-    "vision": "^4.1.0"
+    "vision": "^4.1.0",
+    "vml-common": "https://github.com/vandemataramlib/vml-common.git"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^2.0.2",

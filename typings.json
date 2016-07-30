@@ -6,6 +6,7 @@
   "globalDependencies": {
     "boom": "registry:dt/boom#0.0.0+20160317120654",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
+    "dotenv": "registry:dt/dotenv#2.0.0+20160327131627",
     "handlebars": "registry:dt/handlebars#3.0.3+20160317120654",
     "hapi": "registry:dt/hapi#13.0.0+20160521152637",
     "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046",

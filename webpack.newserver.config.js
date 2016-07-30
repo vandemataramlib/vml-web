@@ -1,6 +1,9 @@
 var fs = require('fs');
 var path = require('path');
 var webpack = require('webpack');
+var dotenv = require("dotenv");
+
+var envConfig = dotenv.config();
 
 module.exports = {
 
@@ -33,10 +36,9 @@ module.exports = {
 
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': {
-                'SERVER': true
-            }
-        })
+            'process.env.SERVER': true,
+        }),
+        new webpack.EnvironmentPlugin(Object.keys(envConfig))
     ],
 
     module: {

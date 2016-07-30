@@ -2,10 +2,11 @@ import * as React from "react";
 import { withRouter } from "react-router";
 import { observable } from "mobx";
 import { observer, inject } from "mobx-react";
+import { Models } from "vml-common";
 
 import { RouterRenderedComponent } from "../../interfaces/component";
 import { Context } from "../../interfaces/context";
-import { DocumentStore, Document as DocumentModel } from "../../stores/documents";
+import { DocumentStore } from "../../stores/documents";
 import { AppState } from "../../stores/appState";
 
 import { Header } from "./Header";
