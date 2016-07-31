@@ -6,12 +6,10 @@ import ContentAdd from "material-ui/svg-icons/content/add";
 import * as ReactRouter from "react-router";
 import { Link, withRouter } from "react-router";
 import { observable } from "mobx";
-import { observer } from "mobx-react";
-import DevTools from "mobx-react-devtools";
+import { observer, inject } from "mobx-react";
 
-import { RouterRenderedComponent } from "../../interfaces/component";
 import { Context } from "../../interfaces/context";
-import { DocumentStore } from "../../stores/documents";
+import { DocumentListStore } from "../../stores/documentList";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
 
@@ -26,20 +24,32 @@ const styles = {
     }
 };
 
-const doFetchData = (context: Context, props: any) => {
+const doFetchData = (context: Context | AppProps, props: any) => {
     return context.documentListStore.getDocumentList();
 };
 
 interface AppProps {
-    router: ReactRouter.IRouter;
+    router?: ReactRouter.IRouter;
+    documentListStore?: DocumentListStore;
 }
 
+@inject("documentListStore")
 @withRouter
 @observer
 export class App extends React.Component<AppProps, {}> {
     @observable drawerOpen: boolean = false;
     static fetchData(context: Context, props: any) {
         return doFetchData(context, props);
+    }
+
+    componentDidMount() {
+
+        doFetchData(this.props, this.props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        doFetchData(nextProps, nextProps);
     }
 
     handleLeftIconClicked= (event) => {
@@ -64,6 +74,16 @@ export class App extends React.Component<AppProps, {}> {
 
     render() {
 
+        const showDevTools = () => {
+
+            if (process.env.NODE_ENV !== "production") {
+                const DevTools = require("mobx-react-devtools").default;
+                return <DevTools />;
+            } else {
+                return null;
+            }
+        };
+
         return (
             <div>
                 <AppBar
@@ -80,10 +100,8 @@ export class App extends React.Component<AppProps, {}> {
                     <ContentAdd />
                 </FloatingActionButton>
                 <Layout>{ this.props.children }</Layout>
-                <DevTools />
+                { showDevTools() }
             </div>
         );
     }
 }
-
-export default App as RouterRenderedComponent;

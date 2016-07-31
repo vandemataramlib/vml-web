@@ -11,12 +11,12 @@ import getMuiTheme from "material-ui/styles/getMuiTheme";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { Provider } from "mobx-react";
 
-import * as HapiReactSSRWithMaterialUI from "./hapi-react-ssr-mui";
+import * as HapiReactSSRWithMaterialUI from "./plugins/hapi-react-ssr-mui";
 import { AppState } from "../stores/appState";
 import { DocumentStore } from "../stores/documents";
 import { DocumentListStore } from "../stores/documentList";
-import * as StaticFileServer from "./fileServer";
-import routes from "../config/routes";
+import * as StaticFileServer from "./plugins/fileServer";
+import { routes } from "../config/routes";
 import { Context } from "../interfaces/context";
 
 const server = new Hapi.Server();
@@ -83,5 +83,5 @@ server.start((err) => {
         return;
     }
 
-    console.log("server started at", server.info.uri);
+    console.log("Production server started at", server.info.uri);
 });

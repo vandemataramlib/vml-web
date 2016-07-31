@@ -4,7 +4,7 @@ class FileServer {
     constructor(server: Hapi.Server, options: any, next: Function) {
 
         server.route({
-            path: "/static/{filename*}",
+            path: "/static/{p*}",
             method: "GET",
             handler: {
                 directory: {

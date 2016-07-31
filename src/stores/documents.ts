@@ -98,30 +98,30 @@ export class DocumentStore implements Store {
     updateStanza = (url: string, stanzaId: string, updatedStanza: Models.Stanza) => {
 
 
-        const document = this.getDocumentByURL(url);
-        const chapter = <Models.Chapter>document.contents;
-        chapter.stanzas = chapter.stanzas.map(stanza => {
+        // const document = this.getDocumentByURL(url);
+        // const chapter = <Models.Chapter>document.contents;
+        // chapter.stanzas = chapter.stanzas.map(stanza => {
 
-            if (stanza.id === stanzaId) {
-                stanza = updatedStanza;
-            }
+        //     if (stanza.id === stanzaId) {
+        //         stanza = updatedStanza;
+        //     }
 
-            return stanza;
-        });
+        //     return stanza;
+        // });
 
-        console.log(toJS(chapter.stanzas));
+        // console.log(toJS(chapter.stanzas));
     }
 
     @action
     getStanza(url: string, stanzaId: string) {
 
-        const stanza = (<Models.Chapter>this.getDocumentByURL(url).contents).stanzas.find(stanza => stanza.id === stanzaId);
-        if (stanza.lines[0].words) {
-            return;
-        }
-        else {
-            fetchData(Models.Stanza.URLFromView(url, stanzaId))
-                .then((stanza) => this.updateStanza(url, stanzaId, stanza));
-        }
+        // const stanza = (<Models.Chapter>this.getDocumentByURL(url).contents).stanzas.find(stanza => stanza.id === stanzaId);
+        // if (stanza.lines[0].words) {
+        //     return;
+        // }
+        // else {
+        //     fetchData(Models.Stanza.URLFromView(url, stanzaId))
+        //         .then((stanza) => this.updateStanza(url, stanzaId, stanza));
+        // }
     }
 }

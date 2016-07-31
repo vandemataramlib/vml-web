@@ -1,11 +1,11 @@
-import App from "../screens/app";
-import Home from "../screens/home";
-import About from "../screens/about";
-import Repos from "../screens/repos";
-import TextForm from "../screens/newDocument";
-import Document from "../screens/document";
+import { App } from "../screens/app";
+import { Home } from "../screens/home";
+import { About } from "../screens/about";
+import { Repos } from "../screens/repos";
+import { TextForm } from "../screens/newDocument";
+import { Document } from "../screens/document";
 
-export default [{
+const routes = [{
     path: "/",
     component: App,
     indexRoute: { component: Home },
@@ -36,3 +36,5 @@ export default [{
         }
     ]
 }];
+
+export { routes };

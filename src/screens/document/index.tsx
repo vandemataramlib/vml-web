@@ -4,7 +4,6 @@ import { observable } from "mobx";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
-import { RouterRenderedComponent } from "../../interfaces/component";
 import { Context } from "../../interfaces/context";
 import { DocumentStore } from "../../stores/documents";
 import { AppState } from "../../stores/appState";
@@ -25,7 +24,7 @@ const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => 
 @inject("documentStore")
 @withRouter
 @observer
-class Document extends React.Component<DocumentProps, {}> {
+export class Document extends React.Component<DocumentProps, {}> {
     @observable annotateMode: boolean = false;
 
     static fetchData(context: Context, props: any) {
@@ -65,5 +64,3 @@ class Document extends React.Component<DocumentProps, {}> {
         );
     }
 }
-
-export default Document as RouterRenderedComponent;

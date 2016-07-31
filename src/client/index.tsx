@@ -1,14 +1,9 @@
 import * as React from "react";
 import * as ReactTapEventPlugin from "react-tap-event-plugin";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { orange100, orange500, orange700 } from "material-ui/styles/colors";
 import { render } from "react-dom";
-import { Router, browserHistory } from "react-router";
-import { Provider } from "mobx-react";
 import "core-js/shim";
 
-import routes from "../config/routes";
+import Main from "./main";
 import { AppState } from "../stores/appState";
 import { DocumentStore } from "../stores/documents";
 import { DocumentListStore } from "../stores/documentList";
@@ -16,23 +11,7 @@ import { Context } from "../interfaces/context";
 
 ReactTapEventPlugin();
 
-const App = () => {
-
-    const muiTheme = getMuiTheme({
-        fontFamily: "Charlotte Sans, sans-serif, Siddhanta",
-        palette: {
-            primary1Color: orange500,
-            primary2Color: orange700,
-            primary3Color: orange100
-        }
-    });
-
-    return (
-        <MuiThemeProvider muiTheme={ muiTheme }>
-            <Router routes={ routes } history={ browserHistory } />
-        </MuiThemeProvider>
-    );
-};
+declare var module: { hot: any };
 
 interface WindowCustom extends Window {
     __INITIAL_STATE__: Context;
@@ -46,9 +25,33 @@ const context: Context = {
     documentListStore: new DocumentListStore(window.__INITIAL_STATE__.documentListStore)
 };
 
-render(
-    <Provider { ...context }>
-        <App />
-    </Provider>,
-    document.getElementById("app")
-);
+if (process.env.NODE_ENV !== "production") {
+    const { AppContainer } = require("react-hot-loader");
+
+    render(
+        <AppContainer>
+            <Main { ...context } />
+        </AppContainer>,
+        document.getElementById("app")
+    );
+
+    if (module.hot) {
+        module.hot.accept("./main", () => {
+
+            const NextApp = require("./main").default;
+
+            render(
+                <AppContainer>
+                    <NextApp { ...context } />
+                </AppContainer>,
+                document.getElementById("app")
+            );
+        });
+    }
+}
+else {
+    render (
+        <Main { ...context } />,
+        document.getElementById("app")
+    );
+}

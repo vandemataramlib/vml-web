@@ -4,16 +4,15 @@
         "target": "es5",
         "noImplicitAny": false,
         "jsx": "react",
-        "outDir": "public",
+        "outDir": "build",
         "experimentalDecorators": true,
         "removeComments": true,
-        "sourceMap": true
+        "sourceMap": false
     },
     "exclude": [
         "node_modules",
-        "webpack.config.js",
-        "webpack.server.config.js",
-        "webpack.client.config.js",
-        "webpack.newserver.config.js"
+        "config",
+        "build",
+        "public"
     ]
 }

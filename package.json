@@ -2,18 +2,15 @@
   "name": "vml",
   "version": "1.0.0",
   "description": "Vande Mataram Library",
-  "main": "index.js",
   "scripts": {
     "start": "per-env",
-    "start:test": "webpack-dev-server --inline --content-base public",
-    "start:development": "npm run buildNew && node -r dotenv/config build/server.bundle.js",
-    "start:production": "npm run build && node build/server.bundle.js",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "webpack",
-    "build:server": "webpack --config webpack.server.config.js",
-    "buildNew": "npm run build:newClient && npm run build:newServer",
-    "build:newClient": "webpack --config webpack.client.config.js",
-    "build:newServer": "webpack --config webpack.newserver.config.js"
+    "run:server": "per-env",
+    "start:development": "npm run build:server && npm run run:server",
+    "start:production": "npm run build:server && npm run build:client && npm run run:server",
+    "build:server": "tsc",
+    "run:server:development": "node build/server/devServer",
+    "run:server:production": "node build/server/prodServer",
+    "build:client": "webpack --config config/webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
@@ -52,8 +49,11 @@
   "devDependencies": {
     "awesome-typescript-loader": "^2.0.2",
     "mobx-react-devtools": "^4.2.2",
+    "react-hot-loader": "^3.0.0-beta.2",
     "tslint": "^3.13.0",
     "typescript": "^1.8.10",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
+    "webpack-hot-middleware": "^2.12.2",
+    "webpack-notifier": "^1.3.0"
   }
 }

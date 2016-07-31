@@ -1,7 +1,7 @@
 import * as React from "react";
 import PaperCustom from "../shared/PaperCustom";
 
-export default class Home extends React.Component<any, any> {
+export class Home extends React.Component<any, any> {
     render() {
 
         return (

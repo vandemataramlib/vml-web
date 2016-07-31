@@ -1,34 +1,36 @@
 var webpack = require("webpack");
-var fs = require("fs");
-var path = require("path");
 var dotenv = require("dotenv");
 
-var WebpackHashPlugin = require("./WebpackHashPlugin");
+var WebpackHashPlugin = require("./webpack-hash-plugin");
 
 var envConfig = dotenv.config();
 
 module.exports = {
-    entry: './src/client/index.tsx',
+    entry: 'client/index.tsx',
 
     output: {
         filename: 'bundle.[chunkhash].js',
-        publicPath: 'static',
-        path: 'public'
+        path: 'public',
+        publicPath: 'static'
     },
 
     resolve: {
-        extensions: ["", ".tsx", ".ts", ".js", ".jsx"]
+        extensions: ["", ".tsx", ".ts", ".js", ".jsx"],
+        modulesDirectories: ['src', 'node_modules']
     },
 
-    plugins: process.env.NODE_ENV === 'production' ? [
+    plugins: [
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
         new webpack.EnvironmentPlugin(Object.keys(envConfig)),
-    ] : [
-            new webpack.EnvironmentPlugin(Object.keys(envConfig)),
-            new WebpackHashPlugin()
-        ],
+        new webpack.DefinePlugin({
+            "process.env":{
+                "NODE_ENV": JSON.stringify("production")
+            }
+        }),
+        new webpack.optimize.UglifyJsPlugin(),
+        new WebpackHashPlugin()
+    ],
 
     module: {
         loaders: [
