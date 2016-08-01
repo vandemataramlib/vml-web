@@ -1,9 +1,18 @@
 {
-  "ambientDependencies": {
-    "hapi": "github:DefinitelyTyped/DefinitelyTyped/hapi/hapi.d.ts#7084dd9c282165e4496d2fe2f0554f8afa77772e",
-    "react": "github:DefinitelyTyped/DefinitelyTyped/react/react.d.ts#3a44f976ba58e05adb666295d59168ef5e99ae17"
-  },
   "dependencies": {
-    "lodash": "github:typed-typings/npm-lodash#7ccf9dc406a792d702067f4eab0fa8df4109fcaa"
+    "history": "registry:npm/history#2.0.0+20160607172317",
+    "react-router": "registry:npm/react-router#2.4.0+20160616150328"
+  },
+  "globalDependencies": {
+    "boom": "registry:dt/boom#0.0.0+20160317120654",
+    "core-js": "registry:dt/core-js#0.0.0+20160602141332",
+    "dotenv": "registry:dt/dotenv#2.0.0+20160327131627",
+    "handlebars": "registry:dt/handlebars#3.0.3+20160317120654",
+    "hapi": "registry:dt/hapi#13.0.0+20160521152637",
+    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046",
+    "material-ui": "registry:dt/material-ui#0.15.1+20160701192820",
+    "react": "registry:dt/react#0.14.0+20160602151522",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-tap-event-plugin": "registry:dt/react-tap-event-plugin#0.0.0+20160602142434"
   }
 }

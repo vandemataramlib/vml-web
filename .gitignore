@@ -1,4 +1,6 @@
 build
 node_modules
 typings
-public/bundle.js
+public/bundle*.js
+dist
+.env

@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vande Mataram Library</title>
+        <link rel="stylesheet" href="/static/flexboxgrid.min.css">
+        <link rel="stylesheet" href="/static/fonts.css">
+        <link rel="stylesheet" href="/static/sortable.css">
+        <meta rel="shortcut icon" type="image/vnd.microsoft.icon" href="/static/ms-icon-144x144.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+        <link rel="apple-touch-icon" type="image/png" sizes="144x144" href="/static/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" type="image/png" sizes="152x152" href="/static/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/static/apple-icon-180x180.png">
+    </head>
+    <body style="background-color: #FFF3E0">
+        <div id="app">{{{ componentRenderedToString }}}</div>
+    </body>
+    <link rel="stylesheet" href="/static/sortable.css">
+    <script type="application/javascript">
+        window.__INITIAL_STATE__ = {{{ context }}};
+    </script>
+    <script src="/static/{{ bundleName }}" type="application/javascript"></script>
+</html>
