@@ -1,10 +1,10 @@
 import * as React from "react";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 import { Paper } from "material-ui";
 
-import { DocumentStore } from "../../stores/documents";
+import { DocumentStore } from "../../stores";
 import { Paragraph } from "./Paragraph";
 
 interface SegmentProps {
@@ -18,6 +18,18 @@ interface SegmentProps {
 export class Segment extends React.Component<SegmentProps, {}> {
     @observable dialogOpen: boolean;
     @observable dialogText: Models.Stanza;
+
+    @action
+    setDialogOpen = (open: boolean) => {
+
+        this.dialogOpen = open;
+    }
+
+    @action
+    setDialogText = (text: Models.Stanza) => {
+
+        this.dialogText = text;
+    }
 
     renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
 
@@ -36,8 +48,8 @@ export class Segment extends React.Component<SegmentProps, {}> {
 
     handleDialogOpen = (text: Models.Stanza) => {
 
-        this.dialogText = text;
-        this.dialogOpen = true;
+        this.setDialogText(text);
+        this.setDialogOpen(true);
     }
 
     render() {
@@ -48,9 +60,18 @@ export class Segment extends React.Component<SegmentProps, {}> {
 
         return (
             <div>
-                <Paper>{ title ? <h2>{ title }</h2> : null }</Paper>
+                { title ? <Paper style={ styles.self }><h2>{ title }</h2></Paper> : null }
                 { stanzas.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs)) }
             </div>
         );
     }
 }
+
+const styles = {
+    self: {
+        padding: "5px 20px",
+        borderBottomRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        boxShadow: "rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px"
+    }
+};

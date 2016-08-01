@@ -1,13 +1,12 @@
 import * as React from "react";
-import TextField from "material-ui/TextField";
-import FlatButton from "material-ui/FlatButton";
+import { TextField, FlatButton } from "material-ui";
 import { grey500 } from "material-ui/styles/colors";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer } from "mobx-react";
 import { Models } from "vml-common";
 
-import { translit, getColour } from "../../utils";
-import { DocumentStore } from "../../stores/documents";
+import { translit, getColour } from "../../shared/utils";
+import { DocumentStore } from "../../stores";
 
 interface WordPopoverProps {
     word: Models.Word;
@@ -19,15 +18,21 @@ interface WordPopoverProps {
 export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @observable localWord: string;
 
+    @action
+    setLocalWord = (localWord: string) => {
+
+        this.localWord = localWord;
+    }
+
     constructor(props) {
 
         super(props);
-        this.localWord = this.props.word.analysis ? this.props.word.analysis.map(token => token.token).join(" ") : this.props.word.word;
+        this.setLocalWord(this.props.word.analysis ? this.props.word.analysis.map(token => token.token).join(" ") : this.props.word.word)
     }
 
     handleWordChange = (event) => {
 
-        this.localWord = event.target.value.trim();
+        this.setLocalWord(event.target.value.trim())
     }
 
     handleTokenMeaningEntered = (event) => {

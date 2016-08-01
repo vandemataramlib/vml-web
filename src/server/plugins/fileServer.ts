@@ -13,6 +13,14 @@ class FileServer {
             }
         });
 
+        server.route({
+            path: "/favicon.ico",
+            method: "GET",
+            handler: {
+                file: "public/favicon.ico"
+            }
+        });
+
         next();
     }
 

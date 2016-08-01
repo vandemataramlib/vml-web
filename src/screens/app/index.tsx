@@ -1,15 +1,11 @@
 import * as React from "react";
-import AppBar from "material-ui/AppBar";
-import FlatButton from "material-ui/FlatButton";
-import FloatingActionButton from "material-ui/FloatingActionButton";
-import ContentAdd from "material-ui/svg-icons/content/add";
+import { AppBar, FlatButton, FloatingActionButton } from "material-ui";
+import { ContentAdd } from "material-ui/svg-icons";
 import * as ReactRouter from "react-router";
 import { Link, withRouter } from "react-router";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 
-import { Context } from "../../interfaces/context";
-import { DocumentListStore } from "../../stores/documentList";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
 
@@ -24,42 +20,28 @@ const styles = {
     }
 };
 
-const doFetchData = (context: Context | AppProps, props: any) => {
-    return context.documentListStore.getDocumentList();
-};
-
 interface AppProps {
     router?: ReactRouter.IRouter;
-    documentListStore?: DocumentListStore;
 }
 
-@inject("documentListStore")
 @withRouter
 @observer
 export class App extends React.Component<AppProps, {}> {
     @observable drawerOpen: boolean = false;
-    static fetchData(context: Context, props: any) {
-        return doFetchData(context, props);
-    }
 
-    componentDidMount() {
+    @action setDrawerOpen = (open: boolean) => {
 
-        doFetchData(this.props, this.props);
-    }
-
-    componentWillReceiveProps(nextProps) {
-
-        doFetchData(nextProps, nextProps);
+        this.drawerOpen = open;
     }
 
     handleLeftIconClicked= (event) => {
 
-        this.drawerOpen = !this.drawerOpen;
+        this.setDrawerOpen(!this.drawerOpen);
     }
 
     handleClose = () => {
 
-        this.drawerOpen = false;
+        this.setDrawerOpen(false);
     }
 
     handleTitleTouchTap = () => {
@@ -67,7 +49,7 @@ export class App extends React.Component<AppProps, {}> {
         this.props.router.push("/");
     }
 
-    handleTouchEnded = () => {
+    handleCreateNew = () => {
 
         this.props.router.push("/new");
     }
@@ -96,7 +78,7 @@ export class App extends React.Component<AppProps, {}> {
                     open={ this.drawerOpen }
                     onClose={ this.handleClose }
                     />
-                <FloatingActionButton onMouseDown={ this.handleTouchEnded } style={ styles.fab }>
+                <FloatingActionButton onMouseDown={ this.handleCreateNew } style={ styles.fab }>
                     <ContentAdd />
                 </FloatingActionButton>
                 <Layout>{ this.props.children }</Layout>

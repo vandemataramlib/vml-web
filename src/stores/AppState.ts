@@ -1,19 +1,21 @@
-import { observable, computed, action, transaction } from "mobx";
+import { observable, computed, action } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 
 export enum Encoding {
     devanagari,
-    iast
+    iast,
+    itrans
 }
 
 enum Environment {
-    server,
-    client
+    Server,
+    Client
 }
 
 export class AppState {
     @observable currentUrl: string;
     @observable encoding: Encoding;
+    defaultEncoding: Encoding = Encoding.itrans;
     @observable env: Environment;
     encodingSchemes = [
         {
@@ -27,35 +29,37 @@ export class AppState {
     ];
 
     constructor(initialState?: AppState) {
-        transaction(() => {
-            this.currentUrl = initialState ? initialState.currentUrl : "/";
-            this.env = ExecutionEnvironment.canUseDOM ? Environment.client : Environment.server;
-            if (this.isClientEnv && localStorage.getItem("encoding")) {
-                this.encoding = parseInt(localStorage.getItem("encoding"));
-            } else {
-                this.encoding = Encoding.devanagari;
-            }
-        });
+
+        this.currentUrl = initialState ? initialState.currentUrl : "/";
+        this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
+        if (this.isClientEnv && localStorage.getItem("encoding")) {
+            this.encoding = parseInt(localStorage.getItem("encoding"));
+        } else {
+            this.encoding = Encoding.devanagari;
+        }
     }
 
     @computed
     get isClientEnv() {
 
-        return this.env === Environment.client;
+        return this.env === Environment.Client;
     }
 
     @computed
     get encodingScheme() {
+
         return this.encodingSchemes.filter(scheme => scheme.value === this.encoding)[0];
     }
 
     @action
     setCurrentUrl(url) {
+
         this.currentUrl = url;
     }
 
     @action
     changeEncoding(encoding: Encoding) {
+
         this.encoding = encoding;
         if (ExecutionEnvironment.canUseDOM) {
             localStorage.setItem("encoding", encoding.toString());

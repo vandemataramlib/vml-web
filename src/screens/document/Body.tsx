@@ -1,13 +1,12 @@
 import * as React from "react";
 import { observer, inject } from "mobx-react";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { Models } from "vml-common";
 
 import { Paragraph } from "./Paragraph";
 import { Segment } from "./Segment";
 import { ParagraphDialog } from "./ParagraphDialog";
-import { Encoding } from "../../stores/appState";
-import { DocumentStore } from "../../stores/documents";
+import { DocumentStore } from "../../stores";
 
 interface BodyProps {
     annotateMode: boolean;
@@ -19,6 +18,18 @@ interface BodyProps {
 export class Body extends React.Component<BodyProps, {}> {
     @observable dialogOpen: boolean;
     @observable dialogText: Models.Stanza;
+
+    @action
+    setDialogOpen = (open: boolean) => {
+
+        this.dialogOpen = open;
+    }
+
+    @action
+    setDialogText = (text: Models.Stanza) => {
+
+        this.dialogText = text;
+    }
 
     renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
 
@@ -37,13 +48,13 @@ export class Body extends React.Component<BodyProps, {}> {
 
     handleDialogOpen = (text: Models.Stanza) => {
 
-        this.dialogText = text;
-        this.dialogOpen = true;
+        this.setDialogText(text);
+        this.setDialogOpen(true);
     }
 
     handleRequestClose = () => {
 
-        this.dialogOpen = false;
+        this.setDialogOpen(false);
     }
 
     handleSaveWordAnalysis = (event, lineId, updatedWord: Models.Word) => {
@@ -71,13 +82,13 @@ export class Body extends React.Component<BodyProps, {}> {
             }
             return newLine;
         });
-        this.dialogText = newText;
+        this.setDialogText(newText);
     }
 
     handleSaveParagraphDialog = (updatedText: Models.Stanza) => {
 
-        this.dialogOpen = false;
-        this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.url, updatedText);
+        this.setDialogOpen(false);
+        // this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.url, updatedText);
     }
 
     render() {
@@ -88,27 +99,11 @@ export class Body extends React.Component<BodyProps, {}> {
             return null;
         }
 
-        // const text = documentStore.shownDocument.text;
         const segments = (documentStore.shownDocument.contents as Models.IChapter).segments;
-        // segments.map(s => s.)
-        // const text = (documentStore.shownDocument.contents as Models.IChapter).stanzas;
-        // const numParagraphs = text.length;
 
         return (
             <div style={ styles.mainBody }>
                 { segments.map((segment, i) => <Segment segment={ segment } annotateMode={ annotateMode } key={ i } />) }
-                { /*text.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs))*/ }
-                {
-                    /*this.props.annotateMode ?
-                        <ParagraphDialog
-                            open={ this.dialogOpen }
-                            text={ this.dialogText }
-                            onRequestClose={ this.handleRequestClose }
-                            onSaveWordAnalysis={ (event, lineId, updatedWord) => this.handleSaveWordAnalysis(event, lineId, updatedWord) }
-                            onSaveParagraph={ this.handleSaveParagraphDialog }
-                            />
-                        : null*/
-                }
             </div>
         );
     }

@@ -1,15 +1,13 @@
 import * as React from "react";
-import Paper from "material-ui/Paper";
-import IconButton from "material-ui/IconButton";
-import ActionSettings from "material-ui/svg-icons/action/settings";
+import { Paper, IconButton } from "material-ui";
+import { ActionSettings } from "material-ui/svg-icons";
 import { orange200 } from "material-ui/styles/colors";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 
 import { HeaderSettings } from "./HeaderSettings";
-import { translit } from "../../utils";
-import { AppState } from "../../stores/appState";
-import { DocumentStore } from "../../stores/documents";
+import { translit } from "../../shared/utils";
+import { AppState, DocumentStore } from "../../stores";
 
 interface HeaderProps {
     onAnnotateToggle: Function;
@@ -24,17 +22,29 @@ export class Header extends React.Component<HeaderProps, {}> {
     @observable settingsPopoverOpen: boolean;
     @observable anchorEl: any;
 
+    @action
+    setSettingsPopover = (open: boolean) => {
+
+        this.settingsPopoverOpen = open;
+    }
+
+    @action
+    setAnchorEl = (anchorEl: any) => {
+
+        this.anchorEl = anchorEl;
+    }
+
     handleSettingsTouchTap = (event) => {
 
         event.preventDefault();
 
-        this.settingsPopoverOpen = true;
-        this.anchorEl = event.currentTarget;
+        this.setSettingsPopover(true);
+        this.setAnchorEl(event.currentTarget);
     }
 
     handleSettingsRequestClose = () => {
 
-        this.settingsPopoverOpen = false;
+        this.setSettingsPopover(false);
     }
 
     render() {
@@ -84,7 +94,7 @@ const styles = {
         // borderBottom: `1px solid ${grey500}`
         padding: "0 20px 20px 20px"
     },
-    settingsContainer: (appState) => {
+    settingsContainer: (appState: AppState) => {
         return {
             display: appState.isClientEnv ? "flex" : "none",
             justifyContent: "flex-end",

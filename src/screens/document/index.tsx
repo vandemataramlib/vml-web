@@ -1,12 +1,11 @@
 import * as React from "react";
 import { withRouter } from "react-router";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
-import { Context } from "../../interfaces/context";
-import { DocumentStore } from "../../stores/documents";
-import { AppState } from "../../stores/appState";
+import { Context } from "../../shared/interfaces";
+import { DocumentStore, AppState } from "../../stores";
 
 import { Header } from "./Header";
 import { Body } from "./Body";
@@ -18,7 +17,7 @@ interface DocumentProps {
 
 const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => {
 
-    return context.documentStore.showDocument(props.params.slug, props.params.subdocId, props.params.recordId);
+    return context.documentStore.getDocument(props.params.slug, props.params.subdocId, props.params.recordId);
 };
 
 @inject("documentStore")
@@ -26,6 +25,12 @@ const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => 
 @observer
 export class Document extends React.Component<DocumentProps, {}> {
     @observable annotateMode: boolean = false;
+
+    @action
+    setAnnotateMode = (on: boolean) => {
+
+        this.annotateMode = on;
+    }
 
     static fetchData(context: Context, props: any) {
 
@@ -44,7 +49,7 @@ export class Document extends React.Component<DocumentProps, {}> {
 
     handleAnnotateToggle = (event, value) => {
 
-        this.annotateMode = value;
+        this.setAnnotateMode(value);
     }
 
     render() {

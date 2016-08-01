@@ -1,11 +1,11 @@
 import * as React from "react";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
-import { observable } from "mobx";
+import { observable, action } from "mobx";
 import { observer } from "mobx-react";
 import { Models } from "vml-common";
 
-import { DocumentStore } from "../../stores/documents";
-import { translit, getColour, getLightColour } from "../../utils";
+import { DocumentStore } from "../../stores";
+import { translit, getColour, getLightColour } from "../../shared/utils";
 
 interface WordProps {
     word: Models.Word;
@@ -16,14 +16,20 @@ interface WordProps {
 export class Word extends React.Component<WordProps, {}> {
     @observable hovered: boolean;
 
+    @action
+    setHovered = (hovered: boolean) => {
+
+        this.hovered = hovered;
+    }
+
     handleMouseEnter = () => {
 
-        this.hovered = true;
+        this.setHovered(true);
     }
 
     handleMouseLeave = () => {
 
-        this.hovered = false;
+        this.setHovered(false);
     }
 
     render() {

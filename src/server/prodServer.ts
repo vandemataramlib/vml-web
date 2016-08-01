@@ -4,20 +4,14 @@ import * as React from "react";
 import * as Vision from "vision";
 import * as Handlebars from "handlebars";
 import { readFileSync } from "fs";
-import { match, RouterContext } from "react-router";
-import { renderToString } from "react-dom/server";
-import { orange100, orange500, orange700 } from "material-ui/styles/colors";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { Provider } from "mobx-react";
 
 import * as HapiReactSSRWithMaterialUI from "./plugins/hapi-react-ssr-mui";
-import { AppState } from "../stores/appState";
-import { DocumentStore } from "../stores/documents";
-import { DocumentListStore } from "../stores/documentList";
+import { AppState, DocumentStore, DocumentListStore, StanzaStore } from "../stores";
 import * as StaticFileServer from "./plugins/fileServer";
-import { routes } from "../config/routes";
-import { Context } from "../interfaces/context";
+import { routes } from "../shared/routes";
+import { Context } from "../shared/interfaces";
+import { muiThemeOptions } from "../shared/theme";
 
 const server = new Hapi.Server();
 
@@ -26,20 +20,13 @@ server.connection({
 });
 
 const getInitialContext = function (): Context {
+
     return {
         appState: new AppState(),
         documentStore: new DocumentStore(),
-        documentListStore: new DocumentListStore()
+        documentListStore: new DocumentListStore(),
+        stanzaStore: new StanzaStore()
     };
-};
-
-const muiThemeOptions = {
-    fontFamily: "Charlotte Sans, sans-serif, Siddhanta",
-    palette: {
-        primary1Color: orange500,
-        primary2Color: orange700,
-        primary3Color: orange100
-    }
 };
 
 const bundleName = JSON.parse(readFileSync("build/webpack.hash.json", "utf-8")).main;

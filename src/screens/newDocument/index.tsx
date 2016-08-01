@@ -1,11 +1,8 @@
 import * as React from "react";
 import { withRouter } from "react-router";
-import MenuItem from "material-ui/MenuItem";
-import SelectField from "material-ui/SelectField";
-import TextField from "material-ui/TextField";
-import FlatButton from "material-ui/FlatButton";
+import { MenuItem, SelectField, TextField, FlatButton } from "material-ui";
 
-import PaperCustom from "../shared/PaperCustom";
+import { PaperCustom } from "../shared/PaperCustom";
 
 const categories = [
     {

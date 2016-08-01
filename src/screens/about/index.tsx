@@ -1,5 +1,6 @@
 import * as React from "react";
-import PaperCustom from "../shared/PaperCustom";
+
+import { PaperCustom } from "../shared/PaperCustom";
 
 export class About extends React.Component<any, any> {
     render() {

@@ -1,6 +1,7 @@
 import * as fetch from "isomorphic-fetch";
 import { Deserializer } from "jsonapi-serializer";
 import * as Sanscript from "sanscript";
+import { Constants } from "vml-common";
 import {
     red500,
     pink500,
@@ -67,9 +68,11 @@ export const getLightColour = (index) => {
 
 export const fetchData = (url: string): Promise<any> => {
 
+    url = Constants.API_SERVER_BASE_URL + url;
+
     return fetch(url)
         .then(response => response.json())
-        .then((data) => new Deserializer({keyForAttribute: "camelCase"}).deserialize(data))
+        .then((data) => new Deserializer({ keyForAttribute: "camelCase" }).deserialize(data))
         .catch((err: Error) => {
 
             console.error(err.message);

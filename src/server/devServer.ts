@@ -31,9 +31,8 @@ const plugins = [
         register: TemplateServer,
         options: {
             template: "index",
-            getInitialContext: () => { return { hot: true }; },
             context: {
-                context: JSON.stringify({env: process.env.NODE_ENV}),
+                context: JSON.stringify({}),
                 bundleName: "bundle.js"
             }
         }

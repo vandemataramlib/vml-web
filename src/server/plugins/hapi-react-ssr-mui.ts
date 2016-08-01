@@ -7,9 +7,11 @@ import * as Boom from "boom";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 
+import { Context } from "../../shared/interfaces";
+
 interface Options {
     routes: Array<any>;
-    getInitialContext(): Object;
+    getInitialContext(): Context;
     bootstrapAction: string;
     rootElement: React.ComponentClass<{}> | React.StatelessComponent<{}>;
     template: string;
@@ -32,7 +34,7 @@ class HapiReactSSRWithMaterialUI {
             handler: this.handler
         });
 
-        next();
+        return next();
     }
 
     handler = (request: Hapi.Request, reply: Hapi.IReply) => {
@@ -64,8 +66,9 @@ class HapiReactSSRWithMaterialUI {
             const context = getInitialContext();
 
             Promise.all(
-                renderProps.components.filter((component: any) => component[bootstrapAction])
-                    .map((component: any) => component[bootstrapAction](context, renderProps))
+                renderProps.components
+                    .filter((component: any) => component.wrappedComponent && component.wrappedComponent[bootstrapAction])
+                    .map((component: any) => component.wrappedComponent[bootstrapAction](context, renderProps))
             ).then(response => {
 
                 const muiTheme = getMuiTheme(

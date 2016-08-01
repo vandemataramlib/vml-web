@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Models } from "vml-common";
-
-import { DocumentStore } from "../../stores/documents";
-import { Word } from "./Word";
 import { observer } from "mobx-react";
+
+import { DocumentStore } from "../../stores";
+import { Word } from "./Word";
 
 interface LineProps {
     line: Models.Line;

@@ -1,38 +1,58 @@
 import * as React from "react";
-import Dialog from "material-ui/Dialog";
-import Popover from "material-ui/Popover";
-import FlatButton from "material-ui/FlatButton";
+import { Dialog, Popover, FlatButton } from "material-ui";
 import { Sortable } from "react-anything-sortable";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
-import { observable } from "mobx";
-import { translit, getColour, getLightColour } from "../../utils";
+import { observable, action } from "mobx";
+import { translit, getColour, getLightColour } from "../../shared/utils";
 import { Models } from "vml-common";
 
-import { DocumentStore } from "../../stores/documents";
+import { DocumentStore } from "../../stores";
 import { SortableToken } from "./SortableToken";
 import { WordPopover } from "./WordPopover";
 import { Line } from "./Line";
 
-interface TheDialogProps {
+interface ParagraphDialogProps {
     open: boolean;
     text: Models.Stanza;
     onRequestClose: React.EventHandler<any>;
-    documentStore?: DocumentStore;
     onSaveWordAnalysis: any;
     onSaveParagraph: any;
 }
 
-@inject("documentStore")
 @observer
-export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
+export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;
     @observable word: Models.Word;
     lineId: string;
     rearrangedTokens: Models.Token[] = [];
     @observable allWordsAnalysed: boolean;
-    @observable analysedClicked: boolean;
+    @observable analyseClicked: boolean;
+
+    @action
+    setWordPopoverOpen = (open: boolean) => {
+
+        this.wordPopoverOpen = open;
+    }
+
+    @action
+    setAnchorEl = (anchorEl: any) => {
+
+        this.anchorEl = anchorEl;
+    }
+
+    @action
+    setWord = (word: Models.Word) => {
+
+        this.word = word;
+    }
+
+    @action
+    setAnalyseClicked = (clicked: boolean) => {
+
+        this.analyseClicked = clicked;
+    }
 
     prepareParagraphSave = () => {
 
@@ -43,7 +63,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
 
     componentWillReceiveProps() {
 
-        this.analysedClicked = false;
+        this.setAnalyseClicked(false);
         this.rearrangedTokens = [];
     }
 
@@ -78,7 +98,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
                 });
             });
         });
-        this.analysedClicked = true;
+        this.setAnalyseClicked(true);
         this.rearrangedTokens = analysedTokens;
     }
 
@@ -95,13 +115,13 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
 
     getAnalysedWords() {
 
-        if (!this.analysedClicked && !this.props.text.analysis) {
+        if (!this.analyseClicked && !this.props.text.analysis) {
             return [];
         }
 
         const analysedTokens: Models.Token[] = [];
 
-        if (this.props.text.analysis && !this.analysedClicked) {
+        if (this.props.text.analysis && !this.analyseClicked) {
             this.props.text.analysis.forEach(token => {
 
                 analysedTokens.push(token);
@@ -147,7 +167,7 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
                 <div style={ styles.analyseButton }>
                     <FlatButton label="Analyse" primary disabled={ this.isAnalysedDisabled() } onTouchTap={ this.handleAnalyseClick } />
                 </div>
-                <div style={ styles.showAnalysis(this.analysedClicked || this.props.text.analysis) }>
+                <div style={ styles.showAnalysis(this.analyseClicked || this.props.text.analysis) }>
                     <Sortable onSort={ this.handleTokenSort } dynamic>
                         {
                             this.getAnalysedWords().map((token, tokenIndex) => {
@@ -176,21 +196,21 @@ export class ParagraphDialog extends React.Component<TheDialogProps, {}> {
 
     handleRequestPopoverClose = () => {
 
-        this.wordPopoverOpen = false;
+        this.setWordPopoverOpen(false);
     }
 
     handleWordClicked = (event: React.TouchEvent, lineId: string, word: Models.Word) => {
 
         event.preventDefault();
-        this.word = word;
-        this.anchorEl = event.currentTarget;
-        this.wordPopoverOpen = true;
+        this.setWord(word);
+        this.setAnchorEl(event.currentTarget);
+        this.setWordPopoverOpen(true);
         this.lineId = lineId;
     }
 
     handleProcessWordAnalysis = (event, updatedWord: Models.Word) => {
 
-        this.wordPopoverOpen = false;
+        this.setWordPopoverOpen(false);
         this.props.onSaveWordAnalysis(event, this.lineId, updatedWord);
     }
 

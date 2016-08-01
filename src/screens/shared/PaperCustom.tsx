@@ -1,5 +1,5 @@
 import * as React from "react";
-import Paper from "material-ui/Paper";
+import { Paper } from "material-ui";
 
 const styles = {
     self: {
@@ -8,7 +8,7 @@ const styles = {
     }
 };
 
-export default class PaperCustom extends React.Component<any, any> {
+export class PaperCustom extends React.Component<any, any> {
     render() {
 
         return (

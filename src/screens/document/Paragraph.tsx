@@ -1,17 +1,13 @@
 import * as React from "react";
-import Paper from "material-ui/Paper";
-import LinearProgress from "material-ui/LinearProgress";
-import KeyboardArrowDown from "material-ui/svg-icons/hardware/keyboard-arrow-down";
-import KeyboardArrowUp from "material-ui/svg-icons/hardware/keyboard-arrow-up";
+import { Paper, LinearProgress } from "material-ui";
+import { HardwareKeyboardArrowDown, HardwareKeyboardArrowUp } from "material-ui/svg-icons";
 import { orange100, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
-import { observable, transaction } from "mobx";
+import { observable, transaction, action } from "mobx";
 import { Models } from "vml-common";
 
-import { DEFAULT_TEXT_ENCODING } from "../shared/constants";
-import { translit } from "../../utils";
-import { AppState, Encoding } from "../../stores/appState";
-import { DocumentStore } from "../../stores/documents";
+import { translit } from "../../shared/utils";
+import { AppState, Encoding, DocumentStore, StanzaStore } from "../../stores";
 
 interface ParagraphProps {
     stanza: Models.Stanza;
@@ -20,9 +16,10 @@ interface ParagraphProps {
     appState?: AppState;
     onDialogOpen: React.EventHandler<any>;
     documentStore?: DocumentStore;
+    stanzaStore?: StanzaStore;
 };
 
-@inject("appState", "documentStore")
+@inject("appState", "documentStore", "stanzaStore")
 @observer
 export class Paragraph extends React.Component<ParagraphProps, {}> {
     @observable hovered: boolean = false;
@@ -30,23 +27,40 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
     @observable popoverOpen: boolean = false;
     @observable dialog: any;
 
+    @action
+    setHovered = (hovered: boolean) => {
+
+        this.hovered = hovered;
+    }
+
+    @action
+    setExpanded = (expanded: boolean) => {
+
+        this.expanded = expanded;
+    }
+
+    componentWillReceiveProps() {
+
+        this.setExpanded(false);
+    }
+
     handleMouseEnter = (event) => {
 
-        this.hovered = true;
+        this.setHovered(true);
     }
 
     handleMouseLeave = (event) => {
 
-        this.hovered = false;
+        this.setHovered(false);
     }
 
-    handleVerseClick = (event, stanzaId) => {
+    handleVerseClick = (event: React.MouseEvent, runningStanzaId: string) => {
 
         // if (!this.expanded) {
-        //     this.props.documentStore.getStanza(this.props.documentStore.shownDocument.url, stanzaId);
+        //     this.props.stanzaStore.loadStanza(this.props.documentStore.shownDocument.url, runningStanzaId);
         // }
 
-        this.expanded = !this.expanded;
+        this.setExpanded(!this.expanded);
     }
 
     handleAnnotateParagraph = (text, event) => {
@@ -60,9 +74,15 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
         this.props.onDialogOpen(text);
     }
 
-    renderPara = (line: Models.Line, lineIndex): string | (React.ReactElement<any> | string | number)[] => {
+    renderPara = (line: Models.Line, lineIndex, stanzaRunningId: string, stanzaLength: number): string | (React.ReactElement<any> | string | number)[] => {
 
-        const lineEl = translit(line.line, DEFAULT_TEXT_ENCODING, Encoding[this.props.appState.encodingScheme.value]);
+        const { appState } = this.props;
+
+        let lineEl = translit(line.line, Encoding[appState.defaultEncoding], Encoding[appState.encodingScheme.value]);
+
+        if (stanzaLength - 1 === lineIndex) {
+            lineEl += " ||" + translit(stanzaRunningId, Encoding[appState.defaultEncoding], Encoding[appState.encodingScheme.value]) + "||";
+        }
 
         if (lineIndex === 0) {
             return lineEl;
@@ -76,14 +96,26 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
 
     render() {
 
-        const { stanza } = this.props;
+        const { stanza, stanzaStore, documentStore } = this.props;
+
+        const getStanza = (url: string, runningStanzaId: string) => {
+
+            const stanza = stanzaStore.getStanza(url, runningStanzaId);
+
+            if (!stanza) {
+                return <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } />;
+            }
+
+            return <div>{ stanza.stanza }</div>;
+        };
+
         return (
             <div id={ "p" + stanza.id } style={ stanza.analysis && !this.expanded && this.props.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
-                <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.expanded ? 2 : 1 } style={ styles.self(this.props, this.expanded, this.hovered) }>
+                <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.expanded ? 2 : 1 } transitionEnabled={ false } style={ styles.self(this.props, this.expanded, this.hovered) }>
                     <div onMouseEnter={ this.handleMouseEnter } onMouseLeave={ this.handleMouseLeave } className="row">
                         <div onTouchTap={ (event) => this.handleAnnotateParagraph(stanza, event) } style={ styles.verseContent(this.props) } className="col-xs-11">
                             <p style={ styles.verse(this.expanded) }>
-                                { stanza.lines.map(this.renderPara) }
+                                { stanza.lines.map((line, lineIndex) => this.renderPara(line, lineIndex, stanza.runningId, stanza.lines.length)) }
                             </p>
                             <div className="row" style={ { display: this.expanded ? "block" : "none" } }>
                                 {
@@ -91,19 +123,19 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
                                 }
                             </div>
                         </div>
-                        <div className="col-xs-1" style={ styles.verseHandleContainer } onTouchTap={ (event) => this.handleVerseClick(event, stanza.id) }>
+                        <div className="col-xs-1" style={ styles.verseHandleContainer } onClick={ (event: React.MouseEvent) => this.handleVerseClick(event, stanza.runningId) }>
                             {
                                 this.expanded ?
-                                    <div style={ styles.verseHandle }><KeyboardArrowUp /></div>
+                                    <div style={ styles.verseHandle }><HardwareKeyboardArrowUp /></div>
                                     : (
                                         this.hovered ?
-                                            <div style={ styles.verseHandle }><KeyboardArrowDown /></div>
+                                            <div style={ styles.verseHandle }><HardwareKeyboardArrowDown /></div>
                                             : null
                                     )
                             }
                         </div>
                     </div>
-                    { this.expanded ? <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } /> : null }
+                    { this.expanded ? getStanza(documentStore.shownDocument.url, stanza.runningId) : null }
                 </Paper>
             </div>
         );

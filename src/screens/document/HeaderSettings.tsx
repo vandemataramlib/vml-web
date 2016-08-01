@@ -1,8 +1,5 @@
 import * as React from "react";
-import Popover from "material-ui/Popover";
-import Divider from "material-ui/Divider";
-import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
-import Toggle from "material-ui/Toggle";
+import { Popover, Divider, RadioButton ,RadioButtonGroup, Toggle } from "material-ui";
 import { observer, inject } from "mobx-react";
 
 import { AppState, Encoding } from "../../stores/appState";
