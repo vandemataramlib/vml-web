@@ -2,6 +2,7 @@ import { observable, ObservableMap, map, asMap, action, computed } from "mobx";
 import { Models } from "vml-common";
 
 import { fetchData } from "../shared/utils";
+import { FetchLevel } from "./AppState";
 
 export class DocumentStore {
     @observable private documents: ObservableMap<Models.Document>;
@@ -51,7 +52,7 @@ export class DocumentStore {
 
         this.loadingDocs.add(docURL);
 
-        return fetchData(docURL)
+        return fetchData(docURL, FetchLevel.App)
             .then(document => this.addDocumentToStore(docURL, document))
             .then(() => {
 

@@ -1,4 +1,4 @@
-import { observable, computed, action } from "mobx";
+import { observable, computed, action, ObservableMap, map } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 
 export enum Encoding {
@@ -12,11 +12,20 @@ enum Environment {
     Client
 }
 
+export enum FetchLevel {
+    Local,
+    App
+}
+
+let instance: AppState = null;
+
 export class AppState {
     @observable currentUrl: string;
     @observable encoding: Encoding;
     defaultEncoding: Encoding = Encoding.itrans;
     @observable env: Environment;
+    @observable dataFetchStore: ObservableMap<FetchLevel>;
+
     encodingSchemes = [
         {
             label: "देवनागरी",
@@ -30,13 +39,38 @@ export class AppState {
 
     constructor(initialState?: AppState) {
 
+        if (!instance) {
+            instance = this;
+        }
+
         this.currentUrl = initialState ? initialState.currentUrl : "/";
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
         if (this.isClientEnv && localStorage.getItem("encoding")) {
             this.encoding = parseInt(localStorage.getItem("encoding"));
+            this.dataFetchStore = map({});
         } else {
             this.encoding = Encoding.devanagari;
         }
+
+        return instance;
+    }
+
+    @action
+    addFetch = (url: string, level: FetchLevel) => {
+
+        this.dataFetchStore.set(url, level);
+    }
+
+    @action
+    deleteFetch = (url: string) => {
+
+        this.dataFetchStore.delete(url);
+    }
+
+    @computed
+    get pendingAppFetches() {
+
+        return this.dataFetchStore.values().filter(url => url === FetchLevel.App);
     }
 
     @computed

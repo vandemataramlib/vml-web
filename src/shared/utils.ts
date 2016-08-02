@@ -41,6 +41,8 @@ import {
     blueGrey50
 } from "material-ui/styles/colors";
 
+import { AppState, FetchLevel } from "../stores";
+
 export const translit = (word: string, from?: string, to?: string): string => {
 
     if (!from) {
@@ -66,13 +68,27 @@ export const getLightColour = (index) => {
     return colours[index % colours.length];
 };
 
-export const fetchData = (url: string): Promise<any> => {
+const appState = new AppState();
+
+export const fetchData = (url: string, level: FetchLevel): Promise<any> => {
 
     url = Constants.API_SERVER_BASE_URL + url;
 
+
+    if (appState.isClientEnv) {
+        appState.addFetch(url, level);
+    }
+
     return fetch(url)
         .then(response => response.json())
-        .then((data) => new Deserializer({ keyForAttribute: "camelCase" }).deserialize(data))
+        .then((data) => {
+
+            if (appState.isClientEnv) {
+                appState.deleteFetch(url);
+            }
+
+            return new Deserializer({ keyForAttribute: "camelCase" }).deserialize(data);
+        })
         .catch((err: Error) => {
 
             console.error(err.message);
