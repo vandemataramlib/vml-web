@@ -16,11 +16,6 @@ interface SideNavProps {
 @inject("documentListStore")
 @observer
 export default class SideNav extends React.Component<SideNavProps, {}> {
-    componentWillReceiveProps(nextProps: SideNavProps) {
-
-        nextProps.documentListStore.getDocumentList();
-    }
-
     getMenu = (docListGroup: Models.DocumentListGroup, index: number) => {
 
         return (

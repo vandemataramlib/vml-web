@@ -5,7 +5,7 @@ import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
 import { Context } from "../../shared/interfaces";
-import { DocumentStore, AppState } from "../../stores";
+import { DocumentStore } from "../../stores";
 
 import { Header } from "./Header";
 import { Body } from "./Body";

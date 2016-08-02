@@ -4,7 +4,9 @@ import { About } from "../screens/about";
 import { TextForm } from "../screens/newDocument";
 import { Document } from "../screens/document";
 
-const routes = [{
+import DefaultExport from "./DefaultExport";
+
+const routes = Object.assign(DefaultExport, {
     path: "/",
     component: App,
     indexRoute: { component: Home },
@@ -30,6 +32,6 @@ const routes = [{
             component: Document
         }
     ]
-}];
+});
 
 export { routes };
