@@ -2,7 +2,8 @@ import * as React from "react";
 import { Popover, Divider, RadioButton ,RadioButtonGroup, Toggle } from "material-ui";
 import { observer, inject } from "mobx-react";
 
-import { AppState, Encoding } from "../../stores/appState";
+import { AppState } from "../../stores";
+import { encodingSchemes } from "../../shared/constants";
 
 interface HeaderSettingsProps {
     popoverOpen: boolean;
@@ -18,7 +19,7 @@ interface HeaderSettingsProps {
 export class HeaderSettings extends React.Component<HeaderSettingsProps, {}> {
     handleEncodingChange = (event) => {
 
-        this.props.appState.changeEncoding(parseInt(event.currentTarget.value));
+        this.props.appState.setEncoding(parseInt(event.currentTarget.value));
     }
 
     render() {
@@ -46,7 +47,7 @@ export class HeaderSettings extends React.Component<HeaderSettingsProps, {}> {
                     defaultSelected={ appState.encoding.toString() }
                     >
                     {
-                        appState.encodingSchemes.map((scheme, i) => {
+                        encodingSchemes.map((scheme, i) => {
 
                             return (
                                 <RadioButton

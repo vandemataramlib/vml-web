@@ -7,7 +7,8 @@ import { observable, transaction, action } from "mobx";
 import { Models } from "vml-common";
 
 import { translit } from "../../shared/utils";
-import { AppState, Encoding, DocumentStore, StanzaStore } from "../../stores";
+import { AppState, DocumentStore, StanzaStore } from "../../stores";
+import { Encoding } from "../../shared/interfaces"
 
 interface ParagraphProps {
     stanza: Models.Stanza;
@@ -103,7 +104,7 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
             const stanza = stanzaStore.getStanza(url, runningStanzaId);
 
             if (!stanza) {
-                return <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } />;
+                return null;
             }
 
             return <div>{ stanza.stanza }</div>;
@@ -171,7 +172,7 @@ const styles = {
             // }
         }
         else if (expanded) {
-            style = Object.assign(style, { margin: "20px -20px 20px -20px" });
+            style = Object.assign(style, { margin: "20px -30px 20px -30px" });
         }
 
         return style;

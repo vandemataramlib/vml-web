@@ -2,11 +2,11 @@ import { observable, ObservableMap, map, asMap, action, computed } from "mobx";
 import { Models } from "vml-common";
 
 import { fetchData } from "../shared/utils";
-import { FetchLevel } from "./AppState";
+import { FetchLevel } from "../shared/interfaces";
 
 export class DocumentStore {
-    @observable private documents: ObservableMap<Models.Document>;
     @observable private shownDocumentURL: string;
+    private documents: ObservableMap<Models.Document>;
     private loadingDocs: Set<string>;
 
     constructor(initialState?: any) {
@@ -23,18 +23,21 @@ export class DocumentStore {
     }
 
     @action
-    private setShownDocumentURL = (shownDocumentURL: string) => {
+    private setShownDocumentURL = (url: string) => {
 
-        this.shownDocumentURL = shownDocumentURL;
+        this.shownDocumentURL = url;
     }
 
     getDocument = (slug: string, subdocId?: string, recordId?: string) => {
 
         const docUrl = Models.Document.URL(slug, subdocId, recordId);
 
+        if (docUrl === this.shownDocumentURL) {
+            return;
+        }
+
         if (this.documents.has(docUrl)) {
             this.setShownDocumentURL(docUrl);
-            this.documents.get(docUrl);
         }
         else if (!this.loadingDocs.has(docUrl)) {
             return this.fetchDocument(docUrl);
