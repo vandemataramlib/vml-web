@@ -11,7 +11,7 @@
     "run:server:development": "node build/server/devServer",
     "run:server:production": "node -r dotenv/config build/server/prodServer",
     "build:client": "webpack --config config/webpack.config.prod.js",
-    "lint": "tslint -c ./tslint.json  './src/**/*.ts'"
+    "lint": "tslint -c ./tslint.json  './src/**/*.ts' './src/**/*.tsx'"
   },
   "pre-commit": [
     "lint",

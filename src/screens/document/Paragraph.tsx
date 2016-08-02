@@ -8,7 +8,7 @@ import { Models } from "vml-common";
 
 import { translit } from "../../shared/utils";
 import { AppState, DocumentStore, StanzaStore } from "../../stores";
-import { Encoding } from "../../shared/interfaces"
+import { Encoding } from "../../shared/interfaces";
 
 interface ParagraphProps {
     stanza: Models.Stanza;

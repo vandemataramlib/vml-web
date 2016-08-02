@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Popover, Divider, RadioButton ,RadioButtonGroup, Toggle } from "material-ui";
+import { Popover, Divider, RadioButton, RadioButtonGroup, Toggle } from "material-ui";
 import { observer, inject } from "mobx-react";
 
 import { AppState } from "../../stores";
