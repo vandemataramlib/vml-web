@@ -27,12 +27,14 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     constructor(props) {
 
         super(props);
-        this.setLocalWord(this.props.word.analysis ? this.props.word.analysis.map(token => token.token).join(" ") : this.props.word.word)
+        this.setLocalWord(this.props.word.analysis ?
+            this.props.word.analysis.map(token => token.token).join(" ")
+            : this.props.word.word);
     }
 
     handleWordChange = (event) => {
 
-        this.setLocalWord(event.target.value.trim())
+        this.setLocalWord(event.target.value.trim());
     }
 
     handleTokenMeaningEntered = (event) => {

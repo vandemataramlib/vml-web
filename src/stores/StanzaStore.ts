@@ -2,7 +2,6 @@ import { ObservableMap, observable, action, map, asMap } from "mobx";
 import { Models } from "vml-common";
 
 import { fetchData } from "../shared/utils";
-import { FetchLevel } from "../stores";
 
 export class StanzaStore {
     @observable private stanzas: ObservableMap<Models.Stanza>;
@@ -34,12 +33,21 @@ export class StanzaStore {
         }
     }
 
+    hasStanza = (url: string, runningStanzaId: string) => {
+
+        const urlParams = Models.Document.URLToParams(url);
+
+        const stanzaURL = Models.Stanza.URL(urlParams.slug, urlParams.subdocId, urlParams.recordId, runningStanzaId);
+
+        return this.stanzas.has(stanzaURL);
+    }
+
 
     private fetchStanza = (stanzaURL: string) => {
 
         this.loadingStanzas.add(stanzaURL);
 
-        fetchData(stanzaURL, FetchLevel.Local)
+        fetchData(stanzaURL)
             .then(stanza => this.addStanzaToStore(stanzaURL, stanza))
             .then(() => { this.loadingStanzas.delete(stanzaURL); });
     }

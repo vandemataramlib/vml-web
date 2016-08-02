@@ -6,3 +6,19 @@ export interface Context {
     documentListStore: DocumentListStore;
     stanzaStore: StanzaStore;
 }
+
+export enum Encoding {
+    devanagari,
+    iast,
+    itrans
+}
+
+export enum Environment {
+    Server,
+    Client
+}
+
+export enum FetchLevel {
+    Local,
+    App
+}

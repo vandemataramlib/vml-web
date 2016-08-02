@@ -41,7 +41,8 @@ import {
     blueGrey50
 } from "material-ui/styles/colors";
 
-import { AppState, FetchLevel } from "../stores";
+import { AppState } from "../stores";
+import { FetchLevel } from "./interfaces";
 
 export const translit = (word: string, from?: string, to?: string): string => {
 
@@ -70,20 +71,19 @@ export const getLightColour = (index) => {
 
 const appState = new AppState();
 
-export const fetchData = (url: string, level: FetchLevel): Promise<any> => {
+export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
 
-    url = Constants.API_SERVER_BASE_URL + url;
+    const fullURL = Constants.API_SERVER_BASE_URL + url;
 
-
-    if (appState.isClientEnv) {
+    if (level && appState.isClientEnv) {
         appState.addFetch(url, level);
     }
 
-    return fetch(url)
+    return fetch(fullURL)
         .then(response => response.json())
         .then((data) => {
 
-            if (appState.isClientEnv) {
+            if (level && appState.isClientEnv) {
                 appState.deleteFetch(url);
             }
 

@@ -1,6 +1,8 @@
 import { getMuiTheme } from "material-ui/styles";
 import { orange100, orange500, orange700 } from "material-ui/styles/colors";
 
+import { Encoding } from "./interfaces";
+
 export const muiThemeOptions = getMuiTheme({
     fontFamily: "Charlotte Sans, sans-serif, Siddhanta",
     palette: {
@@ -9,3 +11,14 @@ export const muiThemeOptions = getMuiTheme({
         primary3Color: orange100
     }
 });
+
+export const encodingSchemes = [
+    {
+        label: "देवनागरी",
+        value: Encoding.devanagari
+    },
+    {
+        label: "Roman",
+        value: Encoding.iast
+    }
+];

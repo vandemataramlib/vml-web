@@ -11,7 +11,7 @@ import { AppState, DocumentStore, DocumentListStore, StanzaStore } from "../stor
 import * as StaticFileServer from "./plugins/fileServer";
 import { routes } from "../shared/routes";
 import { Context } from "../shared/interfaces";
-import { muiThemeOptions } from "../shared/theme";
+import { muiThemeOptions } from "../shared/constants";
 
 const server = new Hapi.Server();
 

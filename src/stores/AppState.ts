@@ -1,41 +1,17 @@
 import { observable, computed, action, ObservableMap, map } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 
-export enum Encoding {
-    devanagari,
-    iast,
-    itrans
-}
-
-enum Environment {
-    Server,
-    Client
-}
-
-export enum FetchLevel {
-    Local,
-    App
-}
+import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
+import { encodingSchemes } from "../shared/constants";
 
 let instance: AppState = null;
 
 export class AppState {
     @observable currentUrl: string;
-    @observable encoding: Encoding;
+    @observable encoding: Encoding = Encoding.devanagari;
     defaultEncoding: Encoding = Encoding.itrans;
     @observable env: Environment;
     @observable dataFetchStore: ObservableMap<FetchLevel>;
-
-    encodingSchemes = [
-        {
-            label: "देवनागरी",
-            value: Encoding.devanagari
-        },
-        {
-            label: "Roman",
-            value: Encoding.iast
-        }
-    ];
 
     constructor(initialState?: AppState) {
 
@@ -45,11 +21,12 @@ export class AppState {
 
         this.currentUrl = initialState ? initialState.currentUrl : "/";
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
-        if (this.isClientEnv && localStorage.getItem("encoding")) {
-            this.encoding = parseInt(localStorage.getItem("encoding"));
+        if (this.isClientEnv) {
             this.dataFetchStore = map({});
-        } else {
-            this.encoding = Encoding.devanagari;
+            let encodingFromStorage = localStorage.getItem("encoding");
+            if (encodingFromStorage) {
+                this.setEncoding(parseInt(localStorage.getItem("encoding")));
+            }
         }
 
         return instance;
@@ -82,7 +59,7 @@ export class AppState {
     @computed
     get encodingScheme() {
 
-        return this.encodingSchemes.filter(scheme => scheme.value === this.encoding)[0];
+        return encodingSchemes.filter(scheme => scheme.value === this.encoding)[0];
     }
 
     @action
@@ -92,7 +69,7 @@ export class AppState {
     }
 
     @action
-    changeEncoding(encoding: Encoding) {
+    setEncoding(encoding: Encoding) {
 
         this.encoding = encoding;
         if (ExecutionEnvironment.canUseDOM) {
