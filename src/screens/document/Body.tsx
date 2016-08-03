@@ -6,55 +6,57 @@ import { Models } from "vml-common";
 import { Paragraph } from "./Paragraph";
 import { Segment } from "./Segment";
 import { ParagraphDialog } from "./ParagraphDialog";
-import { DocumentStore } from "../../stores";
+import { DocumentStore, AppState, StanzaStore } from "../../stores";
 
 interface BodyProps {
     annotateMode: boolean;
     documentStore?: DocumentStore;
+    appState?: AppState;
+    stanzaStore?: StanzaStore;
 }
 
-@inject("documentStore")
+@inject("documentStore", "appState", "stanzaStore")
 @observer
 export class Body extends React.Component<BodyProps, {}> {
     @observable dialogOpen: boolean;
     @observable dialogText: Models.Stanza;
 
-    @action
-    setDialogOpen = (open: boolean) => {
+    // @action
+    // setDialogOpen = (open: boolean) => {
 
-        this.dialogOpen = open;
-    }
+    //     this.dialogOpen = open;
+    // }
 
-    @action
-    setDialogText = (text: Models.Stanza) => {
+    // @action
+    // setDialogText = (text: Models.Stanza) => {
 
-        this.dialogText = text;
-    }
+    //     this.dialogText = text;
+    // }
 
-    renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
+    // renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
 
-        const { documentStore, annotateMode } = this.props;
+    //     const { documentStore, annotateMode } = this.props;
 
-        return (
-            <Paragraph
-                stanza={ paragraph }
-                isLast={ paragraphIndex === numParagraphs - 1 }
-                key={ paragraph.id }
-                annotateMode={ annotateMode }
-                onDialogOpen={ this.handleDialogOpen }
-                />
-        );
-    }
+    //     return (
+    //         <Paragraph
+    //             stanza={ paragraph }
+    //             isLast={ paragraphIndex === numParagraphs - 1 }
+    //             key={ paragraph.id }
+    //             annotateMode={ annotateMode }
+    //             onDialogOpen={ this.handleDialogOpen }
+    //             />
+    //     );
+    // }
 
-    handleDialogOpen = (text: Models.Stanza) => {
+    // handleDialogOpen = (text: Models.Stanza) => {
 
-        this.setDialogText(text);
-        this.setDialogOpen(true);
-    }
+    //     this.setDialogText(text);
+    //     this.setDialogOpen(true);
+    // }
 
     handleRequestClose = () => {
 
-        this.setDialogOpen(false);
+        this.props.appState.closeStanzaDialog();
     }
 
     handleSaveWordAnalysis = (event, lineId, updatedWord: Models.Word) => {
@@ -82,18 +84,20 @@ export class Body extends React.Component<BodyProps, {}> {
             }
             return newLine;
         });
-        this.setDialogText(newText);
+        // this.setDialogText(newText);
     }
 
     handleSaveParagraphDialog = (updatedText: Models.Stanza) => {
 
-        this.setDialogOpen(false);
+        // // this.setDialogOpen(false);
+        // const { appState } = this.props;
+        // appState.closeStanzaDialog();
         // this.props.documentStore.updateDocumentText(this.props.documentStore.shownDocument.url, updatedText);
     }
 
     render() {
 
-        const { documentStore, annotateMode } = this.props;
+        const { documentStore, annotateMode, appState, stanzaStore } = this.props;
 
         if (!documentStore.shownDocument) {
             return null;
@@ -101,9 +105,21 @@ export class Body extends React.Component<BodyProps, {}> {
 
         const segments = (documentStore.shownDocument.contents as Models.IChapter).segments;
 
+        const loadingStanzaDialog = appState.loadingStanzaDialog;
+
         return (
             <div style={ styles.mainBody }>
                 { segments.map((segment, i) => <Segment segment={ segment } annotateMode={ annotateMode } key={ i } />) }
+                { this.props.annotateMode ?
+                    <ParagraphDialog
+                        open={ loadingStanzaDialog !== null }
+                        stanza={ loadingStanzaDialog ? stanzaStore.getStanzaFromURL(loadingStanzaDialog.stanzaURL) : null }
+                        onRequestClose={ this.handleRequestClose }
+                        onSaveWordAnalysis={ (event, lineId, updatedWord) => this.handleSaveWordAnalysis(event, lineId, updatedWord) }
+                        onSaveParagraph={ this.handleSaveParagraphDialog }
+                        runningStanzaId={ loadingStanzaDialog ? loadingStanzaDialog.runningId : null }
+                        />
+                    : null}
             </div>
         );
     }

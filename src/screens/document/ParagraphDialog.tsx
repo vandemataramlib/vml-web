@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Dialog, Popover, FlatButton } from "material-ui";
-import { Sortable } from "react-anything-sortable";
+import { Dialog, Popover, FlatButton, LinearProgress } from "material-ui";
+const Sortable = require("react-anything-sortable");
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
 import { observable, action } from "mobx";
@@ -14,10 +14,11 @@ import { Line } from "./Line";
 
 interface ParagraphDialogProps {
     open: boolean;
-    text: Models.Stanza;
+    stanza: Models.Stanza;
     onRequestClose: React.EventHandler<any>;
     onSaveWordAnalysis: any;
     onSaveParagraph: any;
+    runningStanzaId: string;
 }
 
 @observer
@@ -56,7 +57,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     prepareParagraphSave = () => {
 
-        const updatedText: Models.Stanza = Object.assign({}, this.props.text);
+        const updatedText: Models.Stanza = Object.assign({}, this.props.stanza);
         updatedText.analysis = this.rearrangedTokens;
         this.props.onSaveParagraph(updatedText);
     }
@@ -88,7 +89,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
         const analysedTokens: Models.Token[] = [];
 
-        this.props.text.lines.forEach(line => {
+        this.props.stanza.lines.forEach(line => {
 
             line.words.forEach(word => {
 
@@ -104,7 +105,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     isAnalysedDisabled() {
 
-        const lineWithoutAnalysis = this.props.text.lines.some(line => {
+        const lineWithoutAnalysis = this.props.stanza.lines.some(line => {
 
             const wordWithoutAnalysis = line.words.some(word => !word.analysis ? true : false);
             return wordWithoutAnalysis ? true : false;
@@ -115,20 +116,20 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     getAnalysedWords() {
 
-        if (!this.analyseClicked && !this.props.text.analysis) {
+        if (!this.analyseClicked && !this.props.stanza.analysis) {
             return [];
         }
 
         const analysedTokens: Models.Token[] = [];
 
-        if (this.props.text.analysis && !this.analyseClicked) {
-            this.props.text.analysis.forEach(token => {
+        if (this.props.stanza.analysis && !this.analyseClicked) {
+            this.props.stanza.analysis.forEach(token => {
 
                 analysedTokens.push(token);
             });
         }
         else {
-            this.props.text.lines.forEach(line => {
+            this.props.stanza.lines.forEach(line => {
 
                 line.words.forEach(word => {
 
@@ -154,7 +155,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
             <div>
                 <p style={ styles.paragraph }>
                     {
-                        this.props.text.lines.map((line, lineIndex) => {
+                        this.props.stanza.lines.map((line, lineIndex) => {
                             return lineIndex > 0 ?
                                 React.Children.toArray([
                                     <br />,
@@ -167,7 +168,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
                 <div style={ styles.analyseButton }>
                     <FlatButton label="Analyse" primary disabled={ this.isAnalysedDisabled() } onTouchTap={ this.handleAnalyseClick } />
                 </div>
-                <div style={ styles.showAnalysis(this.analyseClicked || this.props.text.analysis) }>
+                <div style={ styles.showAnalysis(this.analyseClicked || this.props.stanza.analysis) }>
                     <Sortable onSort={ this.handleTokenSort } dynamic>
                         {
                             this.getAnalysedWords().map((token, tokenIndex) => {
@@ -216,14 +217,24 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     render() {
 
-        if (!this.props.text) {
-            return null;
+        if (!this.props.stanza) {
+            return (
+                <div>
+                    <Dialog
+                        title={ `Verse ${this.props.runningStanzaId}` }
+                        open={ this.props.open }
+                        contentStyle={ styles.dialogStyle }
+                        bodyStyle={ styles.dialogBodyStyle }
+                        children={ <LinearProgress mode="indeterminate" /> }
+                        />
+                </div>
+            );
         }
 
         return (
             <div>
                 <Dialog
-                    title={ `Verse ${this.props.text.id}` }
+                    title={ `Verse ${this.props.stanza.runningId}` }
                     open={ this.props.open }
                     onRequestClose={ this.handleRequestClose }
                     contentStyle={ styles.dialogStyle }
@@ -293,6 +304,7 @@ const styles = {
         left: 0
     },
     dialogBodyStyle: {
-        color: "inherit"
+        color: "inherit",
+        paddingBottom: 20
     }
 };

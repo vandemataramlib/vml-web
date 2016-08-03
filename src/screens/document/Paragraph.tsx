@@ -9,6 +9,7 @@ import { Models } from "vml-common";
 import { translit } from "../../shared/utils";
 import { AppState, DocumentStore, StanzaStore } from "../../stores";
 import { Encoding } from "../../shared/interfaces";
+import { defaultEncoding } from "../../shared/constants";
 
 interface ParagraphProps {
     stanza: Models.Stanza;
@@ -57,14 +58,10 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
 
     handleVerseClick = (event: React.MouseEvent, runningStanzaId: string) => {
 
-        // if (!this.expanded) {
-        //     this.props.stanzaStore.loadStanza(this.props.documentStore.shownDocument.url, runningStanzaId);
-        // }
-
         this.setExpanded(!this.expanded);
     }
 
-    handleAnnotateParagraph = (text, event) => {
+    handleAnnotateParagraph = (stanza: Models.Stanza, event) => {
 
         if (!this.props.annotateMode) {
             return;
@@ -72,17 +69,21 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
 
         event.preventDefault();
 
-        this.props.onDialogOpen(text);
+        const { appState, documentStore, stanzaStore } = this.props;
+
+        stanzaStore.getStanza(documentStore.shownDocument.url, stanza.runningId);
+
+        appState.openStanzaDialog(documentStore.shownDocument.url, stanza.runningId);
     }
 
     renderPara = (line: Models.Line, lineIndex, stanzaRunningId: string, stanzaLength: number): string | (React.ReactElement<any> | string | number)[] => {
 
         const { appState } = this.props;
 
-        let lineEl = translit(line.line, Encoding[appState.defaultEncoding], Encoding[appState.encodingScheme.value]);
+        let lineEl = translit(line.line, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
 
         if (stanzaLength - 1 === lineIndex) {
-            lineEl += " ||" + translit(stanzaRunningId, Encoding[appState.defaultEncoding], Encoding[appState.encodingScheme.value]) + "||";
+            lineEl += " ||" + translit(stanzaRunningId, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) + "||";
         }
 
         if (lineIndex === 0) {
@@ -104,7 +105,7 @@ export class Paragraph extends React.Component<ParagraphProps, {}> {
             const stanza = stanzaStore.getStanza(url, runningStanzaId);
 
             if (!stanza) {
-                return null;
+                return <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } />;
             }
 
             return <div>{ stanza.stanza }</div>;

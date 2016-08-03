@@ -22,3 +22,5 @@ export const encodingSchemes = [
         value: Encoding.iast
     }
 ];
+
+export const defaultEncoding = Encoding.itrans;

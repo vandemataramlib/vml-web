@@ -1,5 +1,6 @@
 import * as React from "react";
-import { sortable } from "react-anything-sortable";
+// import { sortable } from "react-anything-sortable";
+const sortable = require("react-anything-sortable").sortable;
 import { observer } from "mobx-react";
 
 @sortable

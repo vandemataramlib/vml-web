@@ -19,11 +19,14 @@ export class StanzaStore {
         this.stanzas.set(stanzaUrl, stanza);
     }
 
-    getStanza = (url: string, runningStanzaId: string) => {
+    getStanza = (documentURL: string, runningStanzaId: string) => {
 
-        const urlParams = Models.Document.URLToParams(url);
+        const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
 
-        const stanzaURL = Models.Stanza.URL(urlParams.slug, urlParams.subdocId, urlParams.recordId, runningStanzaId);
+        return this.getStanzaFromURL(stanzaURL);
+    }
+
+    getStanzaFromURL = (stanzaURL: string) => {
 
         if (this.stanzas.has(stanzaURL)) {
             return this.stanzas.get(stanzaURL);

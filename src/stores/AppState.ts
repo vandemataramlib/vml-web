@@ -1,17 +1,23 @@
 import { observable, computed, action, ObservableMap, map } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
+import { Models } from "vml-common";
 
 import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
 import { encodingSchemes } from "../shared/constants";
 
 let instance: AppState = null;
 
+interface StanzaData {
+    stanzaURL: string;
+    runningId: string;
+}
+
 export class AppState {
     @observable currentUrl: string;
     @observable encoding: Encoding = Encoding.devanagari;
-    defaultEncoding: Encoding = Encoding.itrans;
     @observable env: Environment;
-    @observable dataFetchStore: ObservableMap<FetchLevel>;
+    @observable private dataFetchStore: ObservableMap<FetchLevel>;
+    @observable loadingStanzaDialog: StanzaData;
 
     constructor(initialState?: AppState) {
 
@@ -23,6 +29,7 @@ export class AppState {
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
         if (this.isClientEnv) {
             this.dataFetchStore = map({});
+            this.loadingStanzaDialog = null;
             let encodingFromStorage = localStorage.getItem("encoding");
             if (encodingFromStorage) {
                 this.setEncoding(parseInt(localStorage.getItem("encoding")));
@@ -42,6 +49,23 @@ export class AppState {
     deleteFetch = (url: string) => {
 
         this.dataFetchStore.delete(url);
+    }
+
+    @action
+    openStanzaDialog = (documentURL: string, runningStanzaId: string) => {
+
+        const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
+
+        this.loadingStanzaDialog = {
+            runningId: runningStanzaId,
+            stanzaURL
+        };
+    }
+
+    @action
+    closeStanzaDialog = () => {
+
+        this.loadingStanzaDialog = null;
     }
 
     @computed
