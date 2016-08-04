@@ -105,7 +105,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
             const stanza = stanzaStore.getStanza(url, runningStanzaId);
 
             if (!stanza) {
-                return <LinearProgress mode="indeterminate" style={ styles.stanzaProgress } />;
+                return <LinearProgress mode="indeterminate" style={ styles.loadProgress } />;
             }
 
             return <div>{ stanza.stanza }</div>;
@@ -202,7 +202,7 @@ const styles = {
             };
         }
     },
-    stanzaProgress: {
+    loadProgress: {
         marginRight: -20,
         marginLeft: -20,
         width: "auto"

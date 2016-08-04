@@ -226,7 +226,7 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
                         open={ this.props.open }
                         contentStyle={ styles.dialogStyle }
                         bodyStyle={ styles.dialogBodyStyle }
-                        children={ <LinearProgress mode="indeterminate" /> }
+                        children={ <LinearProgress mode="indeterminate" style={ styles.loadProgress } /> }
                         />
                 </div>
             );
@@ -311,5 +311,9 @@ const styles = {
     dialogBodyStyle: {
         color: "inherit",
         paddingBottom: 20
+    },
+    loadProgress: {
+        margin: "0 -24px",
+        width: "auto"
     }
 };
