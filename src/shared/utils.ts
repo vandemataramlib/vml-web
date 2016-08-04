@@ -79,7 +79,11 @@ export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
         appState.addFetch(url, level);
     }
 
-    return fetch(fullURL)
+    return fetch(fullURL, {
+            headers: {
+                "Accept": "application/vnd.api+json"
+            }
+        })
         .then(response => response.json())
         .then((data) => {
 
@@ -94,4 +98,18 @@ export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
             console.error(err.message);
             return err;
         });
+};
+
+export const patchData = (url: string, body: any): Promise<any> => {
+
+    const fullURL = Constants.API_SERVER_BASE_URL + url;
+
+    return fetch(fullURL, {
+        method: "PATCH",
+        headers: {
+            "Accept": "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json"
+        },
+        body
+    });
 };

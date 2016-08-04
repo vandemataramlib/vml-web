@@ -1,7 +1,7 @@
-import { ObservableMap, observable, action, map, asMap } from "mobx";
-import { Models } from "vml-common";
+import { ObservableMap, observable, action, map, asMap, toJSON, toJS } from "mobx";
+import { Models, Serializers } from "vml-common";
 
-import { fetchData } from "../shared/utils";
+import { fetchData, patchData } from "../shared/utils";
 
 export class StanzaStore {
     @observable private stanzas: ObservableMap<Models.Stanza>;
@@ -32,6 +32,8 @@ export class StanzaStore {
         const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
 
         this.stanzas.set(stanzaURL, updatedStanza);
+
+        this.patchStanza(stanzaURL, updatedStanza);
     }
 
     getStanzaFromURL = (stanzaURL: string) => {
@@ -51,5 +53,18 @@ export class StanzaStore {
         fetchData(stanzaURL)
             .then(stanza => this.addStanzaToStore(stanzaURL, stanza))
             .then(() => { this.loadingStanzas.delete(stanzaURL); });
+    }
+
+    private patchStanza = (stanzaURL: string, updatedStanza: Models.Stanza) => {
+
+        const topLevelLinks = {
+            self: stanzaURL
+        };
+
+        const stanzaSerializer = Serializers.getStanzaSerializer("stanzas", topLevelLinks);
+
+        const patchedStanza = JSON.stringify((stanzaSerializer.serialize(toJS(updatedStanza))));
+
+        patchData(stanzaURL, patchedStanza);
     }
 }
