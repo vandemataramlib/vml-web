@@ -12,7 +12,7 @@ import { SortableToken } from "./SortableToken";
 import { WordPopover } from "./WordPopover";
 import { Line } from "./Line";
 
-interface ParagraphDialogProps {
+interface StanzaDialogProps {
     open: boolean;
     stanza: Models.Stanza;
     onRequestClose: React.EventHandler<any>;
@@ -25,7 +25,7 @@ interface ParagraphDialogProps {
 
 @inject("appState", "stanzaStore", "documentStore")
 @observer
-export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
+export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;
     @observable word: Models.Word;

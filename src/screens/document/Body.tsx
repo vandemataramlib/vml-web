@@ -2,9 +2,9 @@ import * as React from "react";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
-import { Paragraph } from "./Paragraph";
+import { Stanza } from "./Stanza";
 import { Segment } from "./Segment";
-import { ParagraphDialog } from "./ParagraphDialog";
+import { StanzaDialog } from "./StanzaDialog";
 import { DocumentStore, AppState, StanzaStore } from "../../stores";
 
 interface BodyProps {
@@ -42,7 +42,7 @@ export class Body extends React.Component<BodyProps, {}> {
             <div style={ styles.mainBody }>
                 { segments.map((segment, i) => <Segment segment={ segment } annotateMode={ annotateMode } key={ i } />) }
                 { this.props.annotateMode ?
-                    <ParagraphDialog
+                    <StanzaDialog
                         open={ loadingStanzaDialog !== null }
                         stanza={ loadingStanzaDialog ? stanzaStore.getStanzaFromURL(loadingStanzaDialog.stanzaURL) : null }
                         onRequestClose={ this.handleRequestClose }

@@ -5,7 +5,7 @@ import { Models } from "vml-common";
 import { Paper } from "material-ui";
 
 import { DocumentStore } from "../../stores";
-import { Paragraph } from "./Paragraph";
+import { Stanza } from "./Stanza";
 
 interface SegmentProps {
     segment?: Models.Segment;
@@ -36,7 +36,7 @@ export class Segment extends React.Component<SegmentProps, {}> {
         const { documentStore, annotateMode } = this.props;
 
         return (
-            <Paragraph
+            <Stanza
                 stanza={ paragraph }
                 isLast={ paragraphIndex === numParagraphs - 1 }
                 key={ paragraph.id }

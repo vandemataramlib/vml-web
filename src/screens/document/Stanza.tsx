@@ -11,7 +11,7 @@ import { AppState, DocumentStore, StanzaStore } from "../../stores";
 import { Encoding } from "../../shared/interfaces";
 import { defaultEncoding } from "../../shared/constants";
 
-interface ParagraphProps {
+interface StanzaProps {
     stanza: Models.Stanza;
     annotateMode: boolean;
     isLast: boolean;
@@ -23,7 +23,7 @@ interface ParagraphProps {
 
 @inject("appState", "documentStore", "stanzaStore")
 @observer
-export class Paragraph extends React.Component<ParagraphProps, {}> {
+export class Stanza extends React.Component<StanzaProps, {}> {
     @observable hovered: boolean = false;
     @observable expanded: boolean = false;
     @observable popoverOpen: boolean = false;
