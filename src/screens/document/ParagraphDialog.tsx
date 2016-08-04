@@ -7,7 +7,7 @@ import { observable, action } from "mobx";
 import { translit, getColour, getLightColour } from "../../shared/utils";
 import { Models } from "vml-common";
 
-import { DocumentStore } from "../../stores";
+import { AppState, StanzaStore, DocumentStore } from "../../stores";
 import { SortableToken } from "./SortableToken";
 import { WordPopover } from "./WordPopover";
 import { Line } from "./Line";
@@ -16,19 +16,20 @@ interface ParagraphDialogProps {
     open: boolean;
     stanza: Models.Stanza;
     onRequestClose: React.EventHandler<any>;
-    onSaveWordAnalysis: any;
     onSaveParagraph: any;
     runningStanzaId: string;
+    appState?: AppState;
+    stanzaStore?: StanzaStore;
+    documentStore?: DocumentStore;
 }
 
+@inject("appState", "stanzaStore", "documentStore")
 @observer
 export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;
     @observable word: Models.Word;
-    lineId: string;
     rearrangedTokens: Models.Token[] = [];
-    @observable allWordsAnalysed: boolean;
     @observable analyseClicked: boolean;
 
     @action
@@ -44,22 +45,18 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
     }
 
     @action
-    setWord = (word: Models.Word) => {
-
-        this.word = word;
-    }
-
-    @action
     setAnalyseClicked = (clicked: boolean) => {
 
         this.analyseClicked = clicked;
     }
 
-    prepareParagraphSave = () => {
+    updateStanza = () => {
 
-        const updatedText: Models.Stanza = Object.assign({}, this.props.stanza);
-        updatedText.analysis = this.rearrangedTokens;
-        this.props.onSaveParagraph(updatedText);
+        const { stanzaStore, documentStore } = this.props;
+        const { editedStanza } = this.props.appState;
+        editedStanza.analysis = this.rearrangedTokens;
+        stanzaStore.updateStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
+        this.props.onSaveParagraph();
     }
 
     componentWillReceiveProps() {
@@ -80,7 +77,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
                 label="Save"
                 primary
                 // disabled
-                onTouchTap={ this.prepareParagraphSave }
+                onTouchTap={ this.updateStanza }
                 />
         ];
     }
@@ -89,7 +86,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
         const analysedTokens: Models.Token[] = [];
 
-        this.props.stanza.lines.forEach(line => {
+        this.props.appState.editedStanza.lines.forEach(line => {
 
             line.words.forEach(word => {
 
@@ -105,7 +102,7 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     isAnalysedDisabled() {
 
-        const lineWithoutAnalysis = this.props.stanza.lines.some(line => {
+        const lineWithoutAnalysis = this.props.appState.editedStanza.lines.some(line => {
 
             const wordWithoutAnalysis = line.words.some(word => !word.analysis ? true : false);
             return wordWithoutAnalysis ? true : false;
@@ -116,20 +113,22 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     getAnalysedWords() {
 
-        if (!this.analyseClicked && !this.props.stanza.analysis) {
+        const { editedStanza } = this.props.appState;
+
+        if (!this.analyseClicked && !editedStanza.analysis) {
             return [];
         }
 
         const analysedTokens: Models.Token[] = [];
 
-        if (this.props.stanza.analysis && !this.analyseClicked) {
-            this.props.stanza.analysis.forEach(token => {
+        if (editedStanza.analysis && !this.analyseClicked) {
+            editedStanza.analysis.forEach(token => {
 
                 analysedTokens.push(token);
             });
         }
         else {
-            this.props.stanza.lines.forEach(line => {
+            editedStanza.lines.forEach(line => {
 
                 line.words.forEach(word => {
 
@@ -151,31 +150,35 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
 
     getDialogChildren() {
 
+        const { appState } = this.props;
+
         return (
             <div>
                 <p style={ styles.paragraph }>
                     {
-                        this.props.stanza.lines.map((line, lineIndex) => {
+                        appState.editedStanza.lines.map((line, lineIndex) => {
                             return lineIndex > 0 ?
                                 React.Children.toArray([
                                     <br />,
-                                    <Line line={ line } onWordClicked={ (event, lineId, word) => this.handleWordClicked(event, lineId, word) } key={ line.id }/>
+                                    <Line line={ line } onWordClicked={ this.handleWordClicked } key={ line.id }/>
                                 ])
-                                : <Line line={ line } onWordClicked={ (event, lineId, word) => this.handleWordClicked(event, lineId, word) } key={ line.id }/>;
+                                : <Line line={ line } onWordClicked={ this.handleWordClicked } key={ line.id }/>;
                         })
                     }
                 </p>
                 <div style={ styles.analyseButton }>
                     <FlatButton label="Analyse" primary disabled={ this.isAnalysedDisabled() } onTouchTap={ this.handleAnalyseClick } />
                 </div>
-                <div style={ styles.showAnalysis(this.analyseClicked || this.props.stanza.analysis) }>
+                <div style={ styles.showAnalysis(this.analyseClicked || appState.editedStanza.analysis) }>
                     <Sortable onSort={ this.handleTokenSort } dynamic>
                         {
                             this.getAnalysedWords().map((token, tokenIndex) => {
 
                                 return (
                                     <SortableToken sortData={ token } key={ tokenIndex }>
-                                        <span style={ Object.assign({ backgroundColor: getLightColour(tokenIndex) }, styles.analysedToken) } key={ tokenIndex }>{ translit(token.token) }</span>
+                                        <span style={ Object.assign({ backgroundColor: getLightColour(tokenIndex) }, styles.analysedToken) } >
+                                            { translit(token.token) }
+                                        </span>
                                     </SortableToken>
                                 );
                             })
@@ -200,19 +203,17 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
         this.setWordPopoverOpen(false);
     }
 
-    handleWordClicked = (event: React.TouchEvent, lineId: string, word: Models.Word) => {
+    handleWordClicked = (event: React.TouchEvent) => {
 
         event.preventDefault();
-        this.setWord(word);
         this.setAnchorEl(event.currentTarget);
         this.setWordPopoverOpen(true);
-        this.lineId = lineId;
     }
 
-    handleProcessWordAnalysis = (event, updatedWord: Models.Word) => {
+    handleProcessWordAnalysis = (event) => {
 
         this.setWordPopoverOpen(false);
-        this.props.onSaveWordAnalysis(event, this.lineId, updatedWord);
+        this.props.appState.unsetEditedWord();
     }
 
     render() {
@@ -231,10 +232,14 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
             );
         }
 
+        const { appState } = this.props;
+
+        appState.setEditedStanza(this.props.stanza);
+
         return (
             <div>
                 <Dialog
-                    title={ `Verse ${this.props.stanza.runningId}` }
+                    title={ `Verse ${appState.editedStanza.runningId}` }
                     open={ this.props.open }
                     onRequestClose={ this.handleRequestClose }
                     contentStyle={ styles.dialogStyle }
@@ -253,8 +258,8 @@ export class ParagraphDialog extends React.Component<ParagraphDialogProps, {}> {
                     autoCloseWhenOffScreen={ false }
                     children={
                         <WordPopover
-                            word={ this.word }
-                            onSaveWordAnalysis={ (event, updatedWord) => this.handleProcessWordAnalysis(event, updatedWord) }
+                            word={ appState.editedWord }
+                            onSaveWordAnalysis={ this.handleProcessWordAnalysis }
                             onTouchTapCancel={ this.handleRequestPopoverClose }
                             />
                     }

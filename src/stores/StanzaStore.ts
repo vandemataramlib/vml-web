@@ -26,6 +26,14 @@ export class StanzaStore {
         return this.getStanzaFromURL(stanzaURL);
     }
 
+    @action
+    updateStanza = (documentURL: string, runningStanzaId: string, updatedStanza: Models.Stanza) => {
+
+        const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
+
+        this.stanzas.set(stanzaURL, updatedStanza);
+    }
+
     getStanzaFromURL = (stanzaURL: string) => {
 
         if (this.stanzas.has(stanzaURL)) {
@@ -35,16 +43,6 @@ export class StanzaStore {
             return null;
         }
     }
-
-    hasStanza = (url: string, runningStanzaId: string) => {
-
-        const urlParams = Models.Document.URLToParams(url);
-
-        const stanzaURL = Models.Stanza.URL(urlParams.slug, urlParams.subdocId, urlParams.recordId, runningStanzaId);
-
-        return this.stanzas.has(stanzaURL);
-    }
-
 
     private fetchStanza = (stanzaURL: string) => {
 

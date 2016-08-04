@@ -2,18 +2,20 @@ import * as React from "react";
 import { TextField, FlatButton } from "material-ui";
 import { grey500 } from "material-ui/styles/colors";
 import { observable, action } from "mobx";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
 import { translit, getColour } from "../../shared/utils";
-import { DocumentStore } from "../../stores";
+import { AppState } from "../../stores";
 
 interface WordPopoverProps {
     word: Models.Word;
     onSaveWordAnalysis: any;
     onTouchTapCancel: any;
+    appState?: AppState;
 }
 
+@inject("appState")
 @observer
 export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @observable localWord: string;
@@ -44,17 +46,20 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
     handleSave = (event) => {
 
-        const { word } = this.props;
+        const { word, appState, onSaveWordAnalysis } = this.props;
 
         const analysis = this.localWord.split(/\s+/).map((token, tokenIndex): Models.Token => {
 
             return {
                 id: word.id + "." + (tokenIndex + 1),
-                token: token
+                token: token,
+                wordId: word.id
             };
         });
 
-        this.props.onSaveWordAnalysis(event, { id: word.id, word, analysis });
+        appState.updateEditedStanzaWordAnalysis(word.lineId, word.id, analysis);
+
+        onSaveWordAnalysis(event);
     }
 
     render() {

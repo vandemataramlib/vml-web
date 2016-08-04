@@ -1,4 +1,4 @@
-import { observable, computed, action, ObservableMap, map } from "mobx";
+import { observable, computed, action, ObservableMap, map, toJS } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 import { Models } from "vml-common";
 
@@ -18,6 +18,8 @@ export class AppState {
     @observable env: Environment;
     @observable private dataFetchStore: ObservableMap<FetchLevel>;
     @observable loadingStanzaDialog: StanzaData;
+    @observable editedStanza: Models.Stanza;
+    editedWord: Models.Word;
 
     constructor(initialState?: AppState) {
 
@@ -30,6 +32,7 @@ export class AppState {
         if (this.isClientEnv) {
             this.dataFetchStore = map({});
             this.loadingStanzaDialog = null;
+            this.editedStanza = null;
             let encodingFromStorage = localStorage.getItem("encoding");
             if (encodingFromStorage) {
                 this.setEncoding(parseInt(localStorage.getItem("encoding")));
@@ -99,5 +102,41 @@ export class AppState {
         if (ExecutionEnvironment.canUseDOM) {
             localStorage.setItem("encoding", encoding.toString());
         }
+    }
+
+    @action
+    setEditedStanza = (stanza: Models.Stanza) => {
+
+        if (this.editedStanza && this.editedStanza.runningId === stanza.runningId) {
+            return;
+        }
+
+        this.editedStanza = new Models.Stanza(toJS(stanza));
+    }
+
+    @action
+    updateEditedStanzaWordAnalysis = (lineId: string, wordId: string, analysis: Models.Token[]) => {
+
+        const newStanza = new Models.Stanza(toJS(this.editedStanza));
+
+        newStanza.lines.find(line => line.id === lineId).words.find(w => w.id === wordId).analysis = analysis;
+
+        this.editedStanza = newStanza;
+    }
+
+    @action
+    deleteEditedStanza = () => {
+
+        this.editedStanza = null;
+    }
+
+    setEditedWord = (word: Models.Word) => {
+
+        this.editedWord = word;
+    }
+
+    unsetEditedWord = () => {
+
+        this.editedWord = null;
     }
 }

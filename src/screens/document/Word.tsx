@@ -1,17 +1,19 @@
 import * as React from "react";
 import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observable, action } from "mobx";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
-import { DocumentStore } from "../../stores";
+import { AppState } from "../../stores";
 import { translit, getColour, getLightColour } from "../../shared/utils";
 
 interface WordProps {
     word: Models.Word;
     onWordClicked: any;
+    appState?: AppState;
 }
 
+@inject("appState")
 @observer
 export class Word extends React.Component<WordProps, {}> {
     @observable hovered: boolean;
@@ -32,6 +34,14 @@ export class Word extends React.Component<WordProps, {}> {
         this.setHovered(false);
     }
 
+    handleTouchTap = (event) => {
+
+        const { appState, onWordClicked, word } = this.props;
+
+        appState.setEditedWord(word);
+        onWordClicked(event);
+    }
+
     render() {
 
         const { word, onWordClicked } = this.props;
@@ -41,7 +51,7 @@ export class Word extends React.Component<WordProps, {}> {
                 style={ styles.wordContainer(this.hovered) }
                 onMouseEnter={ this.handleMouseEnter }
                 onMouseLeave={ this.handleMouseLeave }
-                onTouchTap={ (event) => onWordClicked(event, word) }
+                onTouchTap={ this.handleTouchTap }
                 >
                 <span>{ translit(word.word) }</span>
                 <span style={ styles.analysedTokens }>

@@ -43,7 +43,7 @@
     "mobx-react": "^3.5.3",
     "per-env": "^1.0.2",
     "react": "^15.3.0",
-    "react-anything-sortable": "^1.5.1",
+    "react-anything-sortable": "^1.6.0",
     "react-dom": "^15.3.0",
     "react-router": "^2.5.2",
     "react-tap-event-plugin": "^1.0.0",
