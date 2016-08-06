@@ -57,7 +57,7 @@ export class StanzaStore {
 
         this.loadingStanzas.add(stanzaURL);
 
-        fetchData(stanzaURL)
+        fetchData<Models.Stanza>(stanzaURL)
             .then(stanza => this.addStanzaToStore(stanzaURL, stanza))
             .then(() => { this.loadingStanzas.delete(stanzaURL); });
     }
@@ -72,8 +72,8 @@ export class StanzaStore {
 
         const patchedStanza = JSON.stringify((stanzaSerializer.serialize(toJS(updatedStanza))));
 
-        patchData(stanzaURL, patchedStanza)
-            .then((updatedDBStanza: Models.Stanza) => {
+        patchData<Models.Stanza>(stanzaURL, patchedStanza)
+            .then(updatedDBStanza => {
 
                 this.updateStanza(stanzaURL, updatedDBStanza);
                 appState.showSnackbar({

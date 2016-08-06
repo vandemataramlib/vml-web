@@ -55,7 +55,7 @@ export class DocumentStore {
 
         this.loadingDocs.add(docURL);
 
-        return fetchData(docURL, FetchLevel.App)
+        return fetchData<Models.Document>(docURL, FetchLevel.App)
             .then(document => this.addDocumentToStore(docURL, document))
             .then(() => {
 

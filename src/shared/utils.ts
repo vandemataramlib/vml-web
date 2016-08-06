@@ -71,7 +71,7 @@ export const getLightColour = (index) => {
 
 const appState = new AppState();
 
-export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
+export function fetchData<T>(url: string, level?: FetchLevel): Promise<T> {
 
     const fullURL = Constants.API_SERVER_BASE_URL + url;
 
@@ -101,7 +101,7 @@ export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
         });
 };
 
-export const patchData = (url: string, body: any): Promise<any> => {
+export function patchData<T>(url: string, body: any): Promise<T> {
 
     const fullURL = Constants.API_SERVER_BASE_URL + url;
 
