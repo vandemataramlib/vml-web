@@ -55,7 +55,7 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         const { stanzaStore, documentStore } = this.props;
         const { editedStanza } = this.props.appState;
         editedStanza.analysis = this.rearrangedTokens;
-        stanzaStore.updateStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
+        stanzaStore.tryUpdatingStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
         this.props.onSaveParagraph();
     }
 

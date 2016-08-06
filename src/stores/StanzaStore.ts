@@ -2,6 +2,9 @@ import { ObservableMap, observable, action, map, asMap, toJSON, toJS } from "mob
 import { Models, Serializers } from "vml-common";
 
 import { fetchData, patchData } from "../shared/utils";
+import { AppState } from "./AppState";
+
+const appState = new AppState();
 
 export class StanzaStore {
     @observable private stanzas: ObservableMap<Models.Stanza>;
@@ -10,7 +13,7 @@ export class StanzaStore {
     constructor(initialState?: any) {
 
         this.stanzas = initialState ? asMap(initialState.stanzas) : map({});
-        this.loadingStanzas = new Set("");
+        this.loadingStanzas = new Set([]);
     }
 
     @action
@@ -26,14 +29,18 @@ export class StanzaStore {
         return this.getStanzaFromURL(stanzaURL);
     }
 
-    @action
-    updateStanza = (documentURL: string, runningStanzaId: string, updatedStanza: Models.Stanza) => {
+
+    tryUpdatingStanza = (documentURL: string, runningStanzaId: string, updatedStanza: Models.Stanza) => {
 
         const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
 
-        this.stanzas.set(stanzaURL, updatedStanza);
-
         this.patchStanza(stanzaURL, updatedStanza);
+    }
+
+    @action
+    updateStanza = (stanzaURL: string, updatedStanza: Models.Stanza) => {
+
+        this.stanzas.set(stanzaURL, updatedStanza);
     }
 
     getStanzaFromURL = (stanzaURL: string) => {
@@ -65,6 +72,21 @@ export class StanzaStore {
 
         const patchedStanza = JSON.stringify((stanzaSerializer.serialize(toJS(updatedStanza))));
 
-        patchData(stanzaURL, patchedStanza);
+        patchData(stanzaURL, patchedStanza)
+            .then((updatedDBStanza: Models.Stanza) => {
+
+                this.updateStanza(stanzaURL, updatedDBStanza);
+                appState.showSnackbar({
+                    message: `Stanza ${updatedDBStanza.runningId} updated`
+                });
+            })
+            .catch((err: Error) => {
+
+                appState.showSnackbar({
+                    message: `Error updating stanza ${updatedStanza.runningId}`,
+                    action: "OK",
+                    autoHideDuration: 0
+                });
+            });
     }
 }

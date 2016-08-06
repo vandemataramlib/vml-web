@@ -8,7 +8,8 @@ export const muiThemeOptions = getMuiTheme({
     palette: {
         primary1Color: orange500,
         primary2Color: orange700,
-        primary3Color: orange100
+        primary3Color: orange100,
+        accent1Color: orange700
     }
 });
 

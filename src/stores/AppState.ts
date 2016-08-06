@@ -4,13 +4,9 @@ import { Models } from "vml-common";
 
 import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
 import { encodingSchemes } from "../shared/constants";
+import { StanzaData, SnackbarInfo } from "../shared/interfaces";
 
 let instance: AppState = null;
-
-interface StanzaData {
-    stanzaURL: string;
-    runningId: string;
-}
 
 export class AppState {
     @observable currentUrl: string;
@@ -19,6 +15,7 @@ export class AppState {
     @observable private dataFetchStore: ObservableMap<FetchLevel>;
     @observable loadingStanzaDialog: StanzaData;
     @observable editedStanza: Models.Stanza;
+    @observable snackbars: SnackbarInfo[];
     editedWord: Models.Word;
 
     constructor(initialState?: AppState) {
@@ -29,6 +26,7 @@ export class AppState {
 
         this.currentUrl = initialState ? initialState.currentUrl : "/";
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
+        this.snackbars = [];
         if (this.isClientEnv) {
             this.dataFetchStore = map({});
             this.loadingStanzaDialog = null;
@@ -102,6 +100,28 @@ export class AppState {
         if (ExecutionEnvironment.canUseDOM) {
             localStorage.setItem("encoding", encoding.toString());
         }
+    }
+
+    @action
+    showSnackbar = (snackbar: SnackbarInfo) => {
+
+        if (this.isClientEnv) {
+            this.snackbars.push(snackbar);
+        };
+    }
+
+    @action
+    getNextSnackbar() {
+
+        if (this.snackbars.length) {
+            this.snackbars.shift();
+        }
+    }
+
+    @computed
+    get snackbar() {
+
+        return this.snackbars.length ? this.snackbars[0] : null;
     }
 
     @action

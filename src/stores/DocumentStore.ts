@@ -12,7 +12,7 @@ export class DocumentStore {
     constructor(initialState?: any) {
 
         this.documents = initialState ? asMap(initialState.documents) : map({});
-        this.loadingDocs = new Set("");
+        this.loadingDocs = new Set([]);
         this.shownDocumentURL = initialState ? initialState.shownDocumentURL : null;
     }
 

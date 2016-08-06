@@ -22,3 +22,15 @@ export enum FetchLevel {
     Local,
     App
 }
+
+export interface StanzaData {
+    stanzaURL: string;
+    runningId: string;
+}
+
+export interface SnackbarInfo {
+    message: string;
+    action?: string;
+    onActionTouchTap?: any;
+    autoHideDuration?: number;
+}
