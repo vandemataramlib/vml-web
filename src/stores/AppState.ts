@@ -16,6 +16,7 @@ export class AppState {
     @observable loadingStanzaDialog: StanzaData;
     @observable editedStanza: Models.Stanza;
     @observable snackbars: SnackbarInfo[];
+    @observable annotateMode: boolean;
     editedWord: Models.Word;
 
     constructor(initialState?: AppState) {
@@ -27,6 +28,7 @@ export class AppState {
         this.currentUrl = initialState ? initialState.currentUrl : "/";
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
         this.snackbars = [];
+        this.annotateMode = false;
         if (this.isClientEnv) {
             this.dataFetchStore = map({});
             this.loadingStanzaDialog = null;
@@ -50,6 +52,12 @@ export class AppState {
     deleteFetch = (url: string) => {
 
         this.dataFetchStore.delete(url);
+    }
+
+    @action
+    setAnnotateMode = (on: boolean) => {
+
+        this.annotateMode = on;
     }
 
     @action

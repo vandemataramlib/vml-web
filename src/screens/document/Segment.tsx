@@ -4,16 +4,12 @@ import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 import { Paper } from "material-ui";
 
-import { DocumentStore } from "../../stores";
 import { Stanza } from "./Stanza";
 
 interface SegmentProps {
     segment?: Models.Segment;
-    annotateMode: boolean;
-    documentStore?: DocumentStore;
 }
 
-@inject("documentStore")
 @observer
 export class Segment extends React.Component<SegmentProps, {}> {
     @observable dialogOpen: boolean;
@@ -31,21 +27,6 @@ export class Segment extends React.Component<SegmentProps, {}> {
         this.dialogText = text;
     }
 
-    renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
-
-        const { documentStore, annotateMode } = this.props;
-
-        return (
-            <Stanza
-                stanza={ paragraph }
-                isLast={ paragraphIndex === numParagraphs - 1 }
-                key={ paragraph.id }
-                annotateMode={ annotateMode }
-                onDialogOpen={ this.handleDialogOpen }
-                />
-        );
-    }
-
     handleDialogOpen = (text: Models.Stanza) => {
 
         this.setDialogText(text);
@@ -61,15 +42,19 @@ export class Segment extends React.Component<SegmentProps, {}> {
         return (
             <div>
                 { title ? <Paper style={ styles.self }><h2>{ title }</h2></Paper> : null }
-                { stanzas.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs)) }
+                { stanzas.map((paragraph, paragraphIndex) => {
+
+                    return (
+                        <Stanza
+                            stanza={ paragraph }
+                            isLast={ paragraphIndex === numParagraphs - 1 }
+                            key={ paragraph.id }
+                            onDialogOpen={ this.handleDialogOpen }
+                            />
+                    );
+                }) }
             </div>
         );
-    }
-
-    componentWillUnmount() {
-
-        this.setDialogOpen(false);
-        this.setDialogText(null);
     }
 }
 

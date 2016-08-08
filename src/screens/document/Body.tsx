@@ -8,7 +8,6 @@ import { StanzaDialog } from "./StanzaDialog";
 import { DocumentStore, AppState, StanzaStore } from "../../stores";
 
 interface BodyProps {
-    annotateMode: boolean;
     documentStore?: DocumentStore;
     appState?: AppState;
     stanzaStore?: StanzaStore;
@@ -26,14 +25,9 @@ export class Body extends React.Component<BodyProps, {}> {
         appState.deleteEditedStanza();
     }
 
-    componentWillReceiveProps() {
-
-        this.handleRequestClose();
-    }
-
     render() {
 
-        const { documentStore, annotateMode, appState, stanzaStore } = this.props;
+        const { documentStore, appState, stanzaStore } = this.props;
 
         if (!documentStore.shownDocument) {
             return null;
@@ -45,8 +39,8 @@ export class Body extends React.Component<BodyProps, {}> {
 
         return (
             <div style={ styles.mainBody }>
-                { segments.map((segment, i) => <Segment segment={ segment } annotateMode={ annotateMode } key={ i } />) }
-                { this.props.annotateMode ?
+                { segments.map((segment, i) => <Segment segment={ segment } key={ i } />) }
+                { this.props.appState.annotateMode ?
                     <StanzaDialog
                         open={ loadingStanzaDialog !== null }
                         stanza={ loadingStanzaDialog ? stanzaStore.getStanzaFromURL(loadingStanzaDialog.stanzaURL) : null }

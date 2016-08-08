@@ -24,14 +24,6 @@ const doFetchData = (context: Context | DocumentProps, props: DocumentProps) => 
 @withRouter
 @observer
 export class Document extends React.Component<DocumentProps, {}> {
-    @observable annotateMode: boolean = false;
-
-    @action
-    setAnnotateMode = (on: boolean) => {
-
-        this.annotateMode = on;
-    }
-
     static fetchData(context: Context, props: any) {
 
         return doFetchData(context, props);
@@ -45,12 +37,6 @@ export class Document extends React.Component<DocumentProps, {}> {
     componentWillReceiveProps(nextProps) {
 
         doFetchData(nextProps, nextProps);
-        this.setAnnotateMode(false);
-    }
-
-    handleAnnotateToggle = (event, value) => {
-
-        this.setAnnotateMode(value);
     }
 
     render() {
@@ -58,13 +44,8 @@ export class Document extends React.Component<DocumentProps, {}> {
         return (
             <div className="row">
                 <div className="col-xs-offset-2 col-xs-8">
-                    <Header
-                        onAnnotateToggle={ this.handleAnnotateToggle }
-                        annotateMode={ this.annotateMode }
-                        />
-                    <Body
-                        annotateMode={ this.annotateMode }
-                        />
+                    <Header />
+                    <Body />
                 </div>
             </div>
         );

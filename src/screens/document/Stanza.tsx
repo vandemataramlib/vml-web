@@ -13,7 +13,6 @@ import { defaultEncoding } from "../../shared/constants";
 
 interface StanzaProps {
     stanza: Models.Stanza;
-    annotateMode: boolean;
     isLast: boolean;
     appState?: AppState;
     onDialogOpen: React.EventHandler<any>;
@@ -61,13 +60,13 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 
     handleAnnotateParagraph = (stanza: Models.Stanza, event) => {
 
-        if (!this.props.annotateMode) {
+        const { appState, documentStore, stanzaStore } = this.props;
+
+        if (!appState.annotateMode) {
             return;
         }
 
         event.preventDefault();
-
-        const { appState, documentStore, stanzaStore } = this.props;
 
         stanzaStore.getStanza(documentStore.shownDocument.url, stanza.runningId);
 
@@ -96,7 +95,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 
     render() {
 
-        const { stanza, stanzaStore, documentStore } = this.props;
+        const { stanza, stanzaStore, documentStore, appState } = this.props;
 
         const getStanza = (url: string, runningStanzaId: string) => {
 
@@ -110,7 +109,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
         };
 
         return (
-            <div id={ "p" + stanza.id } style={ stanza.analysis && !this.expanded && this.props.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
+            <div id={ "p" + stanza.id } style={ stanza.analysis && !this.expanded && appState.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
                 <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.expanded ? 2 : 1 } transitionEnabled={ false } style={ styles.self(this.props, this.expanded, this.hovered) }>
                     <div onMouseEnter={ this.handleMouseEnter } onMouseLeave={ this.handleMouseLeave } className="row">
                         <div onTouchTap={ (event) => this.handleAnnotateParagraph(stanza, event) } style={ styles.verseContent(this.props) } className="col-xs-11">
@@ -153,7 +152,7 @@ const styles = {
 
         if (!expanded) {
             // style = { ...style, padding: props.verse.analysis && props.annotateMode ? '0 20px 0 18px' : '0 20px' };
-            if (!props.annotateMode) {
+            if (!props.appState.annotateMode) {
                 // style = { ...style, boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px' };
                 style = Object.assign(style, { boxShadow: "rgba(0, 0, 0, 0.117647) 0px 6px 6px, rgba(0, 0, 0, 0.117647) 0px 6px 6px" });
             }
@@ -194,7 +193,7 @@ const styles = {
     },
     verseContent: (props) => {
 
-        if (props.annotateMode) {
+        if (props.appState.annotateMode) {
             return {
                 cursor: "context-menu"
             };
