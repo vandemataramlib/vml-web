@@ -26,8 +26,6 @@ interface StanzaProps {
 export class Stanza extends React.Component<StanzaProps, {}> {
     @observable hovered: boolean = false;
     @observable expanded: boolean = false;
-    @observable popoverOpen: boolean = false;
-    @observable dialog: any;
 
     @action
     setHovered = (hovered: boolean) => {
