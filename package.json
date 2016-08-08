@@ -39,7 +39,7 @@
     "isomorphic-fetch": "^2.2.1",
     "jsonapi-serializer": "^3.3.0",
     "material-ui": "^0.15.3",
-    "mobx": "^2.4.1",
+    "mobx": "^2.4.2",
     "mobx-react": "^3.5.3",
     "per-env": "^1.0.2",
     "react": "^15.3.0",
