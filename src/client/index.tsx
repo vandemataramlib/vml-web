@@ -5,7 +5,7 @@ import { useStrict } from "mobx";
 import "core-js/shim";
 
 import Main from "./main";
-import { AppState, DocumentStore, DocumentListStore, StanzaStore } from "../stores";
+import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore } from "../stores";
 import { Context } from "../shared/interfaces";
 
 ReactTapEventPlugin();
@@ -24,7 +24,8 @@ const context: Context = {
     appState: new AppState(window.__INITIAL_STATE__.appState),
     documentStore: new DocumentStore(window.__INITIAL_STATE__.documentStore),
     documentListStore: new DocumentListStore(window.__INITIAL_STATE__.documentListStore),
-    stanzaStore: new StanzaStore(window.__INITIAL_STATE__.stanzaStore)
+    stanzaStore: new StanzaStore(window.__INITIAL_STATE__.stanzaStore),
+    rootStore: new RootStore(window.__INITIAL_STATE__.rootStore)
 };
 
 if (process.env.NODE_ENV !== "production") {

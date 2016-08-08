@@ -1,10 +1,11 @@
-import { AppState, DocumentStore, DocumentListStore, StanzaStore } from "../stores";
+import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore } from "../stores";
 
 export interface Context {
     appState: AppState;
     documentStore: DocumentStore;
     documentListStore: DocumentListStore;
     stanzaStore: StanzaStore;
+    rootStore: RootStore;
 }
 
 export enum Encoding {
@@ -33,4 +34,9 @@ export interface SnackbarInfo {
     action?: string;
     onActionTouchTap?: any;
     autoHideDuration?: number;
+}
+
+export interface RootsDataSource {
+    text: string;
+    value: JSX.Element;
 }
