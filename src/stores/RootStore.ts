@@ -7,16 +7,17 @@ import { fetchData, translit } from "../shared/utils";
 import { RootsDataSource } from "../shared/interfaces";
 
 export class RootStore {
-    @observable roots: Models.Root[] = [];
+    @observable roots: Models.Root[];
     mappedRoots: RootsDataSource[];
 
     constructor(initialState?: any) {
 
-        Object.assign(this, initialState);
+        this.roots = initialState ? initialState.roots : [];
     }
 
     @action
     setRoots = (roots: Models.Root[]) => {
+
         this.roots = roots;
     }
 
