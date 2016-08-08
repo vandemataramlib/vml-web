@@ -45,6 +45,7 @@ export class Document extends React.Component<DocumentProps, {}> {
     componentWillReceiveProps(nextProps) {
 
         doFetchData(nextProps, nextProps);
+        this.setAnnotateMode(false);
     }
 
     handleAnnotateToggle = (event, value) => {

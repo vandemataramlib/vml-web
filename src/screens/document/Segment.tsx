@@ -65,6 +65,12 @@ export class Segment extends React.Component<SegmentProps, {}> {
             </div>
         );
     }
+
+    componentWillUnmount() {
+
+        this.setDialogOpen(false);
+        this.setDialogText(null);
+    }
 }
 
 const styles = {

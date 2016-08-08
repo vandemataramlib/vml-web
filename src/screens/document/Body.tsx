@@ -26,6 +26,11 @@ export class Body extends React.Component<BodyProps, {}> {
         appState.deleteEditedStanza();
     }
 
+    componentWillReceiveProps() {
+
+        this.handleRequestClose();
+    }
+
     render() {
 
         const { documentStore, annotateMode, appState, stanzaStore } = this.props;
