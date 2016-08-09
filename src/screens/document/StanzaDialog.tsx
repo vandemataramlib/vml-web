@@ -76,7 +76,6 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
             <FlatButton
                 label="Save"
                 primary
-                // disabled
                 onTouchTap={ this.updateStanza }
                 />
         ];
