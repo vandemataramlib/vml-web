@@ -18,7 +18,12 @@ export class PrefixStore {
     @action
     setPrefixes = (prefixes: Models.Prefix[]) => {
 
-        this.prefixes = prefixes;
+        this.prefixes = prefixes.map(prefix => {
+
+            prefix._id = prefix["id"];
+            delete prefix["id"];
+            return prefix;
+        });
     }
 
     findPrefixes = (startsWith: string) => {

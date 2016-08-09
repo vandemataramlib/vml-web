@@ -18,7 +18,12 @@ export class RootStore {
     @action
     setRoots = (roots: Models.Root[]) => {
 
-        this.roots = roots;
+        this.roots = roots.map(root => {
+
+            root._id = root["id"];
+            delete root["id"];
+            return root;
+        });
     }
 
     findRoots = (startsWith: string) => {

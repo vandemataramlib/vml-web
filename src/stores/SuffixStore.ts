@@ -18,7 +18,12 @@ export class SuffixStore {
     @action
     setSuffixes = (suffixes: Models.Suffix[]) => {
 
-        this.suffixes = suffixes;
+        this.suffixes = suffixes.map(suffix => {
+
+            suffix._id = suffix["id"];
+            delete suffix["id"];
+            return suffix;
+        });
     }
 
     findSuffixes = (startsWith: string) => {
