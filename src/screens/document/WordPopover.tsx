@@ -1,52 +1,35 @@
 import * as React from "react";
-import { TextField, FlatButton, AutoComplete } from "material-ui";
+import { TextField, FlatButton, AutoComplete, IconMenu, MenuItem, IconButton } from "material-ui";
+import { ContentAdd, ContentClear } from "material-ui/svg-icons";
 import { grey500 } from "material-ui/styles/colors";
-import { observable, action, toJS } from "mobx";
+import { observable, action, toJS, ObservableMap, map } from "mobx";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
 import { translit, getColour } from "../../shared/utils";
-import { AppState } from "../../stores";
+import { AppState, RootStore, PrefixStore, SuffixStore } from "../../stores";
 
 interface WordPopoverProps {
     word: Models.Word;
     onSaveWordAnalysis: any;
     onTouchTapCancel: any;
     appState?: AppState;
-    // rootStore?: RootStore;
+    rootStore?: RootStore;
+    suffixStore?: SuffixStore;
+    prefixStore?: PrefixStore;
 }
 
 interface WordPopoverRefs {
     definitions?: {};
 }
 
-@inject("appState")
+@inject("appState", "rootStore", "prefixStore", "suffixStore")
 @observer
 export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @observable localWord: string;
     @observable localTokens: Models.Token[];
+    @observable localEtymologies: ObservableMap<Models.Etymology[]> = map<Models.Etymology[]>();
     componentRefs: WordPopoverRefs = [];
-
-    @action
-    setLocalWord = (localWord: string) => {
-
-        this.localWord = localWord;
-    }
-
-    @action
-    updateLocalTokens = (localTokens: Models.Token[]) => {
-
-        this.localTokens = localTokens;
-    }
-
-    @action
-    updateLocalTokenDefinitions = () => {
-
-        this.localTokens.forEach(token => {
-
-            token.definition = this.componentRefs.definitions[token.id].getValue();
-        });
-    }
 
     constructor(props) {
 
@@ -59,9 +42,122 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
         this.updateLocalTokens(this.getTokensFromWord(this.props.word));
     }
 
+    @action
+    setLocalWord = (localWord: string) => {
+
+        this.localWord = localWord;
+    }
+
+    @action
+    updateLocalTokens = (localTokens: Models.Token[]) => {
+
+        this.localTokens = [];
+        this.localTokens = localTokens;
+    }
+
+    @action
+    updateLocalTokenDefinitions = () => {
+
+        this.localTokens.forEach(token => {
+
+            token.definition = this.componentRefs.definitions[token.id].getValue();
+        });
+    }
+
+    @action
+    attachLocalEtymologyToTokens = () => {
+
+        const etyEntries = this.localEtymologies.entries();
+        for (let [tokenId, ety] of toJS(etyEntries)) {
+
+            this.localTokens.find(token => token.id === tokenId).ety = ety;
+        }
+    }
+
+    @action
+    handleAddLocalEtymology = (tokenId: string, type: Models.EtymologyType) => {
+
+        const ety = new Models.Etymology({
+            id: null,
+            tokenId,
+            type,
+            value: null,
+            senses: [],
+            typeId: null
+        });
+
+        if (this.localEtymologies.has(tokenId)) {
+            const etymologies = this.localEtymologies.get(tokenId);
+            ety.id = `${tokenId}.${etymologies.length}`;
+            this.localEtymologies.get(tokenId).push(ety);
+        }
+        else {
+            ety.id = `${tokenId}.0`;
+            this.localEtymologies.set(tokenId, [ety]);
+        }
+    }
+
+    @action
+    setLocalTokenEtymology = (ety: ObservableMap<Models.Etymology[]>) => {
+
+        this.localEtymologies = ety;
+    }
+
+    @action
+    setEtymologiesFromTokens(tokens: Models.Token[]) {
+
+        tokens.forEach(token => {
+
+            if (token.ety) {
+                this.localEtymologies.set(token.id, token.ety);
+            }
+        });
+    }
+
+    @action
+    handleTokenDefinitionEntered = (event: any, tokenId: string) => {
+
+        this.localTokens.find(token => token.id === tokenId).definition = event.target.value.trim();
+    }
+
+    @action
+    handleEtyRemoved = (event, ety: Models.Etymology) => {
+
+        const tokenEtymologies = this.localEtymologies.get(ety.tokenId);
+        const deletedIndex = tokenEtymologies.findIndex(tokenEtymology => tokenEtymology.id === ety.id);
+        this.localEtymologies.set(ety.tokenId, [
+            ...tokenEtymologies.slice(0, deletedIndex),
+            ...tokenEtymologies.slice(deletedIndex + 1)
+        ]);
+    }
+
+    @action
+    handleEtySelected = (request: any, index: number, ety: Models.Etymology) => {
+
+        const tokenEtymologies = this.localEtymologies.get(ety.tokenId);
+        const tokenEtymology = tokenEtymologies.find(tokenEtymology => tokenEtymology.id === ety.id);
+        tokenEtymology.value = request.text;
+        if (ety.type === Models.EtymologyType.Root) {
+            const root = this.props.rootStore.roots[index];
+            tokenEtymology.senses = root.senses;
+            tokenEtymology.typeId = root._id;
+        }
+        else if (ety.type === Models.EtymologyType.Prefix) {
+            const prefix = this.props.prefixStore.prefixes[index];
+            tokenEtymology.senses = prefix.senses;
+            tokenEtymology.typeId = prefix._id;
+        }
+        else if (ety.type === Models.EtymologyType.Suffix) {
+            const suffix = this.props.suffixStore.suffixes[index];
+            tokenEtymology.senses = suffix.senses;
+            tokenEtymology.typeId = suffix._id;
+        }
+    }
+
     getTokensFromWord(word: Models.Word): Models.Token[] {
 
         if (word.analysis) {
+            this.setEtymologiesFromTokens(word.analysis);
             return word.analysis;
         }
 
@@ -85,13 +181,8 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     handleWordChange = (event: any) => {
 
         this.setLocalWord(event.target.value.trim());
-        this.updateLocalTokens(this.splitWordIntoTokens(event.target.value, this.props.word.id));
-    }
-
-    @action
-    handleTokenDefinitionEntered = (event: any, tokenId: string) => {
-
-        this.localTokens.find(token => token.id === tokenId).definition = event.target.value;
+        this.setLocalTokenEtymology(map<Models.Etymology[]>());
+        this.updateLocalTokens(this.splitWordIntoTokens(this.localWord, this.props.word.id));
     }
 
     handleSave = (event) => {
@@ -100,15 +191,12 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         this.updateLocalTokenDefinitions();
 
+        this.attachLocalEtymologyToTokens();
+
         appState.updateEditedStanzaWordAnalysis(word.lineId, word.id, this.localTokens);
 
         onSaveWordAnalysis(event);
     }
-
-    // handleRootSelected = (request: string, index: number) => {
-
-    //     console.log(toJS(this.props.rootStore.roots[index]));
-    // }
 
     render() {
 
@@ -116,7 +204,49 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
             return null;
         }
 
-        // const { rootStore } = this.props;
+        const { rootStore, prefixStore, suffixStore } = this.props;
+
+        const etymologies = (ety: Models.Etymology, i) => {
+
+            let dataSource;
+
+            if (ety.type === Models.EtymologyType.Root) {
+                dataSource = rootStore.rootsDataSource;
+            }
+            else if (ety.type === Models.EtymologyType.Prefix) {
+                dataSource = prefixStore.prefixesDataSource;
+            }
+            else if (ety.type === Models.EtymologyType.Suffix) {
+                dataSource = suffixStore.suffixesDataSource;
+            }
+
+            return (
+                <div style={ styles.etymologiesList } key={ i }>
+                    <div style={ styles.etymologyTypeLabel }>
+                        { Models.EtymologyType[ety.type]}
+                    </div>
+                    <AutoComplete
+                        openOnFocus={ true }
+                        hintText={ Models.EtymologyType[ety.type]}
+                        dataSource={ dataSource }
+                        searchText={ ety.value ? ety.value : "" }
+                        filter={ (text, source) => text !== "" && source.startsWith(text) }
+                        fullWidth={ true }
+                        onNewRequest={ (request, index) => this.handleEtySelected(request, index, ety) }
+                        maxSearchResults={ 10 }
+                        />
+                    <IconButton
+                        style={ styles.deleteEtymologyButton }
+                        iconStyle={ styles.deleteEtymologyIcon }
+                        disableTouchRipple
+                        disableFocusRipple
+                        onTouchTap={ (event) => this.handleEtyRemoved(event, ety) }
+                        >
+                        <ContentClear />
+                    </IconButton>
+                </div>
+            );
+        };
 
         return (
             <div style={ styles.popoverStyle }>
@@ -132,23 +262,45 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                         this.localTokens.map((token, i) => {
 
                             return (
-                                <div style={ styles.tokenContainer } key={ Math.random() }>
-                                    <span style={ { color: grey500, marginRight: 5 } }> { i === 0 ? "=" : "+"} </span>
-                                    <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(token.token) }</span>
-                                    <span style={ { color: grey500, marginRight: 5 } }> = </span>
-                                    <TextField
-                                        defaultValue={ token.definition ? (token.definition instanceof Array ? (token.definition as string[]).join(", ") : (token.definition as string)) : null }
-                                        ref={ (definition) => this.componentRefs.definitions[token.id] = definition }
-                                        hintText={ `Definition of ${translit(token.token)}` }
-                                        fullWidth />
-                                    {/*<AutoComplete
-                                        dataSource={ rootStore.rootDataSource }
-                                        openOnFocus={ false }
-                                        hintText="Root"
-                                        fullWidth={ true }
-                                        filter={ (text, source) => text !== "" && source.startsWith(text) }
-                                        onNewRequest={ this.handleRootSelected }
-                                        />*/}
+                                <div key={ i }>
+                                    <div style={ styles.tokenContainer }>
+                                        <span style={ styles.equalsOrPlusSign }> { i === 0 ? "=" : "+"} </span>
+                                        <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(token.token) }</span>
+                                        <span style={ styles.equalsOrPlusSign }> = </span>
+                                        <TextField
+                                            defaultValue={ token.definition && (token.definition instanceof Array ? (token.definition as string[]).join(", ") : (token.definition as string)) }
+                                            ref={ (definition) => this.componentRefs.definitions[token.id] = definition }
+                                            onKeyDown={ (event) => this.handleTokenDefinitionEntered(event, token.id) }
+                                            hintText={ `Definition of ${translit(token.token)}` }
+                                            fullWidth
+                                            />
+                                        <IconMenu
+                                            iconButtonElement={
+                                                <IconButton style={ styles.addEtymologyButton }>
+                                                    <ContentAdd color={ grey500 } hoverColor="inherit" />
+                                                </IconButton>
+                                            }
+                                            >
+                                            <MenuItem
+                                                primaryText="Root"
+                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Root) }
+                                                />
+                                            <MenuItem
+                                                primaryText="Prefix"
+                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Prefix) }
+                                                />
+                                            <MenuItem
+                                                primaryText="Suffix"
+                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Suffix) }
+                                                />
+                                        </IconMenu>
+                                    </div>
+                                    <div style={ styles.etymologyContainer } >
+                                        {
+                                            this.localEtymologies.has(token.id) &&
+                                            this.localEtymologies.get(token.id).map(etymologies)
+                                        }
+                                    </div>
                                 </div>
                             );
                         })
@@ -168,7 +320,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 const styles = {
     popoverStyle: {
         padding: "10px 20px",
-        minWidth: 400
+        minWidth: 450
     },
     createButton: {
         textAlign: "right"
@@ -187,5 +339,37 @@ const styles = {
         display: "flex",
         flexDirection: "row",
         alignItems: "center"
+    },
+    etymologyContainer: {
+        display: "flex",
+        flexDirection: "column"
+    },
+    addEtymologyButton: {
+        width: 20,
+        height: 20,
+        padding: 0
+    },
+    deleteEtymologyButton: {
+        width: "inherit",
+        height: "inherit",
+        padding: 0
+    },
+    deleteEtymologyIcon: {
+        width: 16,
+        height: 16,
+        color: grey500
+    },
+    etymologyTypeLabel: {
+        alignSelf: "center",
+        paddingRight: 10,
+        fontSize: "80%",
+        textTransform: "uppercase"
+    },
+    etymologiesList: {
+        display: "flex"
+    },
+    equalsOrPlusSign: {
+        color: grey500,
+        marginRight: 5
     }
 };
