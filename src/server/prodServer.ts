@@ -7,7 +7,7 @@ import { readFileSync } from "fs";
 import { Provider } from "mobx-react";
 
 import * as HapiReactSSRWithMaterialUI from "./plugins/hapi-react-ssr-mui";
-import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore } from "../stores";
+import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore, SuffixStore, PrefixStore } from "../stores";
 import * as StaticFileServer from "./plugins/fileServer";
 import { routes } from "../shared/routes";
 import { Context } from "../shared/interfaces";
@@ -26,7 +26,9 @@ const getInitialContext = function (): Context {
         documentStore: new DocumentStore(),
         documentListStore: new DocumentListStore(),
         stanzaStore: new StanzaStore(),
-        rootStore: new RootStore()
+        rootStore: new RootStore(),
+        prefixStore: new PrefixStore(),
+        suffixStore: new SuffixStore()
     };
 };
 

@@ -4,11 +4,11 @@ import { MenuItem } from "material-ui";
 import * as React from "react";
 
 import { fetchData, translit } from "../shared/utils";
-import { RootsDataSource } from "../shared/interfaces";
+import { EtymologyDataSource } from "../shared/interfaces";
 
 export class RootStore {
     @observable roots: Models.Root[];
-    mappedRoots: RootsDataSource[];
+    mappedRoots: EtymologyDataSource[];
 
     constructor(initialState?: any) {
 
@@ -31,17 +31,8 @@ export class RootStore {
         return [];
     }
 
-    loadRoots = () => {
-
-        if (this.roots.length > 0) {
-            return;
-        }
-
-        return this.fetchRoots();
-    }
-
     @computed
-    get rootDataSource(): RootsDataSource[] {
+    get rootsDataSource(): EtymologyDataSource[] {
 
         if (this.roots.length === 0) {
             this.fetchRoots();

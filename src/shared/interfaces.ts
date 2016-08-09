@@ -1,4 +1,4 @@
-import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore } from "../stores";
+import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore, SuffixStore, PrefixStore } from "../stores";
 
 export interface Context {
     appState: AppState;
@@ -6,6 +6,8 @@ export interface Context {
     documentListStore: DocumentListStore;
     stanzaStore: StanzaStore;
     rootStore: RootStore;
+    suffixStore: SuffixStore;
+    prefixStore: PrefixStore;
 }
 
 export enum Encoding {
@@ -36,7 +38,7 @@ export interface SnackbarInfo {
     autoHideDuration?: number;
 }
 
-export interface RootsDataSource {
+export interface EtymologyDataSource {
     text: string;
     value: JSX.Element;
 }
