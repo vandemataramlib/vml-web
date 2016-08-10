@@ -404,7 +404,7 @@ const styles = {
 
         return {
             backgroundColor: getLightColour(i),
-            padding: 5,
+            padding: "5px 10px",
             marginBottom: 5
         };
     }
