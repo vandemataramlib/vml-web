@@ -6,7 +6,7 @@ import { observable, action, toJS, ObservableMap, map } from "mobx";
 import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 
-import { translit, getColour } from "../../shared/utils";
+import { translit, getColour, getLightColour } from "../../shared/utils";
 import { AppState, RootStore, PrefixStore, SuffixStore } from "../../stores";
 
 interface WordPopoverProps {
@@ -270,6 +270,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                     floatingLabelText="Definition"
                     defaultValue={ this.props.word.definition as string }
                     ref={ (wordDefinition) => this.componentRefs.wordDefinition = wordDefinition }
+                    inputStyle={ styles.definition }
                     fullWidth
                     />
                 <TextField
@@ -279,55 +280,54 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                     inputStyle={ styles.analysis }
                     fullWidth
                     />
-                <div>
-                    {
-                        this.localTokens.map((token, i) => {
+                {
+                    this.localTokens.map((token, i) => {
 
-                            return (
-                                <div key={ i }>
-                                    <div style={ styles.tokenContainer }>
-                                        <span style={ styles.equalsOrPlusSign }> { i === 0 ? "=" : "+"} </span>
-                                        <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(token.token) }</span>
-                                        <span style={ styles.equalsOrPlusSign }> = </span>
-                                        <TextField
-                                            defaultValue={ token.definition && (token.definition instanceof Array ? (token.definition as string[]).join(", ") : (token.definition as string)) }
-                                            ref={ (definition) => this.componentRefs.tokenDefinitions[token.id] = definition }
-                                            onKeyDown={ (event) => this.handleTokenDefinitionEntered(event, token.id) }
-                                            hintText={ `Definition of ${translit(token.token)}` }
-                                            fullWidth
-                                            />
-                                        <IconMenu
-                                            iconButtonElement={
-                                                <IconButton style={ styles.addEtymologyButton }>
-                                                    <ContentAddCircleOutline color={ grey500 } />
-                                                </IconButton>
-                                            }
-                                            >
-                                            <MenuItem
-                                                primaryText="Root"
-                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Root) }
-                                                />
-                                            <MenuItem
-                                                primaryText="Prefix"
-                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Prefix) }
-                                                />
-                                            <MenuItem
-                                                primaryText="Suffix"
-                                                onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Suffix) }
-                                                />
-                                        </IconMenu>
-                                    </div>
-                                    <div style={ styles.etymologyContainer } >
-                                        {
-                                            this.localEtymologies.has(token.id) &&
-                                            this.localEtymologies.get(token.id).map(etymologies)
+                        return (
+                            <div key={ i } style={ styles.analysisContainer(i) }>
+                                <div style={ styles.tokenContainer }>
+                                    <span style={ styles.equalsOrPlusSign }> { i === 0 ? "=" : "+"} </span>
+                                    <span style={ Object.assign({ color: getColour(i) }, styles.sandhi) }>{ translit(token.token) }</span>
+                                    <span style={ styles.equalsOrPlusSign }> = </span>
+                                    <TextField
+                                        defaultValue={ token.definition && (token.definition instanceof Array ? (token.definition as string[]).join(", ") : (token.definition as string)) }
+                                        ref={ (definition) => this.componentRefs.tokenDefinitions[token.id] = definition }
+                                        onKeyDown={ (event) => this.handleTokenDefinitionEntered(event, token.id) }
+                                        hintText={ `Definition of ${translit(token.token)}` }
+                                        inputStyle={ styles.definition }
+                                        fullWidth
+                                        />
+                                    <IconMenu
+                                        iconButtonElement={
+                                            <IconButton style={ styles.addEtymologyButton }>
+                                                <ContentAddCircleOutline color={ grey500 } />
+                                            </IconButton>
                                         }
-                                    </div>
+                                        >
+                                        <MenuItem
+                                            primaryText="Root"
+                                            onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Root) }
+                                            />
+                                        <MenuItem
+                                            primaryText="Prefix"
+                                            onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Prefix) }
+                                            />
+                                        <MenuItem
+                                            primaryText="Suffix"
+                                            onTouchTap={ () => this.handleAddLocalEtymology(token.id, Models.EtymologyType.Suffix) }
+                                            />
+                                    </IconMenu>
                                 </div>
-                            );
-                        })
-                    }
-                </div>
+                                <div style={ styles.etymologyContainer } >
+                                    {
+                                        this.localEtymologies.has(token.id) &&
+                                        this.localEtymologies.get(token.id).map(etymologies)
+                                    }
+                                </div>
+                            </div>
+                        );
+                    })
+                }
                 <div className="row" style={ styles.createButton }>
                     <div className="col-xs-12">
                         <FlatButton label="Cancel" secondary onTouchTap={ this.props.onTouchTapCancel } />
@@ -396,5 +396,16 @@ const styles = {
     },
     analysis: {
         fontFamily: "monospace"
+    },
+    definition: {
+        fontWeight: 500
+    },
+    analysisContainer: (i: number) => {
+
+        return {
+            backgroundColor: getLightColour(i),
+            padding: 5,
+            marginBottom: 5
+        };
     }
 };
