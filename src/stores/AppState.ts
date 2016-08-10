@@ -147,7 +147,9 @@ export class AppState {
 
         const newStanza = new Models.Stanza(toJS(this.editedStanza));
 
-        newStanza.lines.find(line => line.id === lineId).words.find(w => w.id === wordId).analysis = analysis;
+        if (analysis.length > 0) {
+            newStanza.lines.find(line => line.id === lineId).words.find(w => w.id === wordId).analysis = toJS(analysis);
+        }
 
         this.editedStanza = newStanza;
     }

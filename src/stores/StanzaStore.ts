@@ -1,5 +1,6 @@
 import { ObservableMap, observable, action, map, asMap, toJSON, toJS } from "mobx";
 import { Models, Serializers } from "vml-common";
+import { isEqual } from "lodash";
 
 import { fetchData, patchData } from "../shared/utils";
 import { AppState } from "./AppState";
@@ -19,7 +20,7 @@ export class StanzaStore {
     @action
     private addStanzaToStore = (stanzaUrl: string, stanza: Models.Stanza) => {
 
-        this.stanzas.set(stanzaUrl, stanza);
+        this.stanzas.set(stanzaUrl, new Models.Stanza(stanza));
     }
 
     getStanza = (documentURL: string, runningStanzaId: string) => {
@@ -33,8 +34,12 @@ export class StanzaStore {
     tryUpdatingStanza = (documentURL: string, runningStanzaId: string, updatedStanza: Models.Stanza) => {
 
         const stanzaURL = Models.Stanza.URLFromDocURL(documentURL, runningStanzaId);
+        const updatedObject = toJS(updatedStanza);
+        const originalObject = toJS(this.stanzas.get(stanzaURL));
 
-        this.patchStanza(stanzaURL, updatedStanza);
+        if (!isEqual(updatedObject, originalObject)) {
+            this.patchStanza(stanzaURL, updatedStanza);
+        }
     }
 
     @action

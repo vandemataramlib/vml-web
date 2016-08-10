@@ -34,7 +34,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @observable localWord: string;
     @observable localTokens: Models.Token[];
     @observable localEtymologies: ObservableMap<Models.Etymology[]> = map<Models.Etymology[]>();
-    componentRefs: WordPopoverRefs = [];
+    componentRefs: WordPopoverRefs = {};
 
     constructor(props) {
 
@@ -168,8 +168,9 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     getTokensFromWord(word: Models.Word): Models.Token[] {
 
         if (word.analysis) {
-            this.setEtymologiesFromTokens(word.analysis);
-            return word.analysis;
+            const wordAnalysisClone = word.analysis.slice();
+            this.setEtymologiesFromTokens(wordAnalysisClone);
+            return wordAnalysisClone;
         }
 
         return this.splitWordIntoTokens(word.word, word.id);
