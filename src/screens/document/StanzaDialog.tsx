@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Popover, FlatButton, LinearProgress } from "material-ui";
+import { Dialog, Popover, FlatButton, LinearProgress, TextField, Divider } from "material-ui";
 const Sortable = require("react-anything-sortable");
 import { observer, inject } from "mobx-react";
 import { observable, action, computed, toJS } from "mobx";
@@ -22,6 +22,10 @@ interface StanzaDialogProps {
     documentStore?: DocumentStore;
 }
 
+interface StanzaDialogRefs {
+    translation?: TextField;
+}
+
 @inject("appState", "stanzaStore", "documentStore")
 @observer
 export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
@@ -29,6 +33,7 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
     @observable anchorEl: any;
     @observable localTokens: Models.Token[];
     @observable analyseClicked: boolean;
+    componentRefs: StanzaDialogRefs = {};
 
     @action
     setWordPopoverOpen = (open: boolean) => {
@@ -125,6 +130,7 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         const { stanzaStore, documentStore } = this.props;
         const { editedStanza } = this.props.appState;
         editedStanza.analysis = this.localTokens;
+        editedStanza.translation = this.componentRefs.translation.getValue().trim();
         stanzaStore.tryUpdatingStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
         this.props.onSaveParagraph();
     }
@@ -180,6 +186,18 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
                         }
                     </Sortable>
                 </div>
+                <Divider
+                    style={ styles.translationDivider }
+                    />
+                <TextField
+                    defaultValue={ appState.editedStanza.translation }
+                    ref={ (translation) => this.componentRefs.translation = translation }
+                    inputStyle={ styles.translation }
+                    fullWidth={ true }
+                    multiLine
+                    rows={ 4 }
+                    floatingLabelText="Translation"
+                    />
             </div>
         );
     }
@@ -298,5 +316,11 @@ const styles = {
     loadProgress: {
         margin: "0 -24px",
         width: "auto"
+    },
+    translation: {
+        fontSize: "1.5em"
+    },
+    translationDivider: {
+        marginTop: 20
     }
 };
