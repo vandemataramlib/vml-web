@@ -19,8 +19,13 @@ interface WordPopoverProps {
     prefixStore?: PrefixStore;
 }
 
+interface TokenDefinition {
+    [tokenId: string]: TextField;
+}
+
 interface WordPopoverRefs {
-    definitions?: {};
+    tokenDefinitions?: TokenDefinition;
+    wordDefinition?: TextField;
 }
 
 @inject("appState", "rootStore", "prefixStore", "suffixStore")
@@ -34,7 +39,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     constructor(props) {
 
         super(props);
-        this.componentRefs.definitions = {};
+        this.componentRefs.tokenDefinitions = {};
         this.setLocalWord(this.props.word.analysis ?
             this.props.word.analysis.map(token => token.token).join(" ")
             : this.props.word.word);
@@ -60,7 +65,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         this.localTokens.forEach(token => {
 
-            token.definition = this.componentRefs.definitions[token.id].getValue();
+            token.definition = this.componentRefs.tokenDefinitions[token.id].getValue();
         });
     }
 
@@ -68,9 +73,11 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     attachLocalEtymologyToTokens = () => {
 
         const etyEntries = this.localEtymologies.entries();
-        for (let [tokenId, ety] of toJS(etyEntries)) {
+        for (let [tokenId, localEtymologies] of toJS(etyEntries)) {
 
-            this.localTokens.find(token => token.id === tokenId).ety = ety;
+            const nonEmptyEtyTokens = (localEtymologies as Models.Etymology[])
+                .filter(etymology => etymology.value && etymology.value.trim().length > 0);
+            this.localTokens.find(token => token.id === tokenId).ety = nonEmptyEtyTokens;
         }
     }
 
@@ -193,6 +200,8 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         this.attachLocalEtymologyToTokens();
 
+        word.definition = this.componentRefs.wordDefinition.getValue();
+
         appState.updateEditedStanzaWordAnalysis(word.lineId, word.id, this.localTokens);
 
         onSaveWordAnalysis(event);
@@ -250,9 +259,17 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         return (
             <div style={ styles.popoverStyle }>
-                <div style={ styles.heading }>{ translit(this.props.word.word) }</div>
+                <div style={ styles.heading }>
+                    { translit(this.props.word.word) }
+                </div>
                 <TextField
-                    floatingLabelText={ `Sandhi vichchheda for ${translit(this.props.word.word)}` }
+                    floatingLabelText="Definition"
+                    defaultValue={ this.props.word.definition as string }
+                    ref={ (wordDefinition) => this.componentRefs.wordDefinition = wordDefinition }
+                    fullWidth
+                    />
+                <TextField
+                    floatingLabelText="Analysis"
                     defaultValue={ this.localWord }
                     onChange={ this.handleWordChange }
                     fullWidth
@@ -269,7 +286,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                                         <span style={ styles.equalsOrPlusSign }> = </span>
                                         <TextField
                                             defaultValue={ token.definition && (token.definition instanceof Array ? (token.definition as string[]).join(", ") : (token.definition as string)) }
-                                            ref={ (definition) => this.componentRefs.definitions[token.id] = definition }
+                                            ref={ (definition) => this.componentRefs.tokenDefinitions[token.id] = definition }
                                             onKeyDown={ (event) => this.handleTokenDefinitionEntered(event, token.id) }
                                             hintText={ `Definition of ${translit(token.token)}` }
                                             fullWidth
