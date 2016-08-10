@@ -1,6 +1,6 @@
 import * as React from "react";
 import { TextField, FlatButton, AutoComplete, IconMenu, MenuItem, IconButton } from "material-ui";
-import { ContentAdd, ContentClear } from "material-ui/svg-icons";
+import { ContentAddCircleOutline, ContentClear } from "material-ui/svg-icons";
 import { grey500 } from "material-ui/styles/colors";
 import { observable, action, toJS, ObservableMap, map } from "mobx";
 import { observer, inject } from "mobx-react";
@@ -299,7 +299,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                                         <IconMenu
                                             iconButtonElement={
                                                 <IconButton style={ styles.addEtymologyButton }>
-                                                    <ContentAdd color={ grey500 } hoverColor="inherit" />
+                                                    <ContentAddCircleOutline color={ grey500 } />
                                                 </IconButton>
                                             }
                                             >
