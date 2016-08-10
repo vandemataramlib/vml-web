@@ -1,10 +1,9 @@
 import * as React from "react";
 import { Dialog, Popover, FlatButton, LinearProgress } from "material-ui";
 const Sortable = require("react-anything-sortable");
-import { grey300, grey500, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
-import { observable, action } from "mobx";
-import { translit, getColour, getLightColour } from "../../shared/utils";
+import { observable, action, computed, toJS } from "mobx";
+import { translit, getLightColour } from "../../shared/utils";
 import { Models } from "vml-common";
 
 import { AppState, StanzaStore, DocumentStore } from "../../stores";
@@ -28,8 +27,7 @@ interface StanzaDialogProps {
 export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
     @observable wordPopoverOpen: boolean;
     @observable anchorEl: any;
-    @observable word: Models.Word;
-    rearrangedTokens: Models.Token[] = [];
+    @observable localTokens: Models.Token[];
     @observable analyseClicked: boolean;
 
     @action
@@ -45,24 +43,65 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
     }
 
     @action
-    setAnalyseClicked = (clicked: boolean) => {
+    handleAnalyseClicked = () => {
 
-        this.analyseClicked = clicked;
+        this.analyseClicked = true;
+        this.setLocalTokens(this.getTokens(this.props.appState.editedStanza));
     }
 
-    updateStanza = () => {
+    @action
+    setLocalTokens = (tokens: Models.Token[]) => {
 
-        const { stanzaStore, documentStore } = this.props;
-        const { editedStanza } = this.props.appState;
-        editedStanza.analysis = this.rearrangedTokens;
-        stanzaStore.tryUpdatingStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
-        this.props.onSaveParagraph();
+        this.localTokens = tokens;
     }
 
-    componentWillReceiveProps() {
+    @action
+    initAnalyseClicked = () => {
 
-        this.setAnalyseClicked(false);
-        this.rearrangedTokens = [];
+        this.analyseClicked = true;
+    }
+
+    @computed
+    get analyseButtonDisabled() {
+
+        const stanza = this.props.appState.editedStanza;
+
+        if (!stanza) {
+            return true;
+        }
+
+        return stanza.lines.some(line => line.words.some(word => !word.analysis));
+    }
+
+    getTokens = (stanza: Models.Stanza) => {
+
+        if (this.analyseButtonDisabled) {
+            return;
+        }
+
+        const analysedTokens: Models.Token[] = [];
+
+        stanza.lines.forEach(line => {
+
+            line.words.forEach(word => {
+
+                word.analysis.forEach(token => {
+
+                    analysedTokens.push(token);
+                });
+            });
+        });
+
+        return analysedTokens;
+    }
+
+    handleRequestClose = (event) => {
+
+        if (this.wordPopoverOpen) {
+            return;
+        }
+
+        this.props.onRequestClose(event);
     }
 
     getDialogActions(): JSX.Element[] {
@@ -81,70 +120,27 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         ];
     }
 
-    handleAnalyseClick = () => {
+    updateStanza = () => {
 
-        const analysedTokens: Models.Token[] = [];
-
-        this.props.appState.editedStanza.lines.forEach(line => {
-
-            line.words.forEach(word => {
-
-                word.analysis.forEach(token => {
-
-                    analysedTokens.push(token);
-                });
-            });
-        });
-        this.setAnalyseClicked(true);
-        this.rearrangedTokens = analysedTokens;
-    }
-
-    isAnalysedDisabled() {
-
-        const lineWithoutAnalysis = this.props.appState.editedStanza.lines.some(line => {
-
-            const wordWithoutAnalysis = line.words.some(word => !word.analysis ? true : false);
-            return wordWithoutAnalysis ? true : false;
-        });
-
-        return lineWithoutAnalysis;
-    }
-
-    getAnalysedWords() {
-
+        const { stanzaStore, documentStore } = this.props;
         const { editedStanza } = this.props.appState;
-
-        if (!this.analyseClicked && !editedStanza.analysis) {
-            return [];
-        }
-
-        const analysedTokens: Models.Token[] = [];
-
-        if (editedStanza.analysis && !this.analyseClicked) {
-            editedStanza.analysis.forEach(token => {
-
-                analysedTokens.push(token);
-            });
-        }
-        else {
-            editedStanza.lines.forEach(line => {
-
-                line.words.forEach(word => {
-
-                    word.analysis.forEach(token => {
-
-                        analysedTokens.push(token);
-                    });
-                });
-            });
-        }
-
-        return analysedTokens;
+        editedStanza.analysis = this.localTokens;
+        stanzaStore.tryUpdatingStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
+        this.props.onSaveParagraph();
     }
 
-    handleTokenSort = (tokens: Models.Token[]) => {
+    handleWordClicked = (event: React.TouchEvent) => {
 
-        this.rearrangedTokens = tokens;
+        event.preventDefault();
+        this.setAnchorEl(event.currentTarget);
+        this.setWordPopoverOpen(true);
+    }
+
+    handleProcessWordAnalysis = (event) => {
+
+        this.setWordPopoverOpen(false);
+        this.props.appState.unsetEditedWord();
+        this.setLocalTokens(this.getTokens(this.props.appState.editedStanza));
     }
 
     getDialogChildren() {
@@ -166,12 +162,12 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
                     }
                 </p>
                 <div style={ styles.analyseButton }>
-                    <FlatButton label="Analyse" primary disabled={ this.isAnalysedDisabled() } onTouchTap={ this.handleAnalyseClick } />
+                    <FlatButton label="Analyse" primary disabled={ this.analyseButtonDisabled } onTouchTap={ this.handleAnalyseClicked } />
                 </div>
                 <div style={ styles.showAnalysis(this.analyseClicked || appState.editedStanza.analysis) }>
-                    <Sortable onSort={ this.handleTokenSort } dynamic>
+                    <Sortable onSort={ this.setLocalTokens } dynamic>
                         {
-                            this.getAnalysedWords().map((token, tokenIndex) => {
+                            this.localTokens && this.localTokens.map((token, tokenIndex) => {
 
                                 return (
                                     <SortableToken sortData={ token } key={ tokenIndex }>
@@ -188,31 +184,21 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         );
     }
 
-    handleRequestClose = (event) => {
+    componentWillReceiveProps(nextProps: StanzaDialogProps) {
 
-        if (this.wordPopoverOpen) {
-            return;
+        if (nextProps.stanza) {
+
+            nextProps.appState.setEditedStanza(nextProps.stanza);
+
+            if (nextProps.stanza.analysis) {
+
+                this.setLocalTokens(Object.assign([], toJS(nextProps.stanza.analysis)));
+                this.initAnalyseClicked();
+            }
         }
-
-        this.props.onRequestClose(event);
-    }
-
-    handleRequestPopoverClose = () => {
-
-        this.setWordPopoverOpen(false);
-    }
-
-    handleWordClicked = (event: React.TouchEvent) => {
-
-        event.preventDefault();
-        this.setAnchorEl(event.currentTarget);
-        this.setWordPopoverOpen(true);
-    }
-
-    handleProcessWordAnalysis = (event) => {
-
-        this.setWordPopoverOpen(false);
-        this.props.appState.unsetEditedWord();
+        else {
+            this.setLocalTokens([]);
+        }
     }
 
     render() {
@@ -233,33 +219,31 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
 
         const { appState } = this.props;
 
-        appState.setEditedStanza(this.props.stanza);
-
         return (
             <div>
                 <Dialog
                     title={ `Verse ${appState.editedStanza.runningId}` }
+                    children={ this.getDialogChildren() }
+                    actions={ this.getDialogActions() }
                     open={ this.props.open }
                     onRequestClose={ this.handleRequestClose }
-                    contentStyle={ styles.dialogStyle }
-                    actions={ this.getDialogActions() }
-                    autoScrollBodyContent
-                    children={ this.getDialogChildren() }
                     bodyStyle={ styles.dialogBodyStyle }
+                    contentStyle={ styles.dialogStyle }
+                    autoScrollBodyContent
                     />
                 <Popover
                     open={ this.wordPopoverOpen }
                     anchorEl={ this.anchorEl }
                     anchorOrigin={ { horizontal: "left", vertical: "top" } }
                     targetOrigin={ { horizontal: "right", vertical: "center" } }
-                    onRequestClose={ this.handleRequestPopoverClose }
+                    onRequestClose={ () => this.setWordPopoverOpen(false) }
                     canAutoPosition
                     autoCloseWhenOffScreen={ false }
                     children={
                         <WordPopover
                             word={ appState.editedWord }
                             onSaveWordAnalysis={ this.handleProcessWordAnalysis }
-                            onTouchTapCancel={ this.handleRequestPopoverClose }
+                            onTouchTapCancel={ () => this.setWordPopoverOpen(false) }
                             />
                     }
                     />
