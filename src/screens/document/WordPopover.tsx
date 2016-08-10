@@ -141,6 +141,10 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @action
     handleEtySelected = (request: any, index: number, ety: Models.Etymology) => {
 
+        if (index < 0) {
+            return;
+        }
+
         const tokenEtymologies = this.localEtymologies.get(ety.tokenId);
         const tokenEtymology = tokenEtymologies.find(tokenEtymology => tokenEtymology.id === ety.id);
         tokenEtymology.value = request.text;
@@ -230,13 +234,13 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
             }
 
             return (
-                <div style={ styles.etymologiesList } key={ i }>
+                <div style={ styles.etymologiesList } key={ i } className="etymology-list">
                     <div style={ styles.etymologyTypeLabel }>
                         { Models.EtymologyType[ety.type]}
                     </div>
                     <AutoComplete
                         openOnFocus={ true }
-                        hintText={ Models.EtymologyType[ety.type]}
+                        hintText={ `${Models.EtymologyType[ety.type]} (ITRANS)` }
                         dataSource={ dataSource }
                         searchText={ ety.value ? ety.value : "" }
                         filter={ (text, source) => text !== "" && source.startsWith(text) }
@@ -269,9 +273,10 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                     fullWidth
                     />
                 <TextField
-                    floatingLabelText="Analysis"
+                    floatingLabelText="Analysis (ITRANS)"
                     defaultValue={ this.localWord }
                     onChange={ this.handleWordChange }
+                    inputStyle={ styles.analysis }
                     fullWidth
                     />
                 <div>
@@ -388,5 +393,8 @@ const styles = {
     equalsOrPlusSign: {
         color: grey500,
         marginRight: 5
+    },
+    analysis: {
+        fontFamily: "monospace"
     }
 };
