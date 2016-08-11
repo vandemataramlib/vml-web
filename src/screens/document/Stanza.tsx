@@ -3,13 +3,14 @@ import { Paper, LinearProgress } from "material-ui";
 import { HardwareKeyboardArrowDown, HardwareKeyboardArrowUp } from "material-ui/svg-icons";
 import { orange100, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
-import { observable, transaction, action } from "mobx";
+import { observable, action } from "mobx";
 import { Models } from "vml-common";
 
 import { translit } from "../../shared/utils";
 import { AppState, DocumentStore, StanzaStore } from "../../stores";
 import { Encoding } from "../../shared/interfaces";
 import { defaultEncoding } from "../../shared/constants";
+import { StanzaBody } from "./StanzaBody";
 
 interface StanzaProps {
     stanza: Models.Stanza;
@@ -23,8 +24,13 @@ interface StanzaProps {
 @inject("appState", "documentStore", "stanzaStore")
 @observer
 export class Stanza extends React.Component<StanzaProps, {}> {
-    @observable hovered: boolean = false;
-    @observable expanded: boolean = false;
+    @observable hovered: boolean;
+    @observable expanded: boolean;
+
+    componentWillReceiveProps() {
+
+        this.setExpanded(false);
+    }
 
     @action
     setHovered = (hovered: boolean) => {
@@ -36,11 +42,6 @@ export class Stanza extends React.Component<StanzaProps, {}> {
     setExpanded = (expanded: boolean) => {
 
         this.expanded = expanded;
-    }
-
-    componentWillReceiveProps() {
-
-        this.setExpanded(false);
     }
 
     handleMouseEnter = (event) => {
@@ -77,11 +78,16 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 
         const { appState } = this.props;
 
-        let lineEl = translit(line.line, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
+        let newLine = "";
 
         if (stanzaLength - 1 === lineIndex) {
-            lineEl += " ||" + translit(stanzaRunningId, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) + "||";
+            newLine += `${line.line} ||${stanzaRunningId}||`;
         }
+        else {
+            newLine += `${line.line} |`;
+        }
+
+        let lineEl = translit(newLine, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
 
         if (lineIndex === 0) {
             return lineEl;
@@ -97,44 +103,53 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 
         const { stanza, stanzaStore, documentStore, appState } = this.props;
 
-        const getStanza = (url: string, runningStanzaId: string) => {
+        const showStanza = (url: string, runningStanzaId: string) => {
+
+            const stanzaURL = Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, runningStanzaId);
+
+            if (!this.expanded || !stanzaStore.stanzas.has(stanzaURL)) {
+                return (
+                    <p style={ styles.stanza(this.expanded) }>
+                        { stanza.lines.map((line, lineIndex) => this.renderPara(line, lineIndex, stanza.runningId, stanza.lines.length)) }
+                    </p>
+                );
+            }
+
+            const stanzaFromStore = stanzaStore.getStanzaFromURL(stanzaURL);
+
+            return <StanzaBody stanza={ stanzaFromStore } />;
+        };
+
+        const showProgress = (url: string, runningStanzaId: string) => {
 
             const stanza = stanzaStore.getStanza(url, runningStanzaId);
 
             if (!stanza) {
                 return <LinearProgress mode="indeterminate" style={ styles.loadProgress } />;
             }
-
-            return <div>{ stanza.stanza }</div>;
         };
 
         return (
-            <div id={ "p" + stanza.id } style={ stanza.analysis && !this.expanded && appState.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
+            <div id={ "p" + stanza.runningId } style={ stanza.analysis && !this.expanded && appState.annotateMode ? { borderRight: `2px solid ${orange500}` } : null }>
                 <Paper rounded={ this.props.isLast ? true : false } zDepth={ this.expanded ? 2 : 1 } transitionEnabled={ false } style={ styles.self(this.props, this.expanded, this.hovered) }>
                     <div onMouseEnter={ this.handleMouseEnter } onMouseLeave={ this.handleMouseLeave } className="row">
                         <div onTouchTap={ (event) => this.handleAnnotateParagraph(stanza, event) } style={ styles.verseContent(this.props) } className="col-xs-11">
-                            <p style={ styles.verse(this.expanded) }>
-                                { stanza.lines.map((line, lineIndex) => this.renderPara(line, lineIndex, stanza.runningId, stanza.lines.length)) }
-                            </p>
-                            <div className="row" style={ { display: this.expanded ? "block" : "none" } }>
-                                {
-                                    stanza.analysis && Object.keys(stanza.analysis).length ? <div style={ { paddingBottom: 10 } }className="col-xs-12">{ translit(stanza.analysis.map((a) => a.token).join(" ")) }</div> : null
-                                }
-                            </div>
+                            {
+                                showStanza(documentStore.shownDocument.url, stanza.runningId)
+                            }
                         </div>
                         <div className="col-xs-1" style={ styles.verseHandleContainer } onClick={ (event: React.MouseEvent) => this.handleVerseClick(event, stanza.runningId) }>
                             {
                                 this.expanded ?
                                     <div style={ styles.verseHandle }><HardwareKeyboardArrowUp /></div>
                                     : (
-                                        this.hovered ?
-                                            <div style={ styles.verseHandle }><HardwareKeyboardArrowDown /></div>
-                                            : null
+                                        this.hovered &&
+                                        <div style={ styles.verseHandle }><HardwareKeyboardArrowDown /></div>
                                     )
                             }
                         </div>
                     </div>
-                    { this.expanded ? getStanza(documentStore.shownDocument.url, stanza.runningId) : null }
+                    { this.expanded && showProgress(documentStore.shownDocument.url, stanza.runningId) }
                 </Paper>
             </div>
         );
@@ -147,7 +162,8 @@ const styles = {
         let style: any = {
             padding: "0 20px",
             borderTopRightRadius: props.isLast ? 0 : "inherit",
-            borderTopLeftRadius: props.isLast ? 0 : "inherit"
+            borderTopLeftRadius: props.isLast ? 0 : "inherit",
+            fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta"
         };
 
         if (!expanded) {
@@ -170,7 +186,7 @@ const styles = {
             // }
         }
         else if (expanded) {
-            style = Object.assign(style, { margin: "20px -30px 20px -30px" });
+            style = Object.assign(style, { margin: "20px -30px 20px -30px", padding: "20px" });
         }
 
         return style;
@@ -183,7 +199,7 @@ const styles = {
     verseHandle: {
         alignSelf: "center"
     },
-    verse: (expanded) => {
+    stanza: (expanded) => {
 
         return {
             fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta",

@@ -8,7 +8,7 @@ import { AppState } from "./AppState";
 const appState = new AppState();
 
 export class StanzaStore {
-    @observable private stanzas: ObservableMap<Models.Stanza>;
+    @observable stanzas: ObservableMap<Models.Stanza>;
     private loadingStanzas: Set<string>;
 
     constructor(initialState?: any) {
@@ -29,7 +29,6 @@ export class StanzaStore {
 
         return this.getStanzaFromURL(stanzaURL);
     }
-
 
     tryUpdatingStanza = (documentURL: string, runningStanzaId: string, updatedStanza: Models.Stanza) => {
 
