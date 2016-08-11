@@ -399,7 +399,8 @@ const styles = {
         fontFamily: "monospace"
     },
     definition: {
-        fontWeight: 500
+        fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta",
+        fontSize: "1.2em"
     },
     analysisContainer: (i: number) => {
 

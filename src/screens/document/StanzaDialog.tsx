@@ -129,7 +129,7 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
 
         const { stanzaStore, documentStore } = this.props;
         const { editedStanza } = this.props.appState;
-        if (this.localTokens.length > 0) {
+        if (this.localTokens && this.localTokens.length > 0) {
             editedStanza.analysis = toJS(this.localTokens);
         }
         const translation = this.componentRefs.translation.getValue().trim();
@@ -323,7 +323,8 @@ const styles = {
         width: "auto"
     },
     translation: {
-        fontSize: "1.5em"
+        fontSize: "1.5em",
+        fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta"
     },
     translationDivider: {
         marginTop: 20
