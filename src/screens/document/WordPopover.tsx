@@ -207,9 +207,11 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         word.definition = this.componentRefs.wordDefinition.getValue();
 
-        appState.updateEditedStanzaWordAnalysis(word.lineId, word.id, this.localTokens);
+        word.analysis = this.localTokens;
 
-        onSaveWordAnalysis(event);
+        const updated = appState.updateEditedWord(word);
+
+        onSaveWordAnalysis(event, updated);
     }
 
     render() {

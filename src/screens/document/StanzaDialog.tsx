@@ -3,9 +3,9 @@ import { Dialog, Popover, FlatButton, LinearProgress, TextField, Divider } from 
 const Sortable = require("react-anything-sortable");
 import { observer, inject } from "mobx-react";
 import { observable, action, computed, toJS } from "mobx";
-import { translit, getLightColour } from "../../shared/utils";
 import { Models } from "vml-common";
 
+import { translit, getLightColour } from "../../shared/utils";
 import { AppState, StanzaStore, DocumentStore } from "../../stores";
 import { SortableToken } from "./SortableToken";
 import { WordPopover } from "./WordPopover";
@@ -147,11 +147,13 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         this.setWordPopoverOpen(true);
     }
 
-    handleProcessWordAnalysis = (event) => {
+    handleProcessWordAnalysis = (event, updated: boolean) => {
 
         this.setWordPopoverOpen(false);
         this.props.appState.unsetEditedWord();
-        this.setLocalTokens(this.getTokens(this.props.appState.editedStanza));
+        if (updated) {
+            this.setLocalTokens(this.getTokens(this.props.appState.editedStanza));
+        }
     }
 
     getDialogChildren() {

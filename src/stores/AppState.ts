@@ -1,5 +1,6 @@
 import { observable, computed, action, ObservableMap, map, toJS } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
+import { isEqual } from "lodash";
 import { Models } from "vml-common";
 
 import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
@@ -143,15 +144,27 @@ export class AppState {
     }
 
     @action
-    updateEditedStanzaWordAnalysis = (lineId: string, wordId: string, analysis: Models.Token[]) => {
+    updateEditedWord = (word: Models.Word) => {
 
-        const newStanza = new Models.Stanza(toJS(this.editedStanza));
+        let analysisUpdated = false;
+        const newEditedStanza = new Models.Stanza(toJS(this.editedStanza));
+        const wordFromEditedStanza: Models.Word = newEditedStanza
+            .lines.find(line => line.id === word.lineId)
+            .words.find(w => w.id === word.id);
 
-        if (analysis.length > 0) {
-            newStanza.lines.find(line => line.id === lineId).words.find(w => w.id === wordId).analysis = toJS(analysis);
+        const updatedWord: Models.Word = toJS(word);
+
+        if (!isEqual(wordFromEditedStanza, updatedWord)) {
+            if (!wordFromEditedStanza.analysis
+                || !isEqual(wordFromEditedStanza.analysis.map(token => token.token), updatedWord.analysis.map(token => token.token))) {
+                analysisUpdated = true;
+            }
+            wordFromEditedStanza.definition = updatedWord.definition;
+            wordFromEditedStanza.analysis = updatedWord.analysis;
+            this.editedStanza = newEditedStanza;
         }
 
-        this.editedStanza = newStanza;
+        return analysisUpdated;
     }
 
     @action
@@ -162,7 +175,7 @@ export class AppState {
 
     setEditedWord = (word: Models.Word) => {
 
-        this.editedWord = word;
+        this.editedWord = Object.assign({}, toJS(word));
     }
 
     unsetEditedWord = () => {
