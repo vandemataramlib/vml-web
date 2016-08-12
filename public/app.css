@@ -1,3 +1,7 @@
 .etymology-list input {
     font-family: monospace !important;
 }
+
+span[class^="hint--"]:after{ 
+    font-family: Monotype Sabon, Auromere, serif, Siddhanta;
+}

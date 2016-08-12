@@ -32,14 +32,26 @@ export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
         const punctuation = isLastWord ? (isLastLine ? `||${stanza.runningId}||` : "|") : null;
         const transliteratedWord = translit(word.word, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
 
-        const render = punctuation ?
-            <span>
-                <span>{ transliteratedWord } </span>
-                { punctuation && <span>{ translit(punctuation, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) }</span>}
-            </span>
-            : <span>{ transliteratedWord } </span>;
+        const tooltipText = word.analysis && word.analysis.map(token => {
 
-        return render;
+            return translit(token.token, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
+        }).join(" + ");
+
+        const wordEl = (
+            <span>
+                <span
+                    className={ tooltipText && "hint--top"}
+                    aria-label={ tooltipText }
+                    >
+                    { transliteratedWord }
+                </span>&nbsp;
+                {
+                    punctuation && <span>{ translit(punctuation, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) }</span>
+                }
+            </span>
+        );
+
+        return wordEl;
     }
 
     render() {
