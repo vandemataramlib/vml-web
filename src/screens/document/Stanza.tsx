@@ -5,6 +5,8 @@ import { orange100, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
 import { observable, action } from "mobx";
 import { Models } from "vml-common";
+import * as ReactRouter from "react-router";
+import { withRouter } from "react-router";
 
 import { translit } from "../../shared/utils";
 import { AppState, DocumentStore, StanzaStore } from "../../stores";
@@ -18,9 +20,11 @@ interface StanzaProps {
     appState?: AppState;
     documentStore?: DocumentStore;
     stanzaStore?: StanzaStore;
+    router?: ReactRouter.IRouter;
 };
 
 @inject("appState", "documentStore", "stanzaStore")
+@withRouter
 @observer
 export class Stanza extends React.Component<StanzaProps, {}> {
     @observable hovered: boolean;
@@ -77,7 +81,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 
         event.stopPropagation();
 
-        const { appState } = this.props;
+        const { appState, router } = this.props;
 
         if (!appState.selectedStanzas.find(id => id === runningId)) {
             appState.selectStanza(runningId);
@@ -85,6 +89,8 @@ export class Stanza extends React.Component<StanzaProps, {}> {
         else {
             appState.deselectStanza(runningId);
         }
+
+        router.replace(appState.currentLocation.pathname + appState.hashFromSelectedStanzas);
     }
 
     renderPara = (line: Models.Line, lineIndex, stanzaRunningId: string, stanzaLength: number): string | (React.ReactElement<any> | string | number)[] => {
@@ -163,6 +169,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
                             <Checkbox
                                 onClick={ (event) => this.handleCheckboxClicked(event, stanza.runningId) }
                                 style={ styles.stanzaSelector(this.hovered || this.expanded || appState.stanzaSelectMode) }
+                                checked={ appState.selectedStanzas.indexOf(stanza.runningId) !== -1 }
                                 />
                         </div>
                     </div>

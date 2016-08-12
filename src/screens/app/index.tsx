@@ -2,6 +2,7 @@ import * as React from "react";
 import { AppBar, FlatButton, FloatingActionButton, RefreshIndicator, Snackbar } from "material-ui";
 import { ContentAdd } from "material-ui/svg-icons";
 import * as ReactRouter from "react-router";
+import * as History from "history";
 import { Link, withRouter } from "react-router";
 import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
@@ -15,6 +16,7 @@ interface AppProps {
     router?: ReactRouter.IRouter;
     documentListStore?: DocumentListStore;
     appState?: AppState;
+    location: History.Location;
 }
 
 @inject("documentListStore", "appState")
@@ -87,7 +89,9 @@ export class App extends React.Component<AppProps, {}> {
 
     render() {
 
-        const { appState } = this.props;
+        const { appState, location } = this.props;
+
+        appState.setCurrentLocation(location);
 
         const appLevelComponents = () => {
 
