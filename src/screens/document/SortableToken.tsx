@@ -1,5 +1,5 @@
 import * as React from "react";
-import { sortable } from "react-anything-sortable";
+const sortable = require("react-anything-sortable").sortable;
 import { observer } from "mobx-react";
 
 @sortable
@@ -7,7 +7,12 @@ import { observer } from "mobx-react";
 export class SortableToken extends React.Component<any, any> {
     render() {
         return (
-            <div {...this.props }>
+            <div
+                className={ this.props.className }
+                style={this.props.style}
+                onMouseDown={this.props.onMouseDown}
+                onTouchStart={this.props.onTouchStart}
+                >
                 { this.props.children }
             </div>
         );

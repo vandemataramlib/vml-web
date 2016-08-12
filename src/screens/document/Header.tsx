@@ -10,8 +10,6 @@ import { translit } from "../../shared/utils";
 import { AppState, DocumentStore } from "../../stores";
 
 interface HeaderProps {
-    onAnnotateToggle: Function;
-    annotateMode: boolean;
     appState?: AppState;
     documentStore?: DocumentStore;
 };
@@ -47,9 +45,14 @@ export class Header extends React.Component<HeaderProps, {}> {
         this.setSettingsPopover(false);
     }
 
+    handleAnnotateToggle = (event, value) => {
+
+        this.props.appState.setAnnotateMode(value);
+    }
+
     render() {
 
-        const { annotateMode, onAnnotateToggle, appState, documentStore } = this.props;
+        const { appState, documentStore } = this.props;
 
         if (!documentStore.shownDocument) {
             return null;
@@ -74,8 +77,8 @@ export class Header extends React.Component<HeaderProps, {}> {
                 <HeaderSettings
                     popoverOpen={ this.settingsPopoverOpen }
                     onSettingsRequestClose={ this.handleSettingsRequestClose }
-                    onAnnotateToggle={ onAnnotateToggle }
-                    annotateMode={ annotateMode }
+                    onAnnotateToggle={ this.handleAnnotateToggle }
+                    annotateMode={ appState.annotateMode }
                     anchorEl={ this.anchorEl }
                     />
             </Paper>

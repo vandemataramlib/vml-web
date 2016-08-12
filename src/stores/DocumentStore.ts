@@ -12,7 +12,7 @@ export class DocumentStore {
     constructor(initialState?: any) {
 
         this.documents = initialState ? asMap(initialState.documents) : map({});
-        this.loadingDocs = new Set("");
+        this.loadingDocs = new Set([]);
         this.shownDocumentURL = initialState ? initialState.shownDocumentURL : null;
     }
 
@@ -55,7 +55,7 @@ export class DocumentStore {
 
         this.loadingDocs.add(docURL);
 
-        return fetchData(docURL, FetchLevel.App)
+        return fetchData<Models.Document>(docURL, FetchLevel.App)
             .then(document => this.addDocumentToStore(docURL, document))
             .then(() => {
 

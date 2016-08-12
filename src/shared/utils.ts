@@ -71,7 +71,7 @@ export const getLightColour = (index) => {
 
 const appState = new AppState();
 
-export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
+export function fetchData<T>(url: string, level?: FetchLevel): Promise<T> {
 
     const fullURL = Constants.API_SERVER_BASE_URL + url;
 
@@ -79,7 +79,12 @@ export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
         appState.addFetch(url, level);
     }
 
-    return fetch(fullURL)
+    return fetch(fullURL,
+        {
+            headers: {
+                "Accept": "application/vnd.api+json"
+            }
+        })
         .then(response => response.json())
         .then((data) => {
 
@@ -94,4 +99,21 @@ export const fetchData = (url: string, level?: FetchLevel): Promise<any> => {
             console.error(err.message);
             return err;
         });
+};
+
+export function patchData<T>(url: string, body: any): Promise<T> {
+
+    const fullURL = Constants.API_SERVER_BASE_URL + url;
+
+    return fetch(fullURL,
+        {
+            method: "PATCH",
+            headers: {
+                "Accept": "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json"
+            },
+            body
+        })
+        .then(response => response.json())
+        .then(data => new Deserializer({ keyForAttribute: "camelCase" }).deserialize(data));
 };

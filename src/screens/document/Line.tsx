@@ -2,7 +2,6 @@ import * as React from "react";
 import { Models } from "vml-common";
 import { observer } from "mobx-react";
 
-import { DocumentStore } from "../../stores";
 import { Word } from "./Word";
 
 interface LineProps {
@@ -18,7 +17,7 @@ const Line = observer((props: LineProps) => {
                     (word, wordIndex) =>
                         <Word
                             word={ word }
-                            onWordClicked={ (event, word) => props.onWordClicked(event, props.line.id, word) }
+                            onWordClicked={ props.onWordClicked }
                             key={ word.id }
                             />
                 )

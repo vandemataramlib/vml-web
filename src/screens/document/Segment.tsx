@@ -4,64 +4,33 @@ import { observer, inject } from "mobx-react";
 import { Models } from "vml-common";
 import { Paper } from "material-ui";
 
-import { DocumentStore } from "../../stores";
-import { Paragraph } from "./Paragraph";
+import { Stanza } from "./Stanza";
 
 interface SegmentProps {
-    segment?: Models.Segment;
-    annotateMode: boolean;
-    documentStore?: DocumentStore;
+    segment: Models.Segment;
 }
 
-@inject("documentStore")
 @observer
 export class Segment extends React.Component<SegmentProps, {}> {
-    @observable dialogOpen: boolean;
-    @observable dialogText: Models.Stanza;
-
-    @action
-    setDialogOpen = (open: boolean) => {
-
-        this.dialogOpen = open;
-    }
-
-    @action
-    setDialogText = (text: Models.Stanza) => {
-
-        this.dialogText = text;
-    }
-
-    renderParagraph = (paragraph: Models.Stanza, paragraphIndex: number, numParagraphs: number) => {
-
-        const { documentStore, annotateMode } = this.props;
-
-        return (
-            <Paragraph
-                stanza={ paragraph }
-                isLast={ paragraphIndex === numParagraphs - 1 }
-                key={ paragraph.id }
-                annotateMode={ annotateMode }
-                onDialogOpen={ this.handleDialogOpen }
-                />
-        );
-    }
-
-    handleDialogOpen = (text: Models.Stanza) => {
-
-        this.setDialogText(text);
-        this.setDialogOpen(true);
-    }
-
     render() {
 
         const { title, stanzas } = this.props.segment;
 
-        const numParagraphs = stanzas.length;
+        const numStanzas = stanzas.length;
 
         return (
             <div>
                 { title ? <Paper style={ styles.self }><h2>{ title }</h2></Paper> : null }
-                { stanzas.map((paragraph, paragraphIndex) => this.renderParagraph(paragraph, paragraphIndex, numParagraphs)) }
+                { stanzas.map((stanza, stanzaIndex) => {
+
+                    return (
+                        <Stanza
+                            stanza={ stanza }
+                            isLast={ stanzaIndex === numStanzas - 1 }
+                            key={ stanza.runningId }
+                            />
+                    );
+                }) }
             </div>
         );
     }
