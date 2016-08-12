@@ -2,6 +2,14 @@
     font-family: monospace !important;
 }
 
+.stanza-analysis span[class^="hint--"]:after{ 
+    font-family: Monotype Sabon, Auromere, serif, Siddhanta;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
 span[class^="hint--"]:after{ 
     font-family: Monotype Sabon, Auromere, serif, Siddhanta;
+    font-weight: normal;
+    font-size: 0.6em;
 }

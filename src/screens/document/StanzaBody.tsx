@@ -67,13 +67,26 @@ export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
                     stanza.analysis && stanza.analysis.length > 0 &&
                     <div>
                         <div style={ styles.sectionLabel }>ANALYSIS</div>
-                        <div>
-                            { stanza.analysis.map((token, i) => {
+                        <div className="stanza-analysis">
+                            { stanza.analysis.map(token => {
+
+                                const etymologies = token.ety && token.ety.map(ety => {
+
+                                    let text = translit(ety.value, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
+                                    if (ety.type === Models.EtymologyType.Root) {
+                                        text = "√" + text;
+                                    }
+                                    return text;
+                                }).join(" + ");
 
                                 return (
                                     <span
-                                        key={ i }>
-                                        <span style={ styles.token }>
+                                        key={ token.id }>
+                                        <span
+                                            className={ etymologies && "hint--top"}
+                                            aria-label={ etymologies }
+                                            style={ styles.token }
+                                            >
                                             { translit(token.token, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) }
                                         </span>&nbsp;
                                         { token.definition }{ token.definition && "\u00a0" }
