@@ -41,7 +41,7 @@
     "lodash": "^4.14.2",
     "material-ui": "^0.15.3",
     "mobx": "^2.4.2",
-    "mobx-react": "^3.5.3",
+    "mobx-react": "3.5.3",
     "per-env": "^1.0.2",
     "react": "^15.3.0",
     "react-anything-sortable": "^1.6.0",
