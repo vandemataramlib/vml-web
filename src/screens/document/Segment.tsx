@@ -7,49 +7,27 @@ import { Paper } from "material-ui";
 import { Stanza } from "./Stanza";
 
 interface SegmentProps {
-    segment?: Models.Segment;
+    segment: Models.Segment;
 }
 
 @observer
 export class Segment extends React.Component<SegmentProps, {}> {
-    @observable dialogOpen: boolean;
-    @observable dialogText: Models.Stanza;
-
-    @action
-    setDialogOpen = (open: boolean) => {
-
-        this.dialogOpen = open;
-    }
-
-    @action
-    setDialogText = (text: Models.Stanza) => {
-
-        this.dialogText = text;
-    }
-
-    handleDialogOpen = (text: Models.Stanza) => {
-
-        this.setDialogText(text);
-        this.setDialogOpen(true);
-    }
-
     render() {
 
         const { title, stanzas } = this.props.segment;
 
-        const numParagraphs = stanzas.length;
+        const numStanzas = stanzas.length;
 
         return (
             <div>
                 { title ? <Paper style={ styles.self }><h2>{ title }</h2></Paper> : null }
-                { stanzas.map((paragraph, paragraphIndex) => {
+                { stanzas.map((stanza, stanzaIndex) => {
 
                     return (
                         <Stanza
-                            stanza={ paragraph }
-                            isLast={ paragraphIndex === numParagraphs - 1 }
-                            key={ paragraph.id }
-                            onDialogOpen={ this.handleDialogOpen }
+                            stanza={ stanza }
+                            isLast={ stanzaIndex === numStanzas - 1 }
+                            key={ stanza.runningId }
                             />
                     );
                 }) }

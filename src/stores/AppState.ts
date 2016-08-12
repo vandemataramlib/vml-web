@@ -1,4 +1,4 @@
-import { observable, computed, action, ObservableMap, map, toJS } from "mobx";
+import { observable, computed, action, ObservableMap, map, toJS, IObservableArray } from "mobx";
 import * as ExecutionEnvironment from "fbjs/lib/ExecutionEnvironment";
 import { isEqual } from "lodash";
 import { Models } from "vml-common";
@@ -18,6 +18,7 @@ export class AppState {
     @observable editedStanza: Models.Stanza;
     @observable snackbars: SnackbarInfo[];
     @observable annotateMode: boolean;
+    @observable selectedStanzas: string[];
     editedWord: Models.Word;
 
     constructor(initialState?: AppState) {
@@ -30,6 +31,7 @@ export class AppState {
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
         this.snackbars = [];
         this.annotateMode = false;
+        this.selectedStanzas = [];
         if (this.isClientEnv) {
             this.dataFetchStore = map({});
             this.loadingStanzaDialog = null;
@@ -181,5 +183,23 @@ export class AppState {
     unsetEditedWord = () => {
 
         this.editedWord = null;
+    }
+
+    @action
+    selectStanza = (runningId: string) => {
+
+        this.selectedStanzas.push(runningId);
+    }
+
+    @action
+    deselectStanza = (runningId: string) => {
+
+        (<IObservableArray<string>>this.selectedStanzas).remove(runningId);
+    }
+
+    @computed
+    get stanzaSelectMode() {
+
+        return this.selectedStanzas.length > 0;
     }
 }

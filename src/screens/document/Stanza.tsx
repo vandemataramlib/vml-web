@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, LinearProgress } from "material-ui";
+import { Paper, LinearProgress, Checkbox } from "material-ui";
 import { HardwareKeyboardArrowDown, HardwareKeyboardArrowUp } from "material-ui/svg-icons";
 import { orange100, orange500 } from "material-ui/styles/colors";
 import { observer, inject } from "mobx-react";
@@ -16,7 +16,6 @@ interface StanzaProps {
     stanza: Models.Stanza;
     isLast: boolean;
     appState?: AppState;
-    onDialogOpen: React.EventHandler<any>;
     documentStore?: DocumentStore;
     stanzaStore?: StanzaStore;
 };
@@ -72,6 +71,20 @@ export class Stanza extends React.Component<StanzaProps, {}> {
         stanzaStore.getStanza(documentStore.shownDocument.url, stanza.runningId);
 
         appState.openStanzaDialog(documentStore.shownDocument.url, stanza.runningId);
+    }
+
+    handleCheckboxClicked = (event: React.MouseEvent, runningId: string) => {
+
+        event.stopPropagation();
+
+        const { appState } = this.props;
+
+        if (!appState.selectedStanzas.find(id => id === runningId)) {
+            appState.selectStanza(runningId);
+        }
+        else {
+            appState.deselectStanza(runningId);
+        }
     }
 
     renderPara = (line: Models.Line, lineIndex, stanzaRunningId: string, stanzaLength: number): string | (React.ReactElement<any> | string | number)[] => {
@@ -138,15 +151,19 @@ export class Stanza extends React.Component<StanzaProps, {}> {
                                 showStanza(documentStore.shownDocument.url, stanza.runningId)
                             }
                         </div>
-                        <div className="col-xs-1" style={ styles.verseHandleContainer } onClick={ (event: React.MouseEvent) => this.handleVerseClick(event, stanza.runningId) }>
-                            {
-                                this.expanded ?
-                                    <div style={ styles.verseHandle }><HardwareKeyboardArrowUp /></div>
-                                    : (
-                                        this.hovered &&
-                                        <div style={ styles.verseHandle }><HardwareKeyboardArrowDown /></div>
-                                    )
-                            }
+                        <div className="col-xs-1" style={ styles.stanzaHandleContainer }  onClick={ () => this.setExpanded(!this.expanded) }>
+                            <div style={ styles.stanzaHandle }>
+                                { this.expanded ?
+                                    <HardwareKeyboardArrowUp />
+                                    : <HardwareKeyboardArrowDown
+                                        style={ styles.stanzaHandleIcon(this.hovered) }
+                                        />
+                                }
+                            </div>
+                            <Checkbox
+                                onClick={ (event) => this.handleCheckboxClicked(event, stanza.runningId) }
+                                style={ styles.stanzaSelector(this.hovered || this.expanded || appState.stanzaSelectMode) }
+                                />
                         </div>
                     </div>
                     { this.expanded && showProgress(documentStore.shownDocument.url, stanza.runningId) }
@@ -191,18 +208,31 @@ const styles = {
 
         return style;
     },
-    verseHandleContainer: {
+    stanzaHandleContainer: {
         display: "flex",
-        justifyContent: "center",
-        cursor: "pointer"
+        cursor: "pointer",
+        alignItems: "center"
     },
-    verseHandle: {
-        alignSelf: "center"
+    stanzaHandle: {
+        display: "flex"
+    },
+    stanzaHandleIcon: (shown: boolean) => {
+
+        if (shown) {
+            return {
+                transition: "none",
+                opacity: 1
+            };
+        };
+
+        return {
+            transition: "none",
+            opacity: 0
+        };
     },
     stanza: (expanded) => {
 
         return {
-            fontFamily: "Monotype Sabon, Auromere, serif, Siddhanta",
             margin: "8px 0",
             fontSize: expanded ? "1.5em" : "1em"
         };
@@ -219,5 +249,9 @@ const styles = {
         marginRight: -20,
         marginLeft: -20,
         width: "auto"
+    },
+    stanzaSelector: (shown: boolean) => {
+
+        return shown ? { opacity: 1 } : { opacity: 0 };
     }
 };
