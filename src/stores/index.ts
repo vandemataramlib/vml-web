@@ -5,3 +5,4 @@ export { DocumentListStore } from "./DocumentListStore";
 export { RootStore } from "./RootStore";
 export { PrefixStore } from "./PrefixStore";
 export { SuffixStore } from "./SuffixStore";
+export { CollectionStore } from "./CollectionStore";

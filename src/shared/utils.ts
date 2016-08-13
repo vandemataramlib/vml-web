@@ -101,6 +101,23 @@ export function fetchData<T>(url: string, level?: FetchLevel): Promise<T> {
         });
 };
 
+export function postData<T>(url: string, body: any): Promise<T> {
+
+    const fullURL = Constants.API_SERVER_BASE_URL + url;
+
+    return fetch(fullURL,
+        {
+            method: "POST",
+            headers: {
+                "Accept": "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json"
+            },
+            body
+        })
+        .then(response => response.json())
+        .then(data => new Deserializer({ keyForAttribute: "camelCase" }).deserialize(data));
+}
+
 export function patchData<T>(url: string, body: any): Promise<T> {
 
     const fullURL = Constants.API_SERVER_BASE_URL + url;

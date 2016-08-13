@@ -1,13 +1,16 @@
-import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore, SuffixStore, PrefixStore } from "../stores";
+import { TextField } from "material-ui";
+
+import * as Stores from "../stores";
 
 export interface Context {
-    appState: AppState;
-    documentStore: DocumentStore;
-    documentListStore: DocumentListStore;
-    stanzaStore: StanzaStore;
-    rootStore: RootStore;
-    suffixStore: SuffixStore;
-    prefixStore: PrefixStore;
+    appState: Stores.AppState;
+    documentStore: Stores.DocumentStore;
+    documentListStore: Stores.DocumentListStore;
+    stanzaStore: Stores.StanzaStore;
+    rootStore: Stores.RootStore;
+    suffixStore: Stores.SuffixStore;
+    prefixStore: Stores.PrefixStore;
+    collectionStore: Stores.CollectionStore;
 }
 
 export enum Encoding {
@@ -41,4 +44,14 @@ export interface SnackbarInfo {
 export interface EtymologyDataSource {
     text: string;
     value: JSX.Element;
+}
+
+export interface SelectedCollection {
+    id: string;
+    title: string;
+}
+
+export interface CollectionDialogRefs {
+    collectionName?: TextField;
+    collectionDesc?: TextField;
 }

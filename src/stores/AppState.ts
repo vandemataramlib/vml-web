@@ -198,6 +198,12 @@ export class AppState {
         (<IObservableArray<string>>this.selectedStanzas).remove(runningId);
     }
 
+    @action
+    resetStanzaSelection = () => {
+
+        this.selectedStanzas = [];
+    }
+
     @computed
     get stanzaSelectMode() {
 
