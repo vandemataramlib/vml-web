@@ -181,7 +181,7 @@ export class Stanza extends React.Component<StanzaProps, {}> {
 }
 
 const styles = {
-    self: (props, expanded, hovered) => {
+    self: (props: StanzaProps, expanded: boolean, hovered: boolean) => {
 
         let style: any = {
             padding: "0 20px",
@@ -211,6 +211,10 @@ const styles = {
         }
         else if (expanded) {
             style = Object.assign(style, { margin: "20px -30px 20px -30px", padding: "20px" });
+        }
+
+        if (props.appState.selectedStanzas.indexOf(props.stanza.runningId) !== -1) {
+            style = Object.assign(style, { backgroundColor: orange100 });
         }
 
         return style;
