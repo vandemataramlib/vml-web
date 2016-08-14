@@ -32,7 +32,13 @@ export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
         const punctuation = isLastWord ? (isLastLine ? `||${stanza.runningId}||` : "|") : null;
         const transliteratedWord = translit(word.word, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
 
-        const tooltipText = word.analysis && word.analysis.length > 1 && word.analysis.map(token => {
+        const analysed = word.analysis &&
+            (
+                (word.analysis.length > 1) // has more than one token
+                || (word.analysis.length === 1 && word.analysis[0].token !== word.word) // is visarga sandhi
+            );
+
+        const tooltipText = analysed && word.analysis.map(token => {
 
             return translit(token.token, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
         }).join(" + ");
