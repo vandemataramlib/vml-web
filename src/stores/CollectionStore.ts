@@ -18,10 +18,8 @@ export class CollectionStore {
 
     constructor(initialState?: any) {
 
-        this.collections = initialState ? initialState.collections : map({});
-        if (appState.isClientEnv) {
-            this.loadingCollections = new Set([]);
-        }
+        this.collections = initialState ? asMap(initialState.collections) : map({});
+        this.loadingCollections = new Set([]);
     }
 
     @action

@@ -25,6 +25,11 @@ const doFetchData = (context: Context | CollectionProps, props: CollectionProps)
 @inject("collectionStore", "appState")
 @observer
 export class Collection extends React.Component<CollectionProps, {}> {
+    static fetchData(context: Context, props: any) {
+
+        return doFetchData(context, props);
+    }
+
     componentDidMount() {
 
         doFetchData(this.props, this.props);
