@@ -37,7 +37,7 @@ export interface StanzaData {
 export interface SnackbarInfo {
     message: string;
     action?: string;
-    onActionTouchTap?: any;
+    onActionTouchTapURL?: string;
     autoHideDuration?: number;
 }
 

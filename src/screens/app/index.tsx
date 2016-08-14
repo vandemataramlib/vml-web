@@ -3,7 +3,7 @@ import { AppBar, FlatButton, FloatingActionButton, RefreshIndicator, Snackbar } 
 import { ContentAdd, ActionNoteAdd } from "material-ui/svg-icons";
 import * as ReactRouter from "react-router";
 import * as History from "history";
-import { Link, withRouter } from "react-router";
+import { Link, withRouter, browserHistory } from "react-router";
 import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 
@@ -84,6 +84,11 @@ export class App extends React.Component<AppProps, {}> {
         this.props.appState.getNextSnackbar();
     }
 
+    goToLink = () => {
+
+        browserHistory.push(this.snackbarShown.onActionTouchTapURL);
+    }
+
     showDevTools = () => {
 
         if (process.env.NODE_ENV !== "production") {
@@ -150,7 +155,7 @@ export class App extends React.Component<AppProps, {}> {
                     message={ this.snackbarShown ? this.snackbarShown.message : "" }
                     action={ this.snackbarShown ? this.snackbarShown.action : null }
                     onActionTouchTap={
-                        this.snackbarShown && this.snackbarShown.onActionTouchTap ? this.snackbarShown.onActionTouchTap : this.getNextSnackbar
+                        this.snackbarShown && this.snackbarShown.onActionTouchTapURL ? this.goToLink : this.getNextSnackbar
                     }
                     autoHideDuration={
                         this.snackbarShown ?

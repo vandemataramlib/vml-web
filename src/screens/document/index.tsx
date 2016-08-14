@@ -62,4 +62,9 @@ export class Document extends React.Component<DocumentProps, {}> {
             </div>
         );
     }
+
+    componentWillUnmount() {
+
+        this.props.appState.resetStanzaSelection();
+    }
 }

@@ -3,6 +3,7 @@ import { Home } from "../screens/home";
 import { About } from "../screens/about";
 import { TextForm } from "../screens/newDocument";
 import { Document } from "../screens/document";
+import { Collection } from "../screens/collection";
 
 import DefaultExport from "./DefaultExport";
 
@@ -18,6 +19,10 @@ const routes = Object.assign(DefaultExport, {
         {
             path: "/new",
             component: TextForm
+        },
+        {
+            path: "/collections/:id",
+            component: Collection
         },
         {
             path: "/:slug",

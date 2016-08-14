@@ -1,6 +1,7 @@
 import { observable, action, ObservableMap, map, asMap, computed, toJS } from "mobx";
 import { Models, Serializers } from "vml-common";
 import { Deserializer } from "jsonapi-serializer";
+import { browserHistory } from "react-router";
 
 import { SelectedCollection, CollectionDialogRefs } from "../shared/interfaces";
 import { AppState, DocumentStore } from "./";
@@ -10,8 +11,10 @@ const appState = new AppState();
 
 export class CollectionStore {
     @observable collections: ObservableMap<Models.Collection>;
+    @observable shownCollectionId: string;
     private loadingCollections: Set<string>;
     private loadingAllCollections: boolean;
+    private gotCollectionList: boolean;
 
     constructor(initialState?: any) {
 
@@ -21,10 +24,17 @@ export class CollectionStore {
         }
     }
 
+    @action
+    setShownCollectionId = (id: string) => {
+
+        this.shownCollectionId = id;
+    }
+
     getCollection(id: string) {
 
         if (this.collections.has(id)) {
-            return Promise.resolve(this.collections.get(id));
+            this.setShownCollectionId(id);
+            return;
         }
         else if (!this.loadingCollections.has(id)) {
             return this.fetchCollection(id);
@@ -48,15 +58,22 @@ export class CollectionStore {
         return collection;
     }
 
+    @computed
+    get shownCollection() {
+
+        if (this.shownCollectionId) {
+            return this.collections.get(this.shownCollectionId);
+        }
+    }
+
     tryCreatingCollection = (documentStore: DocumentStore, formValues: CollectionDialogRefs) => {
 
         const collectionStanzas = appState.selectedStanzas.map((runningId, index) => {
 
             const stanza = <Models.CollectionStanza>documentStore.getStanzaFromShownChapter(runningId);
             stanza.id = index;
-            stanza.originalURL = Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, stanza.runningId);
+            stanza.originalUrl = Models.Stanza.URLToWebURL(Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, runningId));
             stanza.referenceTitle = documentStore.shownDocument.title;
-            stanza.runningId = (index + 1).toString();
             return new Models.CollectionStanza(stanza);
         });
 
@@ -76,15 +93,13 @@ export class CollectionStore {
     tryUpdatingCollection = (documentStore: DocumentStore, collectionId: string) => {
 
         const currentStanzas = this.collections.get(collectionId).segments[0].stanzas;
-        const lastRunningId = parseInt(currentStanzas[currentStanzas.length - 1].runningId);
 
         const collectionStanzas = appState.selectedStanzas.map((runningId, index) => {
 
             const stanza = <Models.CollectionStanza>documentStore.getStanzaFromShownChapter(runningId);
             stanza.id = index;
-            stanza.originalURL = Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, stanza.runningId);
+            stanza.originalUrl = Models.Stanza.URLToWebURL(Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, stanza.runningId));
             stanza.referenceTitle = documentStore.shownDocument.title;
-            stanza.runningId = (lastRunningId + index + 1).toString();
             stanza.segmentId = 0;
             return new Models.CollectionStanza(stanza);
         });
@@ -95,7 +110,7 @@ export class CollectionStore {
     @computed
     get collectionList(): SelectedCollection[] {
 
-        if (this.collections.size === 0) {
+        if (this.collections.size === 0 || !this.gotCollectionList) {
             this.fetchCollections();
             return [];
         }
@@ -125,6 +140,7 @@ export class CollectionStore {
                     return collection;
                 });
                 this.loadingAllCollections = false;
+                this.gotCollectionList = true;
                 return this.setCollections(mapped);
             });
     }
@@ -140,8 +156,9 @@ export class CollectionStore {
                 delete (<any>collection).id;
 
                 this.loadingCollections.delete(id);
-                return this.setCollection(collection);
-            });
+                this.setCollection(collection);
+            })
+            .then(() => this.setShownCollectionId(id));
     }
 
     private postCollection(collection: Models.Collection) {
@@ -157,6 +174,7 @@ export class CollectionStore {
                 appState.showSnackbar({
                     message: `Collection ${dbCollection.title} created`,
                     action: "View",
+                    onActionTouchTapURL: `/collections/${dbCollection._id}`,
                     autoHideDuration: 5000
                 });
             })
@@ -183,7 +201,10 @@ export class CollectionStore {
 
                 this.setCollection(dbCollection);
                 appState.showSnackbar({
-                    message: `Collection ${dbCollection.title} updated`
+                    message: `Collection ${dbCollection.title} updated`,
+                    action: "View",
+                    onActionTouchTapURL: `/collections/${dbCollection._id}`,
+                    autoHideDuration: 5000
                 });
             })
             .catch((err: Error) => {
