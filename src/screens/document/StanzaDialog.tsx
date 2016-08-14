@@ -132,11 +132,15 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         if (this.localTokens && this.localTokens.length > 0) {
             editedStanza.analysis = toJS(this.localTokens);
         }
+
         const translation = this.componentRefs.translation.getValue().trim();
+
         if (translation.length > 0) {
             editedStanza.translation = translation;
         }
+
         stanzaStore.tryUpdatingStanza(documentStore.shownDocument.url, editedStanza.runningId, editedStanza);
+
         this.props.onSaveParagraph();
     }
 
@@ -147,13 +151,23 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
         this.setWordPopoverOpen(true);
     }
 
+    @action
     handleProcessWordAnalysis = (event, updated: boolean) => {
 
         this.setWordPopoverOpen(false);
-        this.props.appState.unsetEditedWord();
+        const { appState } = this.props;
         if (updated) {
-            this.setLocalTokens(this.getTokens(this.props.appState.editedStanza));
+            // if the word was split, get all tokens again and reset token order
+            this.setLocalTokens(this.getTokens(appState.editedStanza));
         }
+        else {
+            // go deep and update editedWord in-place with potentially changed etymologies
+            appState.editedWord.analysis.forEach(tokenFromEditedWord => {
+
+                this.localTokens.find(token => token.id === tokenFromEditedWord.id).ety = tokenFromEditedWord.ety;
+            });
+        }
+        appState.unsetEditedWord();
     }
 
     getDialogChildren() {
