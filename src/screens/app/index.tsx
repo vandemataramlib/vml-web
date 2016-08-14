@@ -1,9 +1,9 @@
 import * as React from "react";
 import { AppBar, FlatButton, FloatingActionButton, RefreshIndicator, Snackbar } from "material-ui";
-import { ContentAdd } from "material-ui/svg-icons";
+import { ContentAdd, ActionNoteAdd } from "material-ui/svg-icons";
 import * as ReactRouter from "react-router";
 import * as History from "history";
-import { Link, withRouter } from "react-router";
+import { Link, withRouter, browserHistory } from "react-router";
 import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
 
@@ -11,6 +11,7 @@ import { DocumentListStore, AppState } from "../../stores";
 import { SnackbarInfo } from "../../shared/interfaces";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
+import { CollectionDialog } from "./collectionDialog";
 
 interface AppProps {
     router?: ReactRouter.IRouter;
@@ -25,6 +26,7 @@ interface AppProps {
 export class App extends React.Component<AppProps, {}> {
     @observable drawerOpen: boolean = false;
     @observable snackbarShown: SnackbarInfo = null;
+    @observable collectionDialogOpen: boolean = false;
 
     @action setDrawerOpen = (open: boolean) => {
 
@@ -35,6 +37,18 @@ export class App extends React.Component<AppProps, {}> {
     setSnackbar = (snackbar: any) => {
 
         this.snackbarShown = snackbar;
+    }
+
+    @action
+    setCollectionDialogOpen = (open: boolean, resetSelection?: boolean) => {
+
+        this.collectionDialogOpen = open;
+        if (!open && resetSelection) {
+            const { appState, router } = this.props;
+
+            appState.resetStanzaSelection();
+            router.replace(appState.currentLocation.pathname + appState.hashFromSelectedStanzas);
+        }
     }
 
     handleLeftIconClicked = (event) => {
@@ -53,15 +67,26 @@ export class App extends React.Component<AppProps, {}> {
         this.props.router.push("/");
     }
 
-    handleCreateNew = () => {
+    handleFABClicked = () => {
 
-        this.props.router.push("/new");
+        const { appState } = this.props;
+        if (!appState.stanzaSelectMode) {
+            this.props.router.push("/new");
+        }
+        else {
+            this.setCollectionDialogOpen(true);
+        }
     }
 
     getNextSnackbar = () => {
 
         this.setSnackbar(null);
         this.props.appState.getNextSnackbar();
+    }
+
+    goToLink = () => {
+
+        browserHistory.push(this.snackbarShown.onActionTouchTapURL);
     }
 
     showDevTools = () => {
@@ -119,8 +144,8 @@ export class App extends React.Component<AppProps, {}> {
                     open={ this.drawerOpen }
                     onClose={ this.handleClose }
                     />
-                <FloatingActionButton onMouseDown={ this.handleCreateNew } style={ styles.fab }>
-                    <ContentAdd />
+                <FloatingActionButton onClick={ this.handleFABClicked } style={ styles.fab }>
+                    { !appState.stanzaSelectMode ? <ContentAdd /> : <ActionNoteAdd /> }
                 </FloatingActionButton>
                 <Layout>{ this.props.children }</Layout>
                 { appLevelComponents() }
@@ -130,7 +155,7 @@ export class App extends React.Component<AppProps, {}> {
                     message={ this.snackbarShown ? this.snackbarShown.message : "" }
                     action={ this.snackbarShown ? this.snackbarShown.action : null }
                     onActionTouchTap={
-                        this.snackbarShown && this.snackbarShown.onActionTouchTap ? this.snackbarShown.onActionTouchTap : this.getNextSnackbar
+                        this.snackbarShown && this.snackbarShown.onActionTouchTapURL ? this.goToLink : this.getNextSnackbar
                     }
                     autoHideDuration={
                         this.snackbarShown ?
@@ -139,6 +164,10 @@ export class App extends React.Component<AppProps, {}> {
                     }
                     style={ styles.snackbar }
                     bodyStyle={ styles.snackbarBody }
+                    />
+                <CollectionDialog
+                    open={ this.collectionDialogOpen }
+                    onRequestClose={ (event, reset) => this.setCollectionDialogOpen(false, reset) }
                     />
             </div>
         );

@@ -4,7 +4,7 @@ import { Paper } from "material-ui";
 const styles = {
     self: {
         minHeight: 1000,
-        padding: 40
+        padding: "0 20px"
     }
 };
 

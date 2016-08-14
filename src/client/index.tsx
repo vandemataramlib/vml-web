@@ -5,7 +5,7 @@ import { useStrict } from "mobx";
 import "core-js/shim";
 
 import Main from "./main";
-import { AppState, DocumentStore, DocumentListStore, StanzaStore, RootStore, SuffixStore, PrefixStore } from "../stores";
+import * as Stores from "../stores";
 import { Context } from "../shared/interfaces";
 
 ReactTapEventPlugin();
@@ -21,13 +21,14 @@ interface WindowCustom extends Window {
 declare const window: WindowCustom;
 
 const context: Context = {
-    appState: new AppState(window.__INITIAL_STATE__.appState),
-    documentStore: new DocumentStore(window.__INITIAL_STATE__.documentStore),
-    documentListStore: new DocumentListStore(window.__INITIAL_STATE__.documentListStore),
-    stanzaStore: new StanzaStore(window.__INITIAL_STATE__.stanzaStore),
-    rootStore: new RootStore(window.__INITIAL_STATE__.rootStore),
-    prefixStore: new PrefixStore(window.__INITIAL_STATE__.prefixStore),
-    suffixStore: new SuffixStore(window.__INITIAL_STATE__.suffixStore)
+    appState: new Stores.AppState(window.__INITIAL_STATE__.appState),
+    documentStore: new Stores.DocumentStore(window.__INITIAL_STATE__.documentStore),
+    documentListStore: new Stores.DocumentListStore(window.__INITIAL_STATE__.documentListStore),
+    stanzaStore: new Stores.StanzaStore(window.__INITIAL_STATE__.stanzaStore),
+    rootStore: new Stores.RootStore(window.__INITIAL_STATE__.rootStore),
+    prefixStore: new Stores.PrefixStore(window.__INITIAL_STATE__.prefixStore),
+    suffixStore: new Stores.SuffixStore(window.__INITIAL_STATE__.suffixStore),
+    collectionStore: new Stores.CollectionStore(window.__INITIAL_STATE__.collectionStore)
 };
 
 if (process.env.NODE_ENV !== "production") {

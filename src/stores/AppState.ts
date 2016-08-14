@@ -198,6 +198,12 @@ export class AppState {
         (<IObservableArray<string>>this.selectedStanzas).remove(runningId);
     }
 
+    @action
+    resetStanzaSelection = () => {
+
+        this.selectedStanzas = [];
+    }
+
     @computed
     get stanzaSelectMode() {
 
@@ -224,7 +230,7 @@ export class AppState {
                     return prev + "," + curr;
                 }
                 else if (lastRangeTokens.length === 2) {
-                    return prev.replace(lastToken, curr);
+                    return prev.replace(/\d+$/, curr);
                 }
 
                 return prev + "-" + curr;

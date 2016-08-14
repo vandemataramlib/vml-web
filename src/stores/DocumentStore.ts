@@ -1,4 +1,4 @@
-import { observable, ObservableMap, map, asMap, action, computed } from "mobx";
+import { observable, ObservableMap, map, asMap, action, computed, toJS } from "mobx";
 import { Models } from "vml-common";
 
 import { fetchData } from "../shared/utils";
@@ -49,6 +49,20 @@ export class DocumentStore {
         if (this.shownDocumentURL) {
             return this.documents.get(this.shownDocumentURL);
         }
+    }
+
+    getStanzaFromShownChapter(runningId: string): Models.Stanza {
+
+        const chapter = <Models.Chapter>this.shownDocument.contents;
+        let stanza;
+
+        chapter.segments.some(segment => {
+
+            stanza = segment.stanzas.find(stanza => stanza.runningId === runningId);
+            return stanza ? true : false;
+        });
+
+        return <Models.Stanza>toJS(stanza);
     }
 
     private fetchDocument = (docURL: string) => {
