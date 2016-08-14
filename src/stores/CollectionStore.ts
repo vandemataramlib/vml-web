@@ -75,13 +75,16 @@ export class CollectionStore {
 
     tryUpdatingCollection = (documentStore: DocumentStore, collectionId: string) => {
 
+        const currentStanzas = this.collections.get(collectionId).segments[0].stanzas;
+        const lastRunningId = parseInt(currentStanzas[currentStanzas.length - 1].runningId);
+
         const collectionStanzas = appState.selectedStanzas.map((runningId, index) => {
 
             const stanza = <Models.CollectionStanza>documentStore.getStanzaFromShownChapter(runningId);
             stanza.id = index;
             stanza.originalURL = Models.Stanza.URLFromDocURL(documentStore.shownDocument.url, stanza.runningId);
             stanza.referenceTitle = documentStore.shownDocument.title;
-            stanza.runningId = (index + 1).toString();
+            stanza.runningId = (lastRunningId + index + 1).toString();
             stanza.segmentId = 0;
             return new Models.CollectionStanza(stanza);
         });
@@ -132,6 +135,9 @@ export class CollectionStore {
 
         return fetchData<Models.Collection>(Models.Collection.URL(id))
             .then(collection => {
+
+                collection._id = (<any>collection).id;
+                delete (<any>collection).id;
 
                 this.loadingCollections.delete(id);
                 return this.setCollection(collection);
