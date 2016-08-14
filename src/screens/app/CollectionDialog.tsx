@@ -106,6 +106,7 @@ export class CollectionDialog extends React.Component<CollectionDialogProps, {}>
                     onChange={ this.handleSelectionChanged }
                     floatingLabelText="Collection name"
                     fullWidth
+                    maxHeight={ 300 }
                     >
                     { items }
                 </SelectField>
