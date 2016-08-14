@@ -11,7 +11,7 @@ import { DocumentListStore, AppState } from "../../stores";
 import { SnackbarInfo } from "../../shared/interfaces";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
-import { CollectionDialog } from "./collectionDialog";
+import { CollectionDialog } from "./CollectionDialog";
 
 interface AppProps {
     router?: ReactRouter.IRouter;
