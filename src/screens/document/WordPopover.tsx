@@ -56,7 +56,6 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
     @action
     updateLocalTokens = (localTokens: Models.Token[]) => {
 
-        this.localTokens = [];
         this.localTokens = localTokens;
     }
 
@@ -77,6 +76,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
             const nonEmptyEtyTokens = (localEtymologies as Models.Etymology[])
                 .filter(etymology => etymology.value && etymology.value.trim().length > 0);
+
             this.localTokens.find(token => token.id === tokenId).ety = nonEmptyEtyTokens;
         }
     }
@@ -205,7 +205,7 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
 
         this.attachLocalEtymologyToTokens();
 
-        word.definition = this.componentRefs.wordDefinition.getValue();
+        // word.definition = this.componentRefs.wordDefinition.getValue();
 
         word.analysis = this.localTokens;
 
@@ -269,13 +269,15 @@ export class WordPopover extends React.Component<WordPopoverProps, {}> {
                 <div style={ styles.heading }>
                     { translit(this.props.word.word) }
                 </div>
-                <TextField
+                {
+                    /*<TextField
                     floatingLabelText="Definition"
                     defaultValue={ this.props.word.definition as string }
                     ref={ (wordDefinition) => this.componentRefs.wordDefinition = wordDefinition }
                     inputStyle={ styles.definition }
                     fullWidth
-                    />
+                    />*/
+                }
                 <TextField
                     floatingLabelText="Analysis (ITRANS)"
                     defaultValue={ this.localWord }

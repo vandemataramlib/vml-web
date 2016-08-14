@@ -49,8 +49,8 @@ export class Word extends React.Component<WordProps, {}> {
         return (
             <span
                 style={ styles.wordContainer(this.hovered) }
-                className= { word.definition && "hint--bottom hint--medium" }
-                aria-label={ word.definition }
+                className= { word.analysis && "hint--bottom hint--medium" }
+                aria-label={ word.analysis && word.analysis.map(token => token.definition).join(" + ") }
                 onMouseEnter={ this.handleMouseEnter }
                 onMouseLeave={ this.handleMouseLeave }
                 onTouchTap={ this.handleTouchTap }
