@@ -1,12 +1,16 @@
 import * as React from "react";
-import { Models } from "vml-common";
 import { grey500 } from "material-ui/styles/colors";
+import { observable, action } from "mobx";
 import { observer, inject } from "mobx-react";
+import { Popover } from "material-ui";
+import { Models } from "vml-common";
 
 import { translit } from "../../shared/utils";
 import { Encoding } from "../../shared/interfaces";
 import { AppState } from "../../stores";
 import { defaultEncoding } from "../../shared/constants";
+import { StanzaWordToken } from "./StanzaWordToken";
+import { StanzaWordTokenPopoverContents } from "./StanzaWordTokenPopoverContents";
 
 interface StanzaBodyProps {
     stanza: Models.Stanza;
@@ -16,6 +20,23 @@ interface StanzaBodyProps {
 @inject("appState")
 @observer
 export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
+    @observable clickedToken: Models.Token = null;
+    clickedTokenAnchorEl: any;
+
+    @action
+    setClickedToken = (token: Models.Token) => {
+
+        this.clickedToken = token;
+    }
+
+    setEty = (event, token: Models.Token) => {
+
+        if (!this.props.appState.annotateMode) {
+            this.clickedTokenAnchorEl = event.currentTarget;
+            this.setClickedToken(token);
+        }
+    }
+
     renderLine = (line: Models.Line, lineIndex: number) => {
 
         const { stanza } = this.props;
@@ -74,31 +95,18 @@ export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
                     <div>
                         <div style={ styles.sectionLabel }>ANALYSIS</div>
                         <div className="stanza-analysis">
-                            { stanza.analysis.map(token => {
+                            {
+                                stanza.analysis.map(token => {
 
-                                const etymologies = token.ety && token.ety.map(ety => {
-
-                                    let text = translit(ety.value, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]);
-                                    if (ety.type === Models.EtymologyType.Root) {
-                                        text = "√" + text;
-                                    }
-                                    return text;
-                                }).join(" + ");
-
-                                return (
-                                    <span
-                                        key={ token.id }>
-                                        <span
-                                            className={ etymologies && "hint--top"}
-                                            aria-label={ etymologies }
-                                            style={ styles.token }
-                                            >
-                                            { translit(token.token, Encoding[defaultEncoding], Encoding[appState.encodingScheme.value]) }
-                                        </span>&nbsp;
-                                        { token.definition }{ token.definition && "\u00a0" }
-                                    </span>
-                                );
-                            }) }
+                                    return (
+                                        <StanzaWordToken
+                                            token={ token }
+                                            onWordClick={ this.setEty }
+                                            key={ token.id }
+                                            />
+                                    );
+                                })
+                            }
                         </div>
                     </div>
                 }
@@ -109,6 +117,12 @@ export class StanzaBody extends React.Component<StanzaBodyProps, {}> {
                         <div style={ styles.translationBody }>{ `${stanza.runningId}. ${stanza.translation}` }</div>
                     </div>
                 }
+                <Popover
+                    open={ this.clickedToken !== null }
+                    anchorEl={ this.clickedTokenAnchorEl }
+                    onRequestClose={ () => this.setClickedToken(null) }
+                    children={ <StanzaWordTokenPopoverContents token={ this.clickedToken } /> }
+                    />
             </div>
         );
     }
