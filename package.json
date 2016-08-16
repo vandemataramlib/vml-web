@@ -9,7 +9,7 @@
     "start:production": "npm run build:server && npm run build:client && npm run run:server",
     "build:server": "tsc",
     "run:server:development": "node build/server/devServer",
-    "run:server:production": "node -r dotenv/config build/server/prodServer",
+    "run:server:production": "nohup node -r dotenv/config build/server/prodServer &",
     "build:client": "webpack --config config/webpack.config.prod.js",
     "lint": "tslint -c ./tslint.json  './src/**/*.ts' './src/**/*.tsx'"
   },

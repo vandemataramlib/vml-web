@@ -4,3 +4,4 @@ typings
 public/bundle*.js
 dist
 .env
+nohup.out
