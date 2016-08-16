@@ -164,7 +164,10 @@ export class StanzaDialog extends React.Component<StanzaDialogProps, {}> {
             // go deep and update editedWord in-place with potentially changed etymologies
             appState.editedWord.analysis.forEach(tokenFromEditedWord => {
 
-                this.localTokens.find(token => token.id === tokenFromEditedWord.id).ety = tokenFromEditedWord.ety;
+                const tokenFromLocalTokens = this.localTokens.find(token => token.id === tokenFromEditedWord.id);
+
+                tokenFromLocalTokens.ety = tokenFromEditedWord.ety;
+                tokenFromLocalTokens.definition = tokenFromEditedWord.definition;
             });
         }
         appState.unsetEditedWord();
