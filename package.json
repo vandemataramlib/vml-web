@@ -4,18 +4,18 @@
   "description": "Vande Mataram Library",
   "scripts": {
     "start": "per-env",
-    "run:server": "per-env",
-    "start:development": "npm run build:server && npm run run:server",
-    "start:production": "npm run build:server && npm run build:client && npm run run:server",
-    "build:server": "tsc",
-    "run:server:development": "node build/server/devServer",
-    "run:server:production": "nohup node -r dotenv/config build/server/prodServer &",
-    "build:client": "webpack --config config/webpack.config.prod.js",
+    "start:development": "npm run buildServer && npm run serve",
+    "start:production": "npm run buildServer && npm run buildClient && npm run serve",
+    "buildServer": "tsc",
+    "buildClient": "webpack --config config/webpack.config.prod.js",
+    "serve": "per-env",
+    "serve:development": "node build/server/devServer",
+    "serve:production": "nohup node -r dotenv/config build/server/prodServer &",
     "lint": "tslint -c ./tslint.json  './src/**/*.ts' './src/**/*.tsx'"
   },
   "pre-commit": [
     "lint",
-    "build:server"
+    "buildServer"
   ],
   "repository": {
     "type": "git",
