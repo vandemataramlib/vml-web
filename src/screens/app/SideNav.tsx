@@ -51,6 +51,7 @@ export default class SideNav extends React.Component<SideNavProps, {}> {
 
         return (
             <Drawer open={ this.props.open } docked={ false } onRequestChange={ this.props.onClose }>
+                <div style={ styles.logo }><img src="/static/apple-icon-180x180.png" /></div>
                 { documentListStore.documentListGroups.length ?
                     documentListStore.documentListGroups.map(this.getMenu)
                     : this.getSpinner()
@@ -65,5 +66,9 @@ const styles = {
         display: "flex",
         "justifyContent": "center",
         "paddingTop": 40
+    },
+    logo: {
+        display: "flex",
+        justifyContent: "center"
     }
 };
