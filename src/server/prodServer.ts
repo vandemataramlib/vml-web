@@ -5,6 +5,7 @@ import * as Vision from "vision";
 import * as Handlebars from "handlebars";
 import { readFileSync } from "fs";
 import { Provider } from "mobx-react";
+const Exiting = require("exiting");
 
 import * as HapiReactSSRWithMaterialUI from "./plugins/hapi-react-ssr-mui";
 import * as Stores from "../stores";
@@ -67,11 +68,10 @@ server.views({
     engines: { hbs: Handlebars }
 });
 
-server.start((err) => {
+new Exiting.Manager(server).start((err) => {
 
     if (err) {
-        console.error(err);
-        return;
+        throw err;
     }
 
     console.log("Production server started at", server.info.uri);

@@ -1,6 +1,7 @@
 import * as Hapi from "hapi";
 import * as Inert from "inert";
 import * as Vision from "vision";
+const Exiting = require("exiting");
 
 const TemplateServer = require("./plugins/templateServer");
 const StaticFileServer = require("./plugins/fileServer");
@@ -51,7 +52,7 @@ server.views({
     engines: { hbs: require("handlebars") }
 });
 
-server.start(err => {
+new Exiting.Manager(server).start(err => {
 
     if (err) {
         throw err;

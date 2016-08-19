@@ -8,7 +8,7 @@
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "dotenv": "registry:dt/dotenv#2.0.0+20160327131627",
     "handlebars": "registry:dt/handlebars#3.0.3+20160317120654",
-    "hapi": "registry:dt/hapi#13.0.0+20160803202811",
+    "hapi": "registry:dt/hapi#13.0.0+20160818163303",
     "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160524142046",
     "lodash": "registry:dt/lodash#4.14.0+20160802150749",
     "material-ui": "registry:dt/material-ui#0.15.1+20160720000941",
