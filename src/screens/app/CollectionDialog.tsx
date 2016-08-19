@@ -39,11 +39,6 @@ export class CollectionDialog extends React.Component<CollectionDialogProps, {}>
         return this.selectedCollection.id === "-1";
     }
 
-    handleRequestClose = (event) => {
-
-        this.props.onRequestClose(event);
-    }
-
     handleUpdateCollections = (event) => {
 
         const { collectionStore, documentStore, appState } = this.props;
@@ -138,7 +133,7 @@ export class CollectionDialog extends React.Component<CollectionDialogProps, {}>
             <FlatButton
                 label="Cancel"
                 secondary
-                onTouchTap={ this.handleRequestClose }
+                onTouchTap={ (event) => this.props.onRequestClose(false) }
                 />,
             <FlatButton
                 label="Save"
@@ -152,14 +147,17 @@ export class CollectionDialog extends React.Component<CollectionDialogProps, {}>
 
         const styles = getStyles();
 
+        const { open, onRequestClose } = this.props;
+
         return (
             <Dialog
-                title={ "Add selected to Collection" }
-                open={ this.props.open }
-                onRequestClose={ this.props.onRequestClose }
-                children={ this.props.open && this.getDialogChildren() }
-                actions={ this.props.open && this.getDialogActions() }
+                title="Add selected to Collection"
+                open={ open }
+                onRequestClose={ onRequestClose }
+                children={ open && this.getDialogChildren() }
+                actions={ open && this.getDialogActions() }
                 contentStyle={ styles.contentStyle }
+                autoScrollBodyContent
                 />
         );
     }
