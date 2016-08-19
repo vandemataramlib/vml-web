@@ -1,7 +1,9 @@
 import { observable, ObservableMap, map, asMap, action, computed, toJS } from "mobx";
+import * as React from "react";
+import { MenuItem } from "material-ui";
 import { Models } from "vml-common";
 
-import { fetchData } from "../shared/utils";
+import { fetchData, translit } from "../shared/utils";
 import { FetchLevel } from "../shared/interfaces";
 
 export class DocumentStore {
@@ -17,9 +19,9 @@ export class DocumentStore {
     }
 
     @action
-    private addDocumentToStore = (docURL: string, document: Models.Document) => {
+    addDocumentToStore = (document: Models.Document) => {
 
-        this.documents.set(docURL, document);
+        this.documents.set(document.url, document);
     }
 
     @action
@@ -65,12 +67,36 @@ export class DocumentStore {
         return <Models.Stanza>toJS(stanza);
     }
 
+    @computed
+    get compilations() {
+
+        let compilations: Models.Document[] = [];
+
+        for (let [id, document] of this.documents.entries()) {
+
+            if (document.docType === Models.DocType.Compilation) {
+                compilations.push(document);
+            }
+        }
+
+        return compilations.map(compilation => {
+
+            return {
+                text: compilation.title,
+                value: React.createElement(MenuItem, {
+                    primaryText: translit(compilation.title),
+                    secondaryText: Models.Document.URLToWebURL(compilation.url)
+                })
+            };
+        });
+    }
+
     private fetchDocument = (docURL: string) => {
 
         this.loadingDocs.add(docURL);
 
         return fetchData<Models.Document>(docURL, FetchLevel.App)
-            .then(document => this.addDocumentToStore(docURL, document))
+            .then(document => this.addDocumentToStore(document))
             .then(() => {
 
                 this.setShownDocumentURL(docURL);

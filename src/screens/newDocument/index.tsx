@@ -172,7 +172,7 @@ export class TextForm extends React.Component<TextFormProps, any> {
                     <PaperCustom>
                         <div className="row">
                             <div className="col-xs-12">
-                                <h1>New Document</h1>
+                                <h1>New Chapter</h1>
                             </div>
                         </div>
                         <div className="row">

@@ -40,6 +40,7 @@ import {
     brown50,
     blueGrey50
 } from "material-ui/styles/colors";
+const removeDiacritics = require("diacritics").remove;
 
 import { AppState } from "../stores";
 import { FetchLevel } from "./interfaces";
@@ -51,6 +52,11 @@ export const translit = (word: string, from?: string, to?: string): string => {
     }
 
     return Sanscript.t(word, from, to);
+};
+
+export const normalizeRoman = (word: string) => {
+
+    return removeDiacritics(Sanscript.t(word, "itrans", "iast").replace(/[ṣś]/g, "sh").replace(/[c]/g, "ch"));
 };
 
 export const getColour = (index) => {

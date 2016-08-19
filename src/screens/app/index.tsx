@@ -12,6 +12,7 @@ import { SnackbarInfo } from "../../shared/interfaces";
 import Layout from "./Layout";
 import SideNav from "./SideNav";
 import { CollectionDialog } from "./CollectionDialog";
+import { DocumentDialog } from "./DocumentDialog";
 
 interface AppProps {
     router?: ReactRouter.IRouter;
@@ -27,6 +28,7 @@ export class App extends React.Component<AppProps, {}> {
     @observable drawerOpen: boolean = false;
     @observable snackbarShown: SnackbarInfo = null;
     @observable collectionDialogOpen: boolean = false;
+    @observable documentDialogOpen: boolean = false;
 
     @action setDrawerOpen = (open: boolean) => {
 
@@ -51,6 +53,12 @@ export class App extends React.Component<AppProps, {}> {
         }
     }
 
+    @action
+    setDocumentDialogOpen = (open: boolean) => {
+
+        this.documentDialogOpen = open;
+    }
+
     handleLeftIconClicked = (event) => {
 
         this.props.documentListStore.getDocumentList();
@@ -71,7 +79,7 @@ export class App extends React.Component<AppProps, {}> {
 
         const { appState } = this.props;
         if (!appState.stanzaSelectMode) {
-            this.props.router.push("/new");
+            this.setDocumentDialogOpen(true);
         }
         else {
             this.setCollectionDialogOpen(true);
@@ -168,6 +176,10 @@ export class App extends React.Component<AppProps, {}> {
                 <CollectionDialog
                     open={ this.collectionDialogOpen }
                     onRequestClose={ (event, reset) => this.setCollectionDialogOpen(false, reset) }
+                    />
+                <DocumentDialog
+                    open={ this.documentDialogOpen }
+                    onRequestClose={ (event) => this.setDocumentDialogOpen(false) }
                     />
             </div>
         );
