@@ -8,9 +8,8 @@ import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
 import { encodingSchemes } from "../shared/constants";
 import { StanzaData, SnackbarInfo } from "../shared/interfaces";
 
-let instance: AppState = null;
-
 export class AppState {
+    private instance: AppState = null;
     currentLocation: History.Location;
     @observable encoding: Encoding = Encoding.devanagari;
     @observable env: Environment;
@@ -24,8 +23,8 @@ export class AppState {
 
     constructor(initialState?: AppState) {
 
-        if (!instance) {
-            instance = this;
+        if (!this.instance) {
+            this.instance = this;
         }
 
         this.currentLocation = initialState ? initialState.currentLocation : {};
@@ -41,10 +40,9 @@ export class AppState {
             if (encodingFromStorage) {
                 this.setEncoding(parseInt(localStorage.getItem("encoding")));
             }
-            // autorun(() => console.log(this.selectedStanzas.sort((a, b) => parseInt(a) > parseInt(b) ? 1 : -1)));
         }
 
-        return instance;
+        return this.instance;
     }
 
     @action
