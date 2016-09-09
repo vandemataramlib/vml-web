@@ -41,7 +41,7 @@ import {
     blueGrey50
 } from "material-ui/styles/colors";
 
-import { AppState } from "../stores";
+import { AppState, AuthStore } from "../stores";
 import { FetchLevel } from "./interfaces";
 
 export const translit = (word: string, from?: string, to?: string): string => {
@@ -73,18 +73,21 @@ const appState = new AppState();
 
 export function fetchData<T>(url: string, level?: FetchLevel): Promise<T> {
 
+    const authStore = AuthStore.getInstance();
     const fullURL = Constants.API_SERVER_BASE_URL + url;
 
     if (level && appState.isClientEnv) {
         appState.addFetch(url, level);
     }
 
-    return fetch(fullURL,
-        {
-            headers: {
-                "Accept": "application/vnd.api+json"
-            }
-        })
+    return fetch(fullURL, {
+        headers: Object.assign({
+            "Accept": "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json"
+        }, authStore.loggedIn ? {
+            "Authorization": "Bearer " + authStore.token
+        } : {})
+    })
         .then(response => response.json())
         .then((data) => {
 

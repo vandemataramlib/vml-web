@@ -8,8 +8,10 @@ import { Encoding, Environment, FetchLevel } from "../shared/interfaces";
 import { encodingSchemes } from "../shared/constants";
 import { StanzaData, SnackbarInfo } from "../shared/interfaces";
 
+let instance: AppState = null;
+
 export class AppState {
-    private instance: AppState = null;
+    // private instance: AppState = null;
     currentLocation: History.Location;
     @observable encoding: Encoding = Encoding.devanagari;
     @observable env: Environment;
@@ -21,13 +23,14 @@ export class AppState {
     @observable selectedStanzas: string[];
     editedWord: Models.Word;
 
-    constructor(initialState?: AppState) {
+    constructor() {
 
-        if (!this.instance) {
-            this.instance = this;
-        }
+        // if (!instance) {
+            instance = this;
+        // }
 
-        this.currentLocation = initialState ? initialState.currentLocation : {};
+        // this.currentLocation = initialState ? initialState.currentLocation : {};
+        this.currentLocation = {};
         this.env = ExecutionEnvironment.canUseDOM ? Environment.Client : Environment.Server;
         this.snackbars = [];
         this.annotateMode = false;
@@ -42,7 +45,7 @@ export class AppState {
             }
         }
 
-        return this.instance;
+        return instance;
     }
 
     @action
@@ -261,3 +264,6 @@ export class AppState {
         }
     }
 }
+
+// const AppState = new UIState();
+// export { AppState };

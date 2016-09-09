@@ -11,6 +11,7 @@ export interface Context {
     suffixStore: Stores.SuffixStore;
     prefixStore: Stores.PrefixStore;
     collectionStore: Stores.CollectionStore;
+    authStore: Stores.AuthStore;
 }
 
 export enum Encoding {

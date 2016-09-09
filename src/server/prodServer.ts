@@ -30,7 +30,8 @@ const getInitialContext = function (): Context {
         rootStore: new Stores.RootStore(),
         prefixStore: new Stores.PrefixStore(),
         suffixStore: new Stores.SuffixStore(),
-        collectionStore: new Stores.CollectionStore()
+        collectionStore: new Stores.CollectionStore(),
+        authStore: Stores.AuthStore.getInstance()
     };
 };
 

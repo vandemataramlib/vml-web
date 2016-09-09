@@ -6,3 +6,4 @@ export { RootStore } from "./RootStore";
 export { PrefixStore } from "./PrefixStore";
 export { SuffixStore } from "./SuffixStore";
 export { CollectionStore } from "./CollectionStore";
+export { AuthStore } from "./AuthStore";
